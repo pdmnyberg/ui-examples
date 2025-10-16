@@ -35,7 +35,7 @@ export default function ListView() {
   }, [setSelectedRingers])
   const ringers = getRingers();
   const filterItems = filter.split(/\s+/).map(i => i.toLowerCase())
-  const filteredRingers = ringers.filter(r => Object.values(r).some(value => filterItems.some(fi => value.toLowerCase().includes(fi))))
+  const filteredRingers = ringers.filter(r => Object.values(r).some(value => typeof value === "string" ? filterItems.some(fi => value.toLowerCase().includes(fi)) : false))
   return (
     <div className="container">
       <div className="alert alert-danger" role="alert">
@@ -73,9 +73,10 @@ export default function ListView() {
             <th scope="col"></th>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
-            <th scope="col">License</th>
+            <th scope="col">License Type</th>
+            <th scope="col">Email Sent At</th>
             <th scope="col">Email Status</th>
-            <th scope="col">Updated</th>
+            <th scope="col">License Updated At</th>
             <th scope="col">Download</th>
           </tr>
         </thead>
@@ -85,10 +86,11 @@ export default function ListView() {
               <th><input type="checkbox" onChange={handleRingerSelection} checked={selectedRingers.has(r.id)} data-ringer-id={r.id}/></th>
               <th scope="row">{r.id}</th>
               <td>{r.firstName} {r.lastName}</td>
-              <td>{r.license}</td>
+              <td>{r.licenses[0].type}</td>
+              <td>{r.emailSentAt}</td>
               <td>{r.emailStatus}</td>
-              <td>{r.updated}</td>
-              <td><Link href={r.licenseHref} download>License file</Link></td>
+              <td>{r.licenses[0].createdAt}</td>
+              <td><Link href={r.licenses[0].href} download>License file</Link></td>
             </tr>
           ))}
         </tbody>

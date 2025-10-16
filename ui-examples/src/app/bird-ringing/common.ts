@@ -1,10 +1,14 @@
 export type Ringer = {
     firstName: string;
     lastName: string;
-    license: string;
     emailStatus: string;
-    updated: string;
-    licenseHref: string;
+    emailSentAt: string;
+    updatedAt: string;
+    licenses: {
+        type: string;
+        href: string;
+        createdAt: string;
+    }[]
 }
 
 export type IdentifiableEntity = {
@@ -97,9 +101,9 @@ const lastNames = [
   "Forsberg"
 ]
 
-const licenses = [
-    "A",
-    "B"
+const licenseTypes = [
+    "Ringer",
+    "Helper"
 ]
 
 const emailStatus = [
@@ -527,9 +531,13 @@ class RandomContext {
         return this._items[this._ticker]
     }
 
+    randint(min: number, max: number) {
+        const delta = max - min;
+        return Math.floor(min + delta * this.random());
+    }
+
     choice<T>(entries: T[]): T {
-        const r = this.random()
-        const index = Math.floor((entries.length - 1) * r);
+        const index = Math.min(this.randint(0, entries.length), entries.length - 1);
         return entries[index]
     }
 
@@ -542,10 +550,14 @@ const fixedRandom = new RandomContext(randomBase);
 export const ringers: Record<string, Ringer> = (Array.from({length: 200})).map<Ringer>(() => ({
     firstName: fixedRandom.choice(firstNames),
     lastName: fixedRandom.choice(lastNames),
-    license: fixedRandom.choice(licenses),
     emailStatus: fixedRandom.choice(emailStatus),
-    updated: fixedRandom.choice(dates),
-    licenseHref: "/mock-license.pdf"
+    emailSentAt: fixedRandom.choice(dates),
+    updatedAt: fixedRandom.choice(dates),
+    licenses: (Array.from({length: fixedRandom.randint(1, 3)}).map(() => ({
+        type: fixedRandom.choice(licenseTypes),
+        href: "/mock-license.pdf",
+        createdAt: fixedRandom.choice(dates),
+    })))
 })).reduce<Record<string, Ringer>>((acc, ringer, index) => {
     const id: string = `ringer-${index}`;
     acc[id] = ringer;
