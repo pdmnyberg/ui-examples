@@ -37,6 +37,9 @@ export default function ListView() {
   const filteredRingers = ringers.filter(r => Object.values(r).some(value => value.toLowerCase().includes(filter.toLowerCase())))
   return (
     <div className="container">
+      <div className="alert alert-danger" role="alert">
+        This is <em>NOT</em> a proper implementation. It is just an example used for discussion around what functionality we need for this application.
+      </div>
       <h2>List view</h2>
       <div className="input-group mb-3">
         <span className="input-group-text">Filter</span>
