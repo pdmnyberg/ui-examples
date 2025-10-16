@@ -32,7 +32,10 @@ function EntryViewBase() {
   const helpers = getHelpers({id: ringerId});
   return (
     <div className="container">
-      <Warning />
+      <Warning>
+        <p>This document is an example of how the entry view could look. The idea is to show all the properties related to a single license holder including associated helpers, current license specification and previous license documents.</p>
+        <p>The focus here is to exemplify the structure, properties and interaction behaviors rather than the actual content represented. The data on this page is automatically generated so there might be some inconsistencies when it comes to dates and values that would be acceptable in the real system.</p>
+      </Warning>
       <h2>Entry view</h2>
       <table className="table">
         <thead>
