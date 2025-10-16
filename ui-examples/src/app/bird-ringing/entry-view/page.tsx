@@ -3,14 +3,24 @@ import Link from "next/link";
 import { getRinger, getHelpers, Ringer } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, ReactNode } from "react";
 
 function EntryViewBase() {
   const searchParams = useSearchParams();
-  const listProperties: ((r: Ringer) => [string, string])[] = [
+  const listProperties: ((r: Ringer) => [string, string | ReactNode])[] = [
     (r) => ["Name", r.name],
     (r) => ["License Type", r.licenses[0].type],
     (r) => ["License Created At", r.licenses[0].createdAt],
+    (r) => ["License Start At", r.licenses[0].startsAt],
+    (r) => ["License Expires At", r.licenses[0].expiresAt],
+    (r) => ["Region", r.licenses[0].region],
+    (r) => ["Alowances", (
+      <ul key="allowance-list">
+        {r.licenses[0].allowances.map((a, index) => (
+          <li key={index}>{a}</li>
+        ))}
+      </ul>
+    )],
     (r) => ["Email Sent At", r.emailSentAt],
     (r) => ["Email Status", r.emailStatus],
   ]

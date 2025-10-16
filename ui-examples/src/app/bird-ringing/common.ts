@@ -8,6 +8,10 @@ export type Ringer = {
         type: string;
         href: string;
         createdAt: string;
+        expiresAt: string;
+        startsAt: string;
+        allowances: string[];
+        region: string;
     }[]
 }
 
@@ -111,6 +115,115 @@ const emailStatus = [
     "Not sent",
     "Bounced",
     "Pending"
+]
+
+const allowanceTypes = [
+  "Using a mist net",
+  "Setting a cage trap",
+  "Using a drop net",
+  "Setting a baited trap",
+  "Using a clap net",
+  "Using a funnel trap",
+  "Catching by hand",
+  "Using a snare loop",
+  "Setting a ground net",
+  "Using a decoy bird and trap",
+  "Using a bird lime branch",
+  "Luring with food bait",
+  "Using a throw net",
+  "Trapping in a box trap",
+  "Using a noose carpet",
+  "Using a rocket net",
+  "Capturing at night with a flashlight",
+  "Using a hand net",
+  "Trapping in a misted area with nets",
+  "Using a spring-loaded trap"
+]
+
+const regions = [
+  "Stockholm",
+  "Göteborg",
+  "Malmö",
+  "Uppsala",
+  "Västerås",
+  "Örebro",
+  "Linköping",
+  "Helsingborg",
+  "Jönköping",
+  "Norrköping",
+  "Lund",
+  "Umeå",
+  "Gävle",
+  "Borås",
+  "Sundsvall",
+  "Eskilstuna",
+  "Halmstad",
+  "Karlstad",
+  "Trollhättan",
+  "Luleå",
+  "Skellefteå",
+  "Växjö",
+  "Kristianstad",
+  "Kalmar",
+  "Falun",
+  "Bor­länge",
+  "Östersund",
+  "Södertälje",
+  "Karlskrona",
+  "Visby",
+  "Hudiksvall",
+  "Motala",
+  "Enköping",
+  "Falkenberg",
+  "Åmål",
+  "Mariestad",
+  "Sigtuna",
+  "Alingsås",
+  "Älmhult",
+  "Sandviken"
+]
+
+const regionSignifiers = [
+  "In",
+  "Around",
+  "Near",
+  "North of",
+  "South of",
+  "East of",
+  "West of",
+  "In central",
+  "In northern",
+  "In southern",
+  "In eastern",
+  "In western",
+  "On the coast of",
+  "Outside",
+  "Just outside",
+  "Within",
+  "Close to",
+  "By",
+  "Across",
+  "Beyond",
+  "Inside",
+  "At the edge of",
+  "In the region of",
+  "In greater",
+  "In metropolitan",
+  "In rural",
+  "In downtown",
+  "In the suburbs of",
+  "In the outskirts of",
+  "In old",
+  "Near central",
+  "Close by",
+  "In upper",
+  "In lower",
+  "Just beyond",
+  "Right outside",
+  "At the heart of",
+  "Along the coast of",
+  "High above",
+  "Deep within"
 ]
 
 const randomBase = [
@@ -541,6 +654,15 @@ class RandomContext {
         return entries[index]
     }
 
+    choices<T>(entries: T[], count: number) {
+        const localEntries = [...entries];
+        return (Array.from({length: count}).map(() => {
+            const index = Math.min(this.randint(0, localEntries.length), localEntries.length - 1);
+            const [value] = localEntries.splice(index, 1);
+            return value;
+        }))
+    }
+
     reset() {
         this._ticker = 0;
     }
@@ -554,6 +676,10 @@ export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRing
         type: fixedRandom.choice(licenseTypes),
         href: "/mock-license.pdf",
         createdAt: fixedRandom.choice(dates),
+        expiresAt: fixedRandom.choice(dates),
+        startsAt: fixedRandom.choice(dates),
+        allowances: fixedRandom.choices(allowanceTypes, 5),
+        region: `${fixedRandom.choice(regionSignifiers)} ${fixedRandom.choice(regions)}`
     })));
     return {
         name: [fixedRandom.choice(firstNames), fixedRandom.choice(lastNames)].join(" "),
