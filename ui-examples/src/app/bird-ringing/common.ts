@@ -527,8 +527,8 @@ class RandomContext {
     }
 
     random() {
-        this._ticker = (this._ticker + 1) % this._items.length
-        return this._items[this._ticker]
+        this._ticker = (this._ticker + 1) % this._items.length;
+        return this._items[this._ticker];
     }
 
     randint(min: number, max: number) {
@@ -547,6 +547,7 @@ class RandomContext {
 }
 
 const fixedRandom = new RandomContext(randomBase);
+const fixedIdRandom = new RandomContext(randomBase);
 const numberOfRingers = 200;
 export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRingers})).map<Ringer>(() => {
     const licenses = (Array.from({length: fixedRandom.randint(1, 3)}).map(() => ({
@@ -559,7 +560,7 @@ export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRing
         emailStatus: fixedRandom.choice(emailStatus),
         emailSentAt: fixedRandom.choice(dates),
         updatedAt: fixedRandom.choice(dates),
-        helperOf: `ringer-${fixedRandom.randint(0, numberOfRingers)}`,
+        helperOf: `ringer-${fixedIdRandom.randint(0, numberOfRingers)}`,
         licenses
     }
 }).reduce<Record<string, Ringer>>((acc, ringer, index) => {
