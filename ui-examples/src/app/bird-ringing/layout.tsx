@@ -7,9 +7,8 @@ export default function PageLayout({
 }>) {
   const contextTitle: string = "Bird ringing"
   const navItems: {label: string, href: string}[] = [
-    {label: "Home", href: ""},
-    {label: "List view", href: "br-list-view"},
-    {label: "Entry view", href: "br-entry-view"}
+    {label: "List view", href: "/bird-ringing/list-view"},
+    {label: "Entry view", href: "/bird-ringing/entry-view"}
   ]
   const dropdownItems: {label: string, href: string}[] = []
   return (
@@ -41,7 +40,7 @@ export default function PageLayout({
           </> : <></>}
         </div>
       </aside>
-      <main className="p-3">
+      <main className="p-3 flex-grow-1 overflow-auto">
         {children}
       </main>
     </>
