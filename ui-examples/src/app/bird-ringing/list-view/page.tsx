@@ -34,7 +34,8 @@ export default function ListView() {
     }
   }, [setSelectedRingers])
   const ringers = getRingers();
-  const filteredRingers = ringers.filter(r => Object.values(r).some(value => value.toLowerCase().includes(filter.toLowerCase())))
+  const filterItems = filter.split(/\s+/).map(i => i.toLowerCase())
+  const filteredRingers = ringers.filter(r => Object.values(r).some(value => filterItems.some(fi => value.toLowerCase().includes(fi))))
   return (
     <div className="container">
       <div className="alert alert-danger" role="alert">
