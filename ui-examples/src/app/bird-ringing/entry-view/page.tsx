@@ -94,7 +94,7 @@ function EntryViewBase() {
             <tr key={index}>
               <td>{license.type} License</td>
               <td>{license.createdAt}</td>
-              <td><Link href={license.href} download>License file</Link></td>
+              <td><Link href={license.href} download>Document</Link></td>
             </tr>
           ))}
         </tbody>
