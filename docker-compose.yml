@@ -1,0 +1,10 @@
+services:
+  node:
+    image: node:22
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /opt/build/ui-examples
+    command: bash -c 'npm ci || npm install && npm run dev'
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/opt/build
