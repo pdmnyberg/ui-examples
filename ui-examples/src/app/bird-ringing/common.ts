@@ -4,6 +4,7 @@ export type Ringer = {
     license: string;
     emailStatus: string;
     updated: string;
+    licenseHref: string;
 }
 
 export type IdentifiableEntity = {
@@ -544,6 +545,7 @@ export const ringers: Record<string, Ringer> = (Array.from({length: 200})).map<R
     license: fixedRandom.choice(licenses),
     emailStatus: fixedRandom.choice(emailStatus),
     updated: fixedRandom.choice(dates),
+    licenseHref: "/mock-license.pdf"
 })).reduce<Record<string, Ringer>>((acc, ringer, index) => {
     const id: string = `ringer-${index}`;
     acc[id] = ringer;

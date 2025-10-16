@@ -1,6 +1,7 @@
 "use client"
 import { getRingers } from "../common"
 import { useState, useCallback, ChangeEventHandler, CSSProperties } from "react";
+import Link from "next/link";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -51,11 +52,12 @@ export default function ListView() {
       </div>
       <div className="input-group mb-3">
         <button className="btn btn-outline-secondary" type="button" onClick={() => setSelectedRingers(new Set(filteredRingers.map(r => r.id)))}>Select All</button>
-        <span className="input-group-text" >{selectedRingers.size} of {ringers.length} selected</span>
+        <span className="input-group-text flex-grow-1" >{selectedRingers.size} of {ringers.length} selected</span>
         <button className="btn btn-outline-secondary dropdown-toggle" onClick={() => setActionIsOpen(!actionIsOpen)} type="button" aria-expanded={actionIsOpen}>Batch action</button>
         <ul className={`dropdown-menu ${actionIsOpen ? "show" : ""}`} style={actionIsOpen ? dropdownOpenStyle : {}} onClick={() => setActionIsOpen(false)}>
           <li><a className="dropdown-item" href="#">Send license</a></li>
           <li><a className="dropdown-item" href="#">Generate new license</a></li>
+          <li><a className="dropdown-item" href="#">Download licenses</a></li>
           <li><hr className="dropdown-divider" /></li>
           <li><a className="dropdown-item" href="#">Disable</a></li>
           <li><a className="dropdown-item" href="#">Enable</a></li>
@@ -70,6 +72,7 @@ export default function ListView() {
             <th scope="col">License</th>
             <th scope="col">Email Status</th>
             <th scope="col">Updated</th>
+            <th scope="col">Download</th>
           </tr>
         </thead>
         <tbody>
@@ -81,6 +84,7 @@ export default function ListView() {
               <td>{r.license}</td>
               <td>{r.emailStatus}</td>
               <td>{r.updated}</td>
+              <td><Link href={r.licenseHref} download>License file</Link></td>
             </tr>
           ))}
         </tbody>
