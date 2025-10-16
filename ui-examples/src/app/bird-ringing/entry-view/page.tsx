@@ -21,6 +21,7 @@ function EntryViewBase() {
         ))}
       </ul>
     )],
+    (r) => ["Email", r.email || ""],
     (r) => ["Email Sent At", r.emailSentAt],
     (r) => ["Email Status", r.emailStatus],
   ]

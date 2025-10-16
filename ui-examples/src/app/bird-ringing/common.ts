@@ -1,5 +1,6 @@
 export type Ringer = {
     name: string;
+    email?: string;
     emailStatus: string;
     emailSentAt: string;
     updatedAt: string;
@@ -649,6 +650,10 @@ class RandomContext {
         return Math.floor(min + delta * this.random());
     }
 
+    randbool(): boolean {
+        return this.random() < 0.5;
+    }
+
     choice<T>(entries: T[]): T {
         const index = Math.min(this.randint(0, entries.length), entries.length - 1);
         return entries[index]
@@ -681,8 +686,11 @@ export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRing
         allowances: fixedRandom.choices(allowanceTypes, 5),
         region: `${fixedRandom.choice(regionSignifiers)} ${fixedRandom.choice(regions)}`
     })));
+    const firstName = fixedRandom.choice(firstNames);
+    const lastName = fixedRandom.choice(lastNames);
     return {
-        name: [fixedRandom.choice(firstNames), fixedRandom.choice(lastNames)].join(" "),
+        name: [firstName, lastName].join(" "),
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.edu`,
         emailStatus: fixedRandom.choice(emailStatus),
         emailSentAt: fixedRandom.choice(dates),
         updatedAt: fixedRandom.choice(dates),
