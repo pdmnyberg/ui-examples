@@ -1,7 +1,8 @@
 "use client"
-import { getRingers } from "../common"
+import { getRingers, getHelpers } from "../common"
 import { useState, useCallback, ChangeEventHandler, CSSProperties } from "react";
 import Link from "next/link";
+import Warning from "../warning";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -38,9 +39,7 @@ export default function ListView() {
   const filteredRingers = ringers.filter(r => Object.values(r).some(value => typeof value === "string" ? filterItems.some(fi => value.toLowerCase().includes(fi)) : false))
   return (
     <div className="container">
-      <div className="alert alert-danger" role="alert">
-        This is <em>NOT</em> a proper implementation. It is just an example used for discussion around what functionality we need for this application.
-      </div>
+      <Warning />
       <h2>List view</h2>
       <div className="input-group mb-3">
         <span className="input-group-text">Filter</span>
@@ -73,6 +72,7 @@ export default function ListView() {
             <th scope="col"></th>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
+            <th scope="col">Number Of Helpers</th>
             <th scope="col">License Type</th>
             <th scope="col">Email Sent At</th>
             <th scope="col">Email Status</th>
@@ -84,8 +84,9 @@ export default function ListView() {
           {filteredRingers.map(r => (
             <tr key={r.id}>
               <th><input type="checkbox" onChange={handleRingerSelection} checked={selectedRingers.has(r.id)} data-ringer-id={r.id}/></th>
-              <th scope="row">{r.id}</th>
-              <td>{r.firstName} {r.lastName}</td>
+              <th scope="row"><Link href={`/bird-ringing/entry-view/?ringerId=${r.id}`}>{r.id}</Link></th>
+              <td>{r.name}</td>
+              <td>{getHelpers(r).length}</td>
               <td>{r.licenses[0].type}</td>
               <td>{r.emailSentAt}</td>
               <td>{r.emailStatus}</td>

@@ -1,9 +1,9 @@
 export type Ringer = {
-    firstName: string;
-    lastName: string;
+    name: string;
     emailStatus: string;
     emailSentAt: string;
     updatedAt: string;
+    helperOf?: string;
     licenses: {
         type: string;
         href: string;
@@ -547,18 +547,22 @@ class RandomContext {
 }
 
 const fixedRandom = new RandomContext(randomBase);
-export const ringers: Record<string, Ringer> = (Array.from({length: 200})).map<Ringer>(() => ({
-    firstName: fixedRandom.choice(firstNames),
-    lastName: fixedRandom.choice(lastNames),
-    emailStatus: fixedRandom.choice(emailStatus),
-    emailSentAt: fixedRandom.choice(dates),
-    updatedAt: fixedRandom.choice(dates),
-    licenses: (Array.from({length: fixedRandom.randint(1, 3)}).map(() => ({
+const numberOfRingers = 200;
+export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRingers})).map<Ringer>(() => {
+    const licenses = (Array.from({length: fixedRandom.randint(1, 3)}).map(() => ({
         type: fixedRandom.choice(licenseTypes),
         href: "/mock-license.pdf",
         createdAt: fixedRandom.choice(dates),
-    })))
-})).reduce<Record<string, Ringer>>((acc, ringer, index) => {
+    })));
+    return {
+        name: [fixedRandom.choice(firstNames), fixedRandom.choice(lastNames)].join(" "),
+        emailStatus: fixedRandom.choice(emailStatus),
+        emailSentAt: fixedRandom.choice(dates),
+        updatedAt: fixedRandom.choice(dates),
+        helperOf: `ringer-${fixedRandom.randint(0, numberOfRingers)}`,
+        licenses
+    }
+}).reduce<Record<string, Ringer>>((acc, ringer, index) => {
     const id: string = `ringer-${index}`;
     acc[id] = ringer;
     return acc;
@@ -569,6 +573,10 @@ export function getRingers(): (Ringer & IdentifiableEntity)[] {
         id,
         ...value
     }))
+}
+
+export function getHelpers(ringer: IdentifiableEntity) {
+    return getRingers().filter(r => r.helperOf === ringer.id)
 }
 
 export function getRinger(ringer: IdentifiableEntity): Ringer & IdentifiableEntity {
