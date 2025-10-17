@@ -679,11 +679,13 @@ class RandomContext {
 
 const fixedRandom = new RandomContext(randomBase);
 const fixedIdRandom = new RandomContext(randomBase);
-const numberOfRingers = 200;
-export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRingers})).map<Ringer>((_, index) => {
+const numberOfRingers = 30;
+const numberOfHelpers = 170;
+export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRingers + numberOfHelpers})).map<Ringer>((_, index) => {
     fixedRandom.seed(index)
+    const isHelper = index > numberOfRingers;
     const licenses = (Array.from({length: fixedRandom.randint(1, 3)}).map(() => ({
-        type: fixedRandom.choice(licenseTypes),
+        type: isHelper ? licenseTypes[1] : licenseTypes[0],
         href: "/mock-license.pdf",
         createdAt: fixedRandom.choice(dates),
         expiresAt: fixedRandom.choice(dates),
@@ -699,7 +701,7 @@ export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRing
         emailStatus: fixedRandom.choice(emailStatus),
         emailSentAt: fixedRandom.choice(dates),
         updatedAt: fixedRandom.choice(dates),
-        helperOf: `ringer-${fixedIdRandom.randint(0, numberOfRingers)}`,
+        helperOf: isHelper ? `ringer-${fixedIdRandom.randint(0, numberOfRingers)}` : undefined,
         licenses
     }
 }).reduce<Record<string, Ringer>>((acc, ringer, index) => {
