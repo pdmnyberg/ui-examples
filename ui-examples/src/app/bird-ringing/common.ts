@@ -640,6 +640,10 @@ class RandomContext {
         this._items = items || (Array.from({length: 200}).map(() => Math.random()))
     }
 
+    seed(seed: number) {
+        this._ticker = seed % this._items.length;
+    }
+
     random() {
         this._ticker = (this._ticker + 1) % this._items.length;
         return this._items[this._ticker];
@@ -676,7 +680,8 @@ class RandomContext {
 const fixedRandom = new RandomContext(randomBase);
 const fixedIdRandom = new RandomContext(randomBase);
 const numberOfRingers = 200;
-export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRingers})).map<Ringer>(() => {
+export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRingers})).map<Ringer>((_, index) => {
+    fixedRandom.seed(index)
     const licenses = (Array.from({length: fixedRandom.randint(1, 3)}).map(() => ({
         type: fixedRandom.choice(licenseTypes),
         href: "/mock-license.pdf",
