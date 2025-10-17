@@ -33,10 +33,13 @@ export default function ListView() {
         })
       }
     }
-  }, [setSelectedRingers])
+  }, [setSelectedRingers]);
   const ringers = getRingers();
   const filterItems = filter.split(/\s+/).map(i => i.toLowerCase())
-  const filteredRingers = ringers.filter(r => Object.values(r).some(value => typeof value === "string" ? filterItems.some(fi => value.toLowerCase().includes(fi)) : false))
+  const filteredRingers = ringers
+    .filter(r => Object.values(r).some(value => typeof value === "string" ? filterItems.some(fi => value.toLowerCase().includes(fi)) : false))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const allVisibleSelected = selectedRingers.isSupersetOf(new Set(filteredRingers.map(r => r.id)));
   return (
     <div className="container">
       <Warning>
@@ -57,7 +60,7 @@ export default function ListView() {
         />
       </div>
       <div className="input-group mb-3">
-        <button className="btn btn-outline-secondary" type="button" onClick={() => setSelectedRingers(new Set(filteredRingers.map(r => r.id)))}>Select All</button>
+        <button className="btn btn-outline-secondary" type="button" onClick={() => setSelectedRingers(allVisibleSelected ? selectedRingers.difference(new Set(filteredRingers.map(r => r.id))) : selectedRingers.union(new Set(filteredRingers.map(r => r.id))))}>{allVisibleSelected ? "Select None" : "Select All"}</button>
         <span className="input-group-text flex-grow-1" >{selectedRingers.size} of {ringers.length} selected</span>
         <button className="btn btn-outline-secondary dropdown-toggle" onClick={() => setActionIsOpen(!actionIsOpen)} type="button" aria-expanded={actionIsOpen}>Batch action</button>
         <ul className={`dropdown-menu ${actionIsOpen ? "show" : ""}`} style={actionIsOpen ? dropdownOpenStyle : {}} onClick={() => setActionIsOpen(false)}>
