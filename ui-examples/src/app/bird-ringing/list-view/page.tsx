@@ -1,5 +1,5 @@
 "use client"
-import { getRingers, getHelpers } from "../common"
+import { getActors } from "../common"
 import { useState, useCallback, ChangeEventHandler, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
@@ -14,32 +14,32 @@ const dropdownOpenStyle: CSSProperties = {
 export default function ListView() {
   const [filter, setFilter] = useState<string>("");
   const [actionIsOpen, setActionIsOpen] = useState(false); 
-  const [selectedRingers, setSelectedRingers] = useState(new Set<string>());
-  const handleRingerSelection = useCallback<ChangeEventHandler<HTMLInputElement>>((event) => {
-    const ringerId = event.target.getAttribute("data-ringer-id");
+  const [selectedActors, setSelectedActors] = useState(new Set<string>());
+  const handleActorSelection = useCallback<ChangeEventHandler<HTMLInputElement>>((event) => {
+    const actorId = event.target.getAttribute("data-actor-id");
     const checked = event.target.checked;
-    if (ringerId) {
+    if (actorId) {
       if (checked) {
-        setSelectedRingers((prev) => {
+        setSelectedActors((prev) => {
           const next = new Set(prev);
-          next.add(ringerId);
+          next.add(actorId);
           return next;
         })
       } else {
-        setSelectedRingers((prev) => {
+        setSelectedActors((prev) => {
           const next = new Set(prev);
-          next.delete(ringerId);
+          next.delete(actorId);
           return next;
         })
       }
     }
-  }, [setSelectedRingers]);
-  const ringers = getRingers();
+  }, [setSelectedActors]);
+  const actors = getActors();
   const filterItems = filter.split(/\s+/).map(i => i.toLowerCase())
-  const filteredRingers = ringers
+  const filteredActors = actors
     .filter(r => Object.values(r).some(value => typeof value === "string" ? filterItems.some(fi => value.toLowerCase().includes(fi)) : false))
     .sort((a, b) => a.name.localeCompare(b.name));
-  const allVisibleSelected = selectedRingers.isSupersetOf(new Set(filteredRingers.map(r => r.id)));
+  const allVisibleSelected = selectedActors.isSupersetOf(new Set(filteredActors.map(r => r.id)));
   return (
     <div className="container">
       <Warning>
@@ -60,8 +60,8 @@ export default function ListView() {
         />
       </div>
       <div className="input-group mb-3">
-        <button className="btn btn-outline-secondary" type="button" onClick={() => setSelectedRingers(allVisibleSelected ? selectedRingers.difference(new Set(filteredRingers.map(r => r.id))) : selectedRingers.union(new Set(filteredRingers.map(r => r.id))))}>{allVisibleSelected ? "Select None" : "Select All"}</button>
-        <span className="input-group-text flex-grow-1" >{selectedRingers.size} of {ringers.length} selected</span>
+        <button className="btn btn-outline-secondary" type="button" onClick={() => setSelectedActors(allVisibleSelected ? selectedActors.difference(new Set(filteredActors.map(r => r.id))) : selectedActors.union(new Set(filteredActors.map(r => r.id))))}>{allVisibleSelected ? "Select None" : "Select All"}</button>
+        <span className="input-group-text flex-grow-1" >{selectedActors.size} of {actors.length} selected</span>
         <button className="btn btn-outline-secondary dropdown-toggle" onClick={() => setActionIsOpen(!actionIsOpen)} type="button" aria-expanded={actionIsOpen}>Batch action</button>
         <ul className={`dropdown-menu ${actionIsOpen ? "show" : ""}`} style={actionIsOpen ? dropdownOpenStyle : {}} onClick={() => setActionIsOpen(false)}>
           <li><a className="dropdown-item" href="#">Send license</a></li>
@@ -78,26 +78,18 @@ export default function ListView() {
             <th scope="col"></th>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
-            <th scope="col">Number Of Helpers</th>
-            <th scope="col">License Type</th>
             <th scope="col">Email Sent At</th>
             <th scope="col">Email Status</th>
-            <th scope="col">License Updated At</th>
-            <th scope="col">Download</th>
           </tr>
         </thead>
         <tbody>
-          {filteredRingers.map(r => (
+          {filteredActors.map(r => (
             <tr key={r.id}>
-              <th><input type="checkbox" onChange={handleRingerSelection} checked={selectedRingers.has(r.id)} data-ringer-id={r.id}/></th>
-              <th scope="row"><Link href={`/bird-ringing/entry-view/?ringerId=${r.id}`}>{r.id}</Link></th>
+              <th><input type="checkbox" onChange={handleActorSelection} checked={selectedActors.has(r.id)} data-actor-id={r.id}/></th>
+              <th scope="row"><Link href={`/bird-ringing/actor-view/?entryId=${r.id}`}>{r.id}</Link></th>
               <td>{r.name}</td>
-              <td>{getHelpers(r).length}</td>
-              <td>{r.licenses[0].type}</td>
               <td>{r.emailSentAt}</td>
               <td>{r.emailStatus}</td>
-              <td>{r.licenses[0].createdAt}</td>
-              <td><Link href={r.licenses[0].href} download>License file</Link></td>
             </tr>
           ))}
         </tbody>

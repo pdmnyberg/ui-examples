@@ -7,7 +7,7 @@ export default function Home() {
       <p>The following are example pages to demonstrate layout an interaction behaviors. These document do not aim to show anything related to a final design.</p>
       <ul>
         <li><Link href="/bird-ringing/list-view">List view</Link></li>
-        <li><Link href="/bird-ringing/entry-view/?ringerId=ringer-0">Entry view</Link></li>
+        <li><Link href="/bird-ringing/actor-view/?entryId=actor-0">Actor view</Link></li>
       </ul>
     </div>
   )

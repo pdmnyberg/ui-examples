@@ -1,19 +1,29 @@
-export type Ringer = {
+export type Actor = {
     name: string;
     email?: string;
     emailStatus: string;
     emailSentAt: string;
     updatedAt: string;
     helperOf?: string;
-    licenses: {
+}
+
+export type LicenseType = "Ringer" | "Helper";
+
+export type License = {
+    createdAt: string;
+    expiresAt: string;
+    startsAt: string;
+    allowances: string[];
+    region: string;
+    actors: {
+        actorId: string;
+        type: LicenseType;
+    }[];
+    documents: {
         type: string;
-        href: string;
         createdAt: string;
-        expiresAt: string;
-        startsAt: string;
-        allowances: string[];
-        region: string;
-    }[]
+        href: string;
+    }[];
 }
 
 export type IdentifiableEntity = {
@@ -106,7 +116,7 @@ const lastNames = [
   "Forsberg"
 ]
 
-const licenseTypes = [
+const licenseTypes: LicenseType[] = [
     "Ringer",
     "Helper"
 ]
@@ -678,21 +688,9 @@ class RandomContext {
 }
 
 const fixedRandom = new RandomContext(randomBase);
-const fixedIdRandom = new RandomContext(randomBase);
-const numberOfRingers = 30;
-const numberOfHelpers = 170;
-export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRingers + numberOfHelpers})).map<Ringer>((_, index) => {
+const numberOfActors = 200;
+export const actors: Record<string, Actor> = (Array.from({length: numberOfActors})).map<Actor>((_, index) => {
     fixedRandom.seed(index)
-    const isHelper = index > numberOfRingers;
-    const licenses = (Array.from({length: fixedRandom.randint(1, 3)}).map(() => ({
-        type: isHelper ? licenseTypes[1] : licenseTypes[0],
-        href: "/mock-license.pdf",
-        createdAt: fixedRandom.choice(dates),
-        expiresAt: fixedRandom.choice(dates),
-        startsAt: fixedRandom.choice(dates),
-        allowances: fixedRandom.choices(allowanceTypes, 5),
-        region: `${fixedRandom.choice(regionSignifiers)} ${fixedRandom.choice(regions)}`
-    })));
     const firstName = fixedRandom.choice(firstNames);
     const lastName = fixedRandom.choice(lastNames);
     return {
@@ -701,29 +699,58 @@ export const ringers: Record<string, Ringer> = (Array.from({length: numberOfRing
         emailStatus: fixedRandom.choice(emailStatus),
         emailSentAt: fixedRandom.choice(dates),
         updatedAt: fixedRandom.choice(dates),
-        helperOf: isHelper ? `ringer-${fixedIdRandom.randint(0, numberOfRingers)}` : undefined,
-        licenses
     }
-}).reduce<Record<string, Ringer>>((acc, ringer, index) => {
-    const id: string = `ringer-${index}`;
-    acc[id] = ringer;
+}).reduce<Record<string, Actor>>((acc, actor, index) => {
+    const id: string = `actor-${index}`;
+    acc[id] = actor;
     return acc;
 }, {})
 
-export function getRingers(): (Ringer & IdentifiableEntity)[] {
-    return Object.entries(ringers).map(([id, value]) => ({
+export const licenses = (Array.from({length: fixedRandom.randint(1, 3)}).map<License>(() => ({
+    documents: [],
+    createdAt: fixedRandom.choice(dates),
+    expiresAt: fixedRandom.choice(dates),
+    startsAt: fixedRandom.choice(dates),
+    allowances: fixedRandom.choices(allowanceTypes, 5),
+    region: `${fixedRandom.choice(regionSignifiers)} ${fixedRandom.choice(regions)}`,
+    actors: Array.from({length: fixedRandom.randint(1, 10)}).map((_, index) => ({
+        type: index > 0 ? "Helper" : "Ringer",
+        actorId: `actor-${fixedRandom.randint(0, numberOfActors)}`
+    }))
+}))).reduce<Record<string, License>>((acc, license, index) => {
+    const id: string = `license-${index}`;
+    acc[id] = license;
+    return acc;
+}, {});
+
+export function getActors(): (Actor & IdentifiableEntity)[] {
+    return Object.entries(actors).map(([id, value]) => ({
         id,
         ...value
     }))
 }
 
-export function getHelpers(ringer: IdentifiableEntity) {
-    return getRingers().filter(r => r.helperOf === ringer.id)
+export function getLicenses(): (License & IdentifiableEntity)[] {
+    return Object.entries(licenses).map(([id, value]) => ({
+        id,
+        ...value
+    }))
 }
 
-export function getRinger(ringer: IdentifiableEntity): Ringer & IdentifiableEntity {
+export function getLicenseActors(license: IdentifiableEntity, type: LicenseType) {
+    return getLicense(license).actors.filter(a => a.type === type).map(a => getActor({id: a.actorId}))
+}
+
+export function getActor(actor: IdentifiableEntity): Actor & IdentifiableEntity {
     return {
-        ...ringer,
-        ...ringers[ringer.id]
+        ...actor,
+        ...actors[actor.id]
+    }
+}
+
+export function getLicense(license: IdentifiableEntity) {
+    return {
+        ...license,
+        ...licenses[license.id]
     }
 }

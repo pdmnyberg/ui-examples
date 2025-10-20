@@ -8,7 +8,7 @@ export default function PageLayout({
   const contextTitle: string = "Bird ringing"
   const navItems: {label: string, href: string}[] = [
     {label: "List view", href: "/bird-ringing/list-view"},
-    {label: "Entry view", href: "/bird-ringing/entry-view/?ringerId=ringer-0"}
+    {label: "Actor view", href: "/bird-ringing/actor-view/?entryId=actor-0"}
   ]
   const dropdownItems: {label: string, href: string}[] = []
   return (
