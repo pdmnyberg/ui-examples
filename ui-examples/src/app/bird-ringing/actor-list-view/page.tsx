@@ -1,8 +1,9 @@
 "use client"
-import { getActors } from "../common"
+import { getActors, getActorLicenses, getLicenseInfo } from "../common"
 import { useState, useCallback, ChangeEventHandler, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
+import { Fragment } from "react";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -76,22 +77,28 @@ export default function ListView() {
         <thead>
           <tr>
             <th scope="col"></th>
-            <th scope="col">ID</th>
             <th scope="col">Name</th>
-            <th scope="col">Email Sent At</th>
-            <th scope="col">Email Status</th>
+            <th scope="col">Licenses</th>
+            <th scope="col">Updated At</th>
           </tr>
         </thead>
         <tbody>
-          {filteredActors.map(r => (
-            <tr key={r.id}>
-              <th><input type="checkbox" onChange={handleActorSelection} checked={selectedActors.has(r.id)} data-actor-id={r.id}/></th>
-              <th scope="row"><Link href={`/bird-ringing/actor-view/?entryId=${r.id}`}>{r.id}</Link></th>
-              <td>{r.name}</td>
-              <td>{r.emailSentAt}</td>
-              <td>{r.emailStatus}</td>
-            </tr>
-          ))}
+          {filteredActors.map(r => {
+            const licenses = getActorLicenses(r);
+            return (
+              <tr key={r.id}>
+                <th><input type="checkbox" onChange={handleActorSelection} checked={selectedActors.has(r.id)} data-actor-id={r.id}/></th>
+                <td><Link href={`/bird-ringing/actor-view/?entryId=${r.id}`}>{r.name}</Link></td>
+                <td>{licenses.map((l, index, list) => {
+                  const info = getLicenseInfo(l, r)
+                  return (
+                    <Fragment key={l.mnr}><Link href={`/bird-ringing/license-view/?entryId=${l.mnr}`}>{info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
+                  );
+                })}</td>
+                <td>{r.updatedAt}</td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>

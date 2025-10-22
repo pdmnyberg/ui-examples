@@ -1,5 +1,5 @@
 "use client"
-import { getActor, Actor } from "../common";
+import { getActor, getActorLicenses, getLicenseInfo, Actor } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense, ReactNode } from "react";
@@ -9,14 +9,14 @@ function EntryViewBase() {
   const listProperties: ((r: Actor) => [string, string | ReactNode])[] = [
     (r) => ["Name", r.name],
     (r) => ["Email", r.email || ""],
-    (r) => ["Email Sent At", r.emailSentAt],
-    (r) => ["Email Status", r.emailStatus],
+    (r) => ["Details of Ringer", "-"],
   ]
   const actorId = searchParams.get("entryId")
   if (!actorId) {
     notFound();
   }
-  const ringer = getActor({id: actorId});
+  const actor = getActor({id: actorId});
+  const licenses = getActorLicenses(actor);
   return (
     <div className="container">
       <Warning>
@@ -33,13 +33,43 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {listProperties.map((p, index) => {
-            const [name, value] = p(ringer);
+            const [name, value] = p(actor);
             return (
               <tr key={index}>
                 <th scope="row">{name}</th>
                 <td>{value}</td>
               </tr>
             )
+          })}
+        </tbody>
+      </table>
+      <h2>Licenses</h2>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">License ID</th>
+            <th scope="col">Role</th>
+            <th scope="col">Starts At</th>
+            <th scope="col">Expires At</th>
+            <th scope="col">Sent At</th>
+            <th scope="col">Sent Status</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {licenses.map((l) => {
+            const licenseInfo = getLicenseInfo(l, actor)
+            return (
+              <tr key={l.id}>
+                <th scope="row">{l.id}</th>
+                <td>{licenseInfo ? licenseInfo.role : "-"}</td>
+                <td>{l.startsAt}</td>
+                <td>{l.expiresAt}</td>
+                <td>{licenseInfo ? licenseInfo.licenseSentAt : "-"}</td>
+                <td>{licenseInfo ? licenseInfo.licenseSentStatus : "-"}</td>
+                <td><button className="btn btn-outline-secondary btn-sm" type="button">Resend</button></td>
+              </tr>
+            );
           })}
         </tbody>
       </table>
