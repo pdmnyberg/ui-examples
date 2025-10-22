@@ -30,6 +30,10 @@ export default function ListView() {
           term: item.name,
           component: <Link href={`/bird-ringing/actor-view/?entryId=${item.id}`}>{item.name}</Link>
         },
+        "Type": {
+          term: item.type,
+          component: item.type,
+        },
         "Roles": {
           term: Array.from(roles).join(" "),
           component: Array.from(roles).join(", ")
@@ -70,6 +74,7 @@ export default function ListView() {
   } = useItemSelections(new Set(filteredItems.map(r => r.id)));
   const columns = [
     "Name",
+    "Type",
     "Roles",
     "Licenses",
     "E-mail",
@@ -111,10 +116,7 @@ export default function ListView() {
         <thead>
           <tr>
             <th scope="col"></th>
-            <th scope="col">Name</th>
-            <th scope="col">Licenses</th>
-            <th scope="col">E-mail</th>
-            <th scope="col">Updated At</th>
+            {columns.map(c => <th key={c} scope="col">{c}</th>)}
           </tr>
         </thead>
         <tbody>
