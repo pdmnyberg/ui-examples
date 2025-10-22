@@ -4,6 +4,7 @@ import { useState, useCallback, ChangeEventHandler, CSSProperties } from "react"
 import Link from "next/link";
 import Warning from "../warning";
 import { Fragment } from "react";
+import { useItemSelections, useFilter, SearchableItem } from "../hooks";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -13,34 +14,58 @@ const dropdownOpenStyle: CSSProperties = {
 }
 
 export default function ListView() {
-  const [filter, setFilter] = useState<string>("");
   const [actionIsOpen, setActionIsOpen] = useState(false); 
-  const [selectedActors, setSelectedActors] = useState(new Set<string>());
-  const handleActorSelection = useCallback<ChangeEventHandler<HTMLInputElement>>((event) => {
-    const actorId = event.target.getAttribute("data-actor-id");
-    const checked = event.target.checked;
-    if (actorId) {
-      if (checked) {
-        setSelectedActors((prev) => {
-          const next = new Set(prev);
-          next.add(actorId);
-          return next;
-        })
-      } else {
-        setSelectedActors((prev) => {
-          const next = new Set(prev);
-          next.delete(actorId);
-          return next;
-        })
+
+  const actors = getActors().sort((a, b) => a.name.localeCompare(b.name));
+  const items = actors.map<SearchableItem>(item => {
+    const licenses = getActorLicenses(item);
+    return {
+      id: item.id,
+      properties: {
+        "Name": {
+          term: item.name,
+          component: <Link href={`/bird-ringing/actor-view/?entryId=${item.id}`}>{item.name}</Link>
+        },
+        "Licenses": {
+          term: licenses.map((l) => {
+            const info = getLicenseInfo(l, item)
+            return (
+              info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr
+            );
+          }).join(" "),
+          component: (
+            <>{licenses.map((l, index, list) => {
+              const info = getLicenseInfo(l, item)
+              return (
+                <Fragment key={l.mnr}><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
+              );
+            })}</>
+          )
+        },
+        "E-mail": {
+          term: item.email ? item.email : "-",
+          component: item.email ? item.email : "-",
+        },
+        "Updated At": {
+          term: item.updatedAt,
+          component: item.updatedAt
+        },
       }
     }
-  }, [setSelectedActors]);
-  const actors = getActors();
-  const filterItems = filter.split(/\s+/).map(i => i.toLowerCase())
-  const filteredActors = actors
-    .filter(r => Object.values(r).some(value => typeof value === "string" ? filterItems.some(fi => value.toLowerCase().includes(fi)) : false))
-    .sort((a, b) => a.name.localeCompare(b.name));
-  const allVisibleSelected = selectedActors.isSupersetOf(new Set(filteredActors.map(r => r.id)));
+  })
+  const {filter, setFilter, filteredItems} = useFilter(items)
+  const {
+    selectedItems,
+    toggleItems,
+    handleItemSelection,
+    allSelected
+  } = useItemSelections(new Set(filteredItems.map(r => r.id)));
+  const columns = [
+    "Name",
+    "Licenses",
+    "E-mail",
+    "Updated At",
+  ]
   return (
     <div className="container">
       <Warning>
@@ -61,8 +86,8 @@ export default function ListView() {
         />
       </div>
       <div className="input-group mb-3">
-        <button className="btn btn-outline-secondary" type="button" onClick={() => setSelectedActors(allVisibleSelected ? selectedActors.difference(new Set(filteredActors.map(r => r.id))) : selectedActors.union(new Set(filteredActors.map(r => r.id))))}>{allVisibleSelected ? "Select None" : "Select All"}</button>
-        <span className="input-group-text flex-grow-1" >{selectedActors.size} of {actors.length} selected</span>
+        <button className="btn btn-outline-secondary" type="button" onClick={toggleItems}>{allSelected ? "Select None" : "Select All"}</button>
+        <span className="input-group-text flex-grow-1" >{selectedItems.size} of {items.length} selected</span>
         <button className="btn btn-outline-secondary dropdown-toggle" onClick={() => setActionIsOpen(!actionIsOpen)} type="button" aria-expanded={actionIsOpen}>Batch action</button>
         <ul className={`dropdown-menu ${actionIsOpen ? "show" : ""}`} style={actionIsOpen ? dropdownOpenStyle : {}} onClick={() => setActionIsOpen(false)}>
           <li><a className="dropdown-item" href="#">Send license</a></li>
@@ -79,23 +104,16 @@ export default function ListView() {
             <th scope="col"></th>
             <th scope="col">Name</th>
             <th scope="col">Licenses</th>
+            <th scope="col">E-mail</th>
             <th scope="col">Updated At</th>
           </tr>
         </thead>
         <tbody>
-          {filteredActors.map(r => {
-            const licenses = getActorLicenses(r);
+          {filteredItems.map(item => {
             return (
-              <tr key={r.id}>
-                <th><input type="checkbox" onChange={handleActorSelection} checked={selectedActors.has(r.id)} data-actor-id={r.id}/></th>
-                <td><Link href={`/bird-ringing/actor-view/?entryId=${r.id}`}>{r.name}</Link></td>
-                <td>{licenses.map((l, index, list) => {
-                  const info = getLicenseInfo(l, r)
-                  return (
-                    <Fragment key={l.mnr}><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
-                  );
-                })}</td>
-                <td>{r.updatedAt}</td>
+              <tr key={item.id}>
+                <th><input type="checkbox" onChange={handleItemSelection} checked={selectedItems.has(item.id)} data-actor-id={item.id}/></th>
+                {columns.map(c => <td key={c}>{item.properties[c].component}</td>)}
               </tr>
             )
           })}
