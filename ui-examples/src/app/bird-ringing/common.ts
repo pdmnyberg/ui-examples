@@ -26,11 +26,6 @@ export type License = {
     region: string;
     description: string;
     actors: LicenseRelation[];
-    documents: {
-        type: string;
-        createdAt: string;
-        href: string;
-    }[];
     reportStatus: ReportStatus;
 }
 
@@ -41,6 +36,11 @@ export type LicenseRelation = {
     licenseSentAt: string;
     licenseSentStatus: string;
     status: RelationStatus;
+    documents: {
+        type: string;
+        createdAt: string;
+        href: string;
+    }[];
 }
 
 export type RelationStatus = "Active" | "Inactive";
@@ -649,6 +649,13 @@ export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_,
             licenseSentAt: createdAt.toISOString(),
             licenseSentStatus: fixedRandom.choice(emailStatus),
             status: isActive ? "Active" : "Inactive",
+            documents: [
+                {
+                    type: "license",
+                    href: "/mock-license.pdf",
+                    createdAt: createdAt.toISOString(),
+                }
+            ]
         }
     });
     const ringer: LicenseRelation = {
@@ -657,16 +664,16 @@ export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_,
         licenseSentAt: createdAt.toISOString(),
         licenseSentStatus: fixedRandom.choice(emailStatus),
         status: "Active",
-    }
-    return {
-        mnr: `${String(index).padStart(4, '0')}`,
         documents: [
             {
                 type: "license",
                 href: "/mock-license.pdf",
                 createdAt: createdAt.toISOString(),
             }
-        ],
+        ]
+    }
+    return {
+        mnr: `${String(index).padStart(4, '0')}`,
         createdAt: createdAt.toISOString(),
         updatedAt: updatedAt.toISOString(),
         expiresAt: expiresAt.toISOString(),

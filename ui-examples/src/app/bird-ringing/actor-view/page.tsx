@@ -51,6 +51,7 @@ function EntryViewBase() {
             <th scope="col">Active</th>
             <th scope="col">Starts At</th>
             <th scope="col">Expires At</th>
+            <th scope="col">Download</th>
             <th scope="col">Sent At</th>
             <th scope="col">Sent Status</th>
             <th scope="col">Actions</th>
@@ -59,6 +60,7 @@ function EntryViewBase() {
         <tbody>
           {licenses.map((l) => {
             const licenseInfo = getLicenseInfo(l, actor)
+            const primaryDocument = licenseInfo.documents[0];
             return (
               <tr key={l.id}>
                 <th scope="row"><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{l.mnr}</Link></th>
@@ -67,6 +69,7 @@ function EntryViewBase() {
                 <td>{licenseInfo ? licenseInfo.status : "-"}</td>
                 <td>{l.startsAt}</td>
                 <td>{l.expiresAt}</td>
+                <td>{primaryDocument ? <Link href={primaryDocument.href}>License document</Link> : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.licenseSentAt : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.licenseSentStatus : "-"}</td>
                 <td><button className="btn btn-outline-secondary btn-sm" type="button">Resend</button></td>
