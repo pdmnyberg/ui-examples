@@ -69,7 +69,7 @@ export default function ListView() {
       <Warning>
         <p></p>
       </Warning>
-      <h2>List view</h2>
+      <h2>License List View</h2>
       <div className="input-group mb-3">
         <span className="input-group-text">Filter</span>
         <input

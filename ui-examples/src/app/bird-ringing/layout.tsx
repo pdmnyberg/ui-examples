@@ -10,7 +10,7 @@ export default function PageLayout({
     {label: "Actor list view", href: "/bird-ringing/actor-list-view"},
     {label: "Actor view", href: "/bird-ringing/actor-view/?entryId=actor-0"},
     {label: "License list view", href: "/bird-ringing/license-list-view"},
-    {label: "License view", href: "/bird-ringing/license-view/?entryId=actor-0"}
+    {label: "License view", href: "/bird-ringing/license-view/?entryId=license-0"}
   ]
   const dropdownItems: {label: string, href: string}[] = []
   return (

@@ -10,7 +10,7 @@ function EntryViewBase() {
   const listProperties: ((r: Actor) => [string, string | ReactNode])[] = [
     (r) => ["Name", r.name],
     (r) => ["Email", r.email || ""],
-    (r) => ["Details of Ringer", "-"],
+    () => ["Details of Ringer", "-"],
   ]
   const actorId = searchParams.get("entryId")
   if (!actorId) {

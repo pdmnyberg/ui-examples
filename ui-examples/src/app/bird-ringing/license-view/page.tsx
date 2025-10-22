@@ -1,0 +1,91 @@
+"use client"
+import { getLicense, getActor, License } from "../common";
+import Warning from "../warning";
+import { useSearchParams, notFound } from "next/navigation";
+import { Suspense } from "react";
+import Link from "next/link";
+
+function entryToTable(entry: License): Record<string, React.ReactNode> {
+  return {
+    "Mnr": entry.mnr,
+    "Created At": entry.createdAt,
+    "Updated At": entry.updatedAt,
+    "Period": `${entry.startsAt}  to ${entry.expiresAt}`,
+    "Description": entry.description,
+    "Region": entry.region,
+    "Permissions": (
+      <ul>
+        {entry.permissions.map((p, index) => <li key={index}>{p}</li>)}
+      </ul>
+    ),
+    "Final Report Status": entry.reportStatus,
+  }
+}
+
+function EntryViewBase() {
+  const searchParams = useSearchParams();
+  const entryId = searchParams.get("entryId")
+  if (!entryId) {
+    notFound();
+  }
+  const entry = getLicense({id: entryId});
+  const entryTable = entryToTable(entry)
+  return (
+    <div className="container">
+      <Warning>
+        <p></p>
+      </Warning>
+      <h2>License view</h2>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">Property</th>
+            <th scope="col">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(entryTable).map(([name, value], index) => {
+            return (
+              <tr key={index}>
+                <th scope="row">{name}</th>
+                <td>{value}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+      <h2>Helpers</h2>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">Type</th>
+            <th scope="col">Role</th>
+            <th scope="col">Mednr</th>
+            <th scope="col">Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entry.actors.map((r, index) => {
+            const actor = getActor({id: r.actorId})
+            return (
+              <tr key={index}>
+                <td>{actor.type}</td>
+                <td>{r.role}</td>
+                <td>{r.mednr}</td>
+                <td><Link href={`/bird-ringing/actor-view/?entryId=${actor.id}`}>{actor.name}</Link></td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+export default function EntryView() {
+  return (
+    <Suspense fallback={<span />}>
+      <EntryViewBase />
+    </Suspense>
+  )
+}

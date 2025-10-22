@@ -47,7 +47,7 @@ export default function ListView() {
         <p>This document is an example of how the list view could look. The idea is to show the most important properties for working with license management. Only the latest state of a current license holder is displayed.</p>
         <p>The focus here is to exemplify the structure, properties and interaction behaviors rather than the actual content represented. The data on this page is automatically generated so there might be some inconsistencies when it comes to dates and values that would be acceptable in the real system.</p>
       </Warning>
-      <h2>List view</h2>
+      <h2>Actor List View</h2>
       <div className="input-group mb-3">
         <span className="input-group-text">Filter</span>
         <input
