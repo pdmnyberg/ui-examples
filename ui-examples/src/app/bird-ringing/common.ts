@@ -3,7 +3,10 @@ export type Actor = {
     email?: string;
     updatedAt: string;
     type: ActorType;
+    sex: Sex,
 }
+
+export type Sex = "Male" | "Female" | "Undisclosed" | "N/A"
 
 export type ActorType = "Organization" | "Person";
 
@@ -67,7 +70,7 @@ const groupNames = [
     "Skådargruppen"
 ]
 
-const firstNames = [
+const maleNames = [
   "Erik",
   "Lars",
   "Johan",
@@ -108,6 +111,49 @@ const firstNames = [
   "Christer",
   "Robin",
   "Martin"
+]
+
+const femaleNames = [
+  "Anna",
+  "Emma",
+  "Elsa",
+  "Maja",
+  "Sara",
+  "Karin",
+  "Lina",
+  "Ingrid",
+  "Sofia",
+  "Hanna",
+  "Maria",
+  "Julia",
+  "Ida",
+  "Elin",
+  "Agnes",
+  "Frida",
+  "Lisa",
+  "Amanda",
+  "Lovisa",
+  "Clara",
+  "Matilda",
+  "Ebba",
+  "Wilma",
+  "Josefin",
+  "Therese",
+  "Gunilla",
+  "Helena",
+  "Jenny",
+  "Camilla",
+  "Carina",
+  "Malin",
+  "Annika",
+  "Emelie",
+  "Beatrice",
+  "Tilda",
+  "Filippa",
+  "Astrid",
+  "Greta",
+  "Linnea",
+  "Saga"
 ]
 
 const lastNames = [
@@ -170,6 +216,15 @@ const emailStatus = [
     "Not sent",
     "Bounced",
     "Pending"
+]
+
+const descriptions = [
+    "Stationsmärkning",
+    "Artprojekt",
+    "Standardiserad slöjnät",
+    "Fälla",
+    "Boungemärkning",
+    "Rehabiliterade fåglar",
 ]
 
 const allowanceTypes = [
@@ -549,12 +604,19 @@ const numberOfOrganizations = 30;
 export const actors: Record<string, Actor> = (Array.from({length: numberOfActors})).map<Actor>((_, index) => {
     const isOrganization = index < numberOfOrganizations;
     fixedRandom.seed(index)
+    const isMale = fixedRandom.randbool();
+    const declareSex = fixedRandom.randbool();
     const updatedAt = fixedRandom.randdate(...period);
+    const firstNames = isMale ? maleNames : femaleNames;
     const name = isOrganization ? `${fixedRandom.choice(groupNames)} ${fixedRandom.choice(regions)}` : `${fixedRandom.choice(firstNames)} ${fixedRandom.choice(lastNames)}`;
-    const email = isOrganization ? `contact@${name.toLowerCase().replace(" ", ".")}.example.edu` : `${name.toLowerCase().replace(" ", ".")}@example.edu`
+    const email = isOrganization ? `contact@${name.toLowerCase().replace(" ", ".")}.example.edu` : `${name.toLowerCase().replace(" ", ".")}@example.edu`;
+    const sex: Sex = isOrganization ? "N/A" : (
+        declareSex ? (isMale ? "Male" : "Female") : "Undisclosed"
+    )
     return {
         name,
         email,
+        sex,
         type: isOrganization ? "Organization" : "Person",
         emailStatus: fixedRandom.choice(emailStatus),
         emailSentAt: updatedAt.toISOString(),
@@ -601,7 +663,7 @@ export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_,
         expiresAt: expiresAt.toISOString(),
         startsAt: startsAt.toISOString(),
         permissions: fixedRandom.choices(allowanceTypes, 5),
-        description: "",
+        description: fixedRandom.choices(descriptions, fixedRandom.randint(1, 3)).join(", "),
         status: fixedRandom.choice(licenseStatuses),
         region: `${fixedRandom.choice(regionSignifiers)} ${fixedRandom.choice(regions)}`,
         actors: [

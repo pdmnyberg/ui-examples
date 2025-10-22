@@ -58,6 +58,10 @@ export default function ListView() {
           term: item.email ? item.email : "-",
           component: item.email ? item.email : "-",
         },
+        "Sex": {
+          term: item.sex,
+          component: item.sex
+        },
         "Updated At": {
           term: item.updatedAt,
           component: item.updatedAt
@@ -78,6 +82,7 @@ export default function ListView() {
     "Roles",
     "Licenses",
     "E-mail",
+    "Sex",
     "Updated At",
   ]
   return (
