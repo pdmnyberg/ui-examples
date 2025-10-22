@@ -51,6 +51,7 @@ function EntryViewBase() {
             <th scope="col">Mnr</th>
             <th scope="col">Role</th>
             <th scope="col">Mednr</th>
+            <th scope="col">Active</th>
             <th scope="col">Starts At</th>
             <th scope="col">Expires At</th>
             <th scope="col">Sent At</th>
@@ -66,6 +67,7 @@ function EntryViewBase() {
                 <th scope="row"><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{l.mnr}</Link></th>
                 <td>{licenseInfo ? licenseInfo.role : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.mednr : "-"}</td>
+                <td>{licenseInfo ? licenseInfo.status : "-"}</td>
                 <td>{l.startsAt}</td>
                 <td>{l.expiresAt}</td>
                 <td>{licenseInfo ? licenseInfo.licenseSentAt : "-"}</td>

@@ -40,8 +40,10 @@ export type LicenseRelation = {
     role: LicenseRole;
     licenseSentAt: string;
     licenseSentStatus: string;
-    active: boolean;
+    status: RelationStatus;
 }
+
+export type RelationStatus = "Active" | "Inactive";
 
 export type IdentifiableEntity = {
     id: string;
@@ -628,27 +630,33 @@ export const actors: Record<string, Actor> = (Array.from({length: numberOfActors
     return acc;
 }, {})
 
-const numberOfLicenses = 50;
+const numberOfLicenses = 100;
+const ringerIds = [
+    ...fixedRandom.choices(Object.keys(actors), numberOfLicenses - numberOfOrganizations),
+    ...Object.keys(actors).slice(0, numberOfOrganizations)
+];
+const helperIds = Object.keys(actors).slice(numberOfOrganizations);
 export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_, index) => {
-    const byOrg = fixedRandom.randbool();
+    const ringerId = ringerIds[index % ringerIds.length]
     const [createdAt, updatedAt] = fixedRandom.randdaterange(...period);
     const [startsAt, expiresAt] = fixedRandom.randdaterange(...period, maxLicenseLength);
-    const helpers = fixedRandom.choices(Object.keys(actors).slice(numberOfOrganizations), fixedRandom.randint(3, 6)).map<LicenseRelation>((actorId, index) => {
+    const helpers = fixedRandom.choices(helperIds.filter(id => id !== ringerId), fixedRandom.randint(2, 5)).map<LicenseRelation>((actorId, index, list) => {
+        const isActive = index > 0.5 * list.length
         return {
             role: "Helper",
             mednr: `${String(index).padStart(4, '0')}`,
             actorId,
             licenseSentAt: createdAt.toISOString(),
             licenseSentStatus: fixedRandom.choice(emailStatus),
-            active: true,
+            status: isActive ? "Active" : "Inactive",
         }
     });
     const ringer: LicenseRelation = {
         role: "Ringer",
-        actorId: fixedRandom.choice(byOrg ? Object.keys(actors).slice(0, 30) : Object.keys(actors).slice(30)),
+        actorId: ringerId,
         licenseSentAt: createdAt.toISOString(),
         licenseSentStatus: fixedRandom.choice(emailStatus),
-        active: true,
+        status: "Active",
     }
     return {
         mnr: `${String(index).padStart(4, '0')}`,
@@ -693,8 +701,12 @@ export function getLicenses(): (License & IdentifiableEntity)[] {
     }))
 }
 
-export function getActorLicenses(actor: IdentifiableEntity, role?: LicenseRole) {
-    return getLicenses().filter(l => l.actors.some(a => a.actorId === actor.id && (!role || a.role === role)))
+export function getActorLicenses(actor: IdentifiableEntity, role?: LicenseRole, status?: RelationStatus) {
+    return getLicenses().filter(l => l.actors.some(a => (
+        a.actorId === actor.id &&
+        (!role || a.role === role) &&
+        (status === undefined || a.status === status)
+    )))
 }
 
 export function getLicenseInfo(license: License, actor: IdentifiableEntity) {

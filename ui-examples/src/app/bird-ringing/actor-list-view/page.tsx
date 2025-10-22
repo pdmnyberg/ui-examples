@@ -18,7 +18,7 @@ export default function ListView() {
 
   const actors = getActors().sort((a, b) => a.name.localeCompare(b.name));
   const items = actors.map<SearchableItem>(item => {
-    const licenses = getActorLicenses(item);
+    const licenses = getActorLicenses(item, undefined, "Active");
     const roles = new Set(licenses.map((l) => {
       const info = getLicenseInfo(l, item)
       return info.role;
