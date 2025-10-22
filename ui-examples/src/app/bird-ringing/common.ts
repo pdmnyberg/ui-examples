@@ -2,7 +2,10 @@ export type Actor = {
     name: string;
     email?: string;
     updatedAt: string;
+    type: ActorType;
 }
+
+export type ActorType = "Organization" | "Person";
 
 export type ReportStatus = "Yes" | "No" | "Incomplete";
 
@@ -552,6 +555,7 @@ export const actors: Record<string, Actor> = (Array.from({length: numberOfActors
     return {
         name,
         email,
+        type: isOrganization ? "Organization" : "Person",
         emailStatus: fixedRandom.choice(emailStatus),
         emailSentAt: updatedAt.toISOString(),
         updatedAt: updatedAt.toISOString(),

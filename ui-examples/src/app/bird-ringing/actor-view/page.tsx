@@ -3,6 +3,7 @@ import { getActor, getActorLicenses, getLicenseInfo, Actor } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense, ReactNode } from "react";
+import Link from "next/link";
 
 function EntryViewBase() {
   const searchParams = useSearchParams();
@@ -47,8 +48,9 @@ function EntryViewBase() {
       <table className="table">
         <thead>
           <tr>
-            <th scope="col">License ID</th>
+            <th scope="col">Mnr</th>
             <th scope="col">Role</th>
+            <th scope="col">Mednr</th>
             <th scope="col">Starts At</th>
             <th scope="col">Expires At</th>
             <th scope="col">Sent At</th>
@@ -61,8 +63,9 @@ function EntryViewBase() {
             const licenseInfo = getLicenseInfo(l, actor)
             return (
               <tr key={l.id}>
-                <th scope="row">{l.id}</th>
+                <th scope="row"><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{l.mnr}</Link></th>
                 <td>{licenseInfo ? licenseInfo.role : "-"}</td>
+                <td>{licenseInfo ? licenseInfo.mednr : "-"}</td>
                 <td>{l.startsAt}</td>
                 <td>{l.expiresAt}</td>
                 <td>{licenseInfo ? licenseInfo.licenseSentAt : "-"}</td>
