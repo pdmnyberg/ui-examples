@@ -630,6 +630,7 @@ export const actors: Record<string, Actor> = (Array.from({length: numberOfActors
 
 const numberOfLicenses = 50;
 export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_, index) => {
+    const byOrg = fixedRandom.randbool();
     const [createdAt, updatedAt] = fixedRandom.randdaterange(...period);
     const [startsAt, expiresAt] = fixedRandom.randdaterange(...period, maxLicenseLength);
     const helpers = fixedRandom.choices(Object.keys(actors).slice(numberOfOrganizations), fixedRandom.randint(3, 6)).map<LicenseRelation>((actorId, index) => {
@@ -644,7 +645,7 @@ export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_,
     });
     const ringer: LicenseRelation = {
         role: "Ringer",
-        actorId: fixedRandom.choice(Object.keys(actors)),
+        actorId: fixedRandom.choice(byOrg ? Object.keys(actors).slice(0, 30) : Object.keys(actors).slice(30)),
         licenseSentAt: createdAt.toISOString(),
         licenseSentStatus: fixedRandom.choice(emailStatus),
         active: true,
