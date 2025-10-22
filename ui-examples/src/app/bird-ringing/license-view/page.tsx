@@ -13,11 +13,6 @@ function entryToTable(entry: License): Record<string, React.ReactNode> {
     "Period": `${entry.startsAt}  to ${entry.expiresAt}`,
     "Description": entry.description,
     "Region": entry.region,
-    "Permissions": (
-      <ul>
-        {entry.permissions.map((p, index) => <li key={index}>{p}</li>)}
-      </ul>
-    ),
     "Final Report Status": entry.reportStatus,
   }
 }
@@ -52,6 +47,29 @@ function EntryViewBase() {
               </tr>
             )
           })}
+        </tbody>
+      </table>
+      <h2>Permissions</h2>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">Type</th>
+            <th scope="col">Properties</th>
+            <th scope="col">Species list</th>
+            <th scope="col">Location</th>
+            <th scope="col">Period</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entry.permissions.map((p, index) => (
+            <tr key={index}>
+              <td>{p}</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          ))}
         </tbody>
       </table>
       <h2>Helpers</h2>
