@@ -570,6 +570,23 @@ const numberOfLicenses = 50;
 export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_, index) => {
     const [createdAt, updatedAt] = fixedRandom.randdaterange(...period);
     const [startsAt, expiresAt] = fixedRandom.randdaterange(...period, maxLicenseLength);
+    const helpers = fixedRandom.choices(Object.keys(actors).slice(numberOfOrganizations), fixedRandom.randint(3, 6)).map<LicenseRelation>((actorId, index) => {
+        return {
+            role: "Helper",
+            mednr: `${String(index).padStart(4, '0')}`,
+            actorId,
+            licenseSentAt: createdAt.toISOString(),
+            licenseSentStatus: fixedRandom.choice(emailStatus),
+            active: true,
+        }
+    });
+    const ringer: LicenseRelation = {
+        role: "Ringer",
+        actorId: fixedRandom.choice(Object.keys(actors)),
+        licenseSentAt: createdAt.toISOString(),
+        licenseSentStatus: fixedRandom.choice(emailStatus),
+        active: true,
+    }
     return {
         mnr: `${String(index).padStart(4, '0')}`,
         documents: [
@@ -587,17 +604,10 @@ export const licenses = (Array.from({length: numberOfLicenses}).map<License>((_,
         description: "",
         status: fixedRandom.choice(licenseStatuses),
         region: `${fixedRandom.choice(regionSignifiers)} ${fixedRandom.choice(regions)}`,
-        actors: fixedRandom.choices(Object.keys(actors), fixedRandom.randint(3, 6)).map((actorId, index) => {
-            const isHelper = index > 0;
-            return {
-                role: isHelper ? "Helper" : "Ringer",
-                mednr: isHelper ? `${String(index).padStart(4, '0')}` : undefined,
-                actorId,
-                licenseSentAt: createdAt.toISOString(),
-                licenseSentStatus: fixedRandom.choice(emailStatus),
-                active: true,
-            }
-        }),
+        actors: [
+            ringer,
+            ...helpers
+        ],
         reportStatus: fixedRandom.choice(reportStatuses),
     }
 })).reduce<Record<string, License>>((acc, license, index) => {
