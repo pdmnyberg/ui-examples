@@ -19,12 +19,20 @@ export default function ListView() {
   const actors = getActors().sort((a, b) => a.name.localeCompare(b.name));
   const items = actors.map<SearchableItem>(item => {
     const licenses = getActorLicenses(item);
+    const roles = new Set(licenses.map((l) => {
+      const info = getLicenseInfo(l, item)
+      return info.role;
+    }));
     return {
       id: item.id,
       properties: {
         "Name": {
           term: item.name,
           component: <Link href={`/bird-ringing/actor-view/?entryId=${item.id}`}>{item.name}</Link>
+        },
+        "Roles": {
+          term: Array.from(roles).join(" "),
+          component: Array.from(roles).join(", ")
         },
         "Licenses": {
           term: licenses.map((l) => {
@@ -62,6 +70,7 @@ export default function ListView() {
   } = useItemSelections(new Set(filteredItems.map(r => r.id)));
   const columns = [
     "Name",
+    "Roles",
     "Licenses",
     "E-mail",
     "Updated At",
@@ -80,8 +89,8 @@ export default function ListView() {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           className="form-control"
-          placeholder="Name, email, license or updated"
-          aria-label="Username"
+          placeholder={columns.join(", ")}
+          aria-label="Filter for actor table"
           aria-describedby="basic-addon1"
         />
       </div>

@@ -77,8 +77,8 @@ export default function ListView() {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           className="form-control"
-          placeholder="Name, email, license or updated"
-          aria-label="Username"
+          placeholder={columns.join(", ")}
+          aria-label="Filter for license table"
           aria-describedby="basic-addon1"
         />
       </div>
