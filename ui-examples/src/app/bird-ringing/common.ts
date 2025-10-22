@@ -525,7 +525,7 @@ class RandomContext {
 
     randdaterange(start: Date, end: Date, maxLength?: number): [Date, Date] {
         const rangeStart = this.randdate(start, end);
-        const delta = rangeStart.getTime() - start.getTime();
+        const delta = end.getTime() - rangeStart.getTime();
         const limitedDelta = maxLength === undefined ? delta : Math.min(delta, maxLength);
         const rangeEnd = this.randdate(rangeStart, new Date(rangeStart.getTime() + limitedDelta));
         return [rangeStart, rangeEnd]
@@ -542,7 +542,7 @@ class RandomContext {
 }
 
 const period: [Date, Date] = [new Date("2020-01-01T00:00:00.000Z"), new Date("2025-01-01T00:00:00.000Z")];
-const maxLicenseLength = new Date("2020-01-01T00:00:00.000Z").getTime() - new Date("2020-06-01T00:00:00.000Z").getTime();
+const maxLicenseLength = new Date("2020-06-01T00:00:00.000Z").getTime() - new Date("2020-01-01T00:00:00.000Z").getTime();
 const fixedRandom = new RandomContext(randomBase);
 const numberOfActors = 200;
 const numberOfOrganizations = 30;
