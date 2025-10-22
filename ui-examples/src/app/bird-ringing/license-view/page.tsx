@@ -77,6 +77,7 @@ function EntryViewBase() {
         <thead>
           <tr>
             <th scope="col">Type</th>
+            <th scope="col">Status</th>
             <th scope="col">Role</th>
             <th scope="col">Mednr</th>
             <th scope="col">Name</th>
@@ -88,6 +89,7 @@ function EntryViewBase() {
             return (
               <tr key={index}>
                 <td>{actor.type}</td>
+                <td>{r.status}</td>
                 <td>{r.role}</td>
                 <td>{r.mednr}</td>
                 <td><Link href={`/bird-ringing/actor-view/?entryId=${actor.id}`}>{actor.name}</Link></td>
