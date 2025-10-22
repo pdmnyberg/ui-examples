@@ -2,22 +2,29 @@
 import { getActor, getActorLicenses, getLicenseInfo, Actor } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
-import { Suspense, ReactNode } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
+
+function entryToTable(entry: Actor): Record<string, React.ReactNode> {
+  return {
+    "Name": entry.name,
+    "Type": entry.type,
+    "E-mail": entry.email,
+    "Sex": entry.sex,
+    "Updated At": entry.updatedAt,
+    "Details of Ringer": "-",
+  }
+}
 
 function EntryViewBase() {
   const searchParams = useSearchParams();
-  const listProperties: ((r: Actor) => [string, string | ReactNode])[] = [
-    (r) => ["Name", r.name],
-    (r) => ["Email", r.email || ""],
-    () => ["Details of Ringer", "-"],
-  ]
   const actorId = searchParams.get("entryId")
   if (!actorId) {
     notFound();
   }
   const actor = getActor({id: actorId});
   const licenses = getActorLicenses(actor);
+  const entryTable = entryToTable(actor)
   return (
     <div className="container">
       <Warning><span/></Warning>
@@ -30,8 +37,7 @@ function EntryViewBase() {
           </tr>
         </thead>
         <tbody>
-          {listProperties.map((p, index) => {
-            const [name, value] = p(actor);
+          {Object.entries(entryTable).map(([name, value], index) => {
             return (
               <tr key={index}>
                 <th scope="row">{name}</th>
