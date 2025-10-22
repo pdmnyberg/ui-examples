@@ -92,7 +92,7 @@ export default function ListView() {
                 <td>{licenses.map((l, index, list) => {
                   const info = getLicenseInfo(l, r)
                   return (
-                    <Fragment key={l.mnr}><Link href={`/bird-ringing/license-view/?entryId=${l.mnr}`}>{info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
+                    <Fragment key={l.mnr}><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
                   );
                 })}</td>
                 <td>{r.updatedAt}</td>
