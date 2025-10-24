@@ -1,6 +1,6 @@
 "use client"
 import { getActors, getActorLicenses, getLicenseInfo } from "../common"
-import { useState, useCallback, ChangeEventHandler, CSSProperties } from "react";
+import { useState, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
 import { Fragment } from "react";
