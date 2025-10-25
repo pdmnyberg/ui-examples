@@ -1,9 +1,10 @@
 "use client"
-import { getLicense, getActor, License } from "../common";
+import { License } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
+import { useDataSource } from "../contexts";
 
 function entryToTable(entry: License): Record<string, React.ReactNode> {
   return {
@@ -18,12 +19,21 @@ function entryToTable(entry: License): Record<string, React.ReactNode> {
 }
 
 function EntryViewBase() {
+  const dataSource = useDataSource();
   const searchParams = useSearchParams();
   const entryId = searchParams.get("entryId")
   if (!entryId) {
     notFound();
   }
-  const entry = getLicense({id: entryId});
+  const entry = (() => {
+    try {
+      return dataSource.getLicense({id: entryId})
+    } catch {
+      return null;
+    }
+  })();
+  if (entry === null) return <></>;
+
   const entryTable = entryToTable(entry)
   return (
     <div className="container">
@@ -85,7 +95,7 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {entry.actors.map((r, index) => {
-            const actor = getActor({id: r.actorId})
+            const actor = dataSource.getActor({id: r.actorId})
             return (
               <tr key={index}>
                 <td>{actor.type}</td>

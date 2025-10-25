@@ -1,9 +1,9 @@
 "use client"
-import { getLicenses, getActor } from "../common"
 import { useState, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
 import { useItemSelections, useFilter, SearchableItem } from "../hooks";
+import { useDataSource } from "../contexts";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -14,11 +14,12 @@ const dropdownOpenStyle: CSSProperties = {
 
 export default function ListView() {
   const [actionIsOpen, setActionIsOpen] = useState(false); 
+  const dataSource = useDataSource();
 
-  const licenses = getLicenses();
+  const licenses = dataSource.getLicenses();
   const items = licenses.map<SearchableItem>(item => {
     const licenseHolderInfo = item.actors.find(r => !r.mednr);
-    const licenseHolder = licenseHolderInfo ? getActor({id: licenseHolderInfo.actorId}) : undefined;
+    const licenseHolder = licenseHolderInfo ? dataSource.getActor({id: licenseHolderInfo.actorId}) : undefined;
     return {
       id: item.id,
       properties: {
