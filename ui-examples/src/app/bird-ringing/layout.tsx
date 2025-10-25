@@ -1,8 +1,11 @@
 "use client"
 import Link from "next/link";
-import { useNavInfo, NavInfoContext, toPath } from "./contexts";
+import { useNavInfo, NavInfoContext, toPath, DataSourceContext } from "./contexts";
 import { Suspense, useMemo } from "react";
 import { usePathname } from 'next/navigation';
+import { StaticDataSource } from "./common";
+import { fetchData } from "../utils";
+import useSWR from 'swr';
 
 function BasePageLayout({
   children,
@@ -67,16 +70,47 @@ function NavStateProvider({
   )
 }
 
+function fetchAppData([licensesUrl, actorsUrl]: [string, string]) {
+  return Promise.all([
+    fetchData<StaticDataSource["licenses"]>(licensesUrl),
+    fetchData<StaticDataSource["actors"]>(actorsUrl),
+  ]);
+}
+
+function DataSourceProvider({
+  licensesUrl,
+  actorsUrl,
+  children,
+}: Readonly<{
+  licensesUrl: string,
+  actorsUrl: string,
+  children: React.ReactNode;
+}>) {
+  const {data, error, isLoading} = useSWR([licensesUrl, actorsUrl], fetchAppData);
+  console.log(error);
+  const dataSource = useMemo(() => new StaticDataSource(data ? data[1] : {}, data ? data[0] : {}, isLoading), [data, isLoading])
+  return (
+    <DataSourceContext.Provider value={dataSource}>{children}</DataSourceContext.Provider>
+  )
+}
+
 export default function PageLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+  const basePath = process.env.NEXT_PUBLIC_API_URL || "";
   return (
     <Suspense fallback={<BasePageLayout>{children}</BasePageLayout>}>
       <NavStateProvider>
-        <BasePageLayout>{children}</BasePageLayout>
+        <BasePageLayout>
+          <DataSourceProvider
+            licensesUrl={`${basePath}/data/bird-ringing/licenses.json`}
+            actorsUrl={`${basePath}/data/bird-ringing/actors.json`}
+          >
+            {children}
+          </DataSourceProvider>
+        </BasePageLayout>
       </NavStateProvider>
     </Suspense>
   )

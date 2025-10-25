@@ -1,10 +1,11 @@
 "use client"
-import { getActors, getActorLicenses, getLicenseInfo } from "../common"
 import { useState, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
 import { Fragment } from "react";
 import { useItemSelections, useFilter, SearchableItem } from "../hooks";
+import { useDataSource } from "../contexts";
+import { getOrDefault } from "../common";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -14,13 +15,14 @@ const dropdownOpenStyle: CSSProperties = {
 }
 
 export default function ListView() {
+  const dataSource = useDataSource();
   const [actionIsOpen, setActionIsOpen] = useState(false); 
 
-  const actors = getActors().sort((a, b) => a.name.localeCompare(b.name));
+  const actors = getOrDefault(dataSource.getActors(), (a) => a, []).sort((a, b) => a.name.localeCompare(b.name));
   const items = actors.map<SearchableItem>(item => {
-    const licenses = getActorLicenses(item, undefined, "Active");
+    const licenses = dataSource.getActorLicenses(item, undefined, "Active");
     const roles = new Set(licenses.map((l) => {
-      const info = getLicenseInfo(l, item)
+      const info = dataSource.getLicenseInfo(l, item)
       return info.role;
     }));
     return {
@@ -40,14 +42,14 @@ export default function ListView() {
         },
         "Licenses": {
           term: licenses.map((l) => {
-            const info = getLicenseInfo(l, item)
+            const info = dataSource.getLicenseInfo(l, item)
             return (
               info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr
             );
           }).join(" "),
           component: (
             <>{licenses.map((l, index, list) => {
-              const info = getLicenseInfo(l, item)
+              const info = dataSource.getLicenseInfo(l, item)
               return (
                 <Fragment key={l.mnr}><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
               );

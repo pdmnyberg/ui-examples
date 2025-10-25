@@ -1,9 +1,10 @@
 "use client"
-import { getLicenses, getActor } from "../common"
 import { useState, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
 import { useItemSelections, useFilter, SearchableItem } from "../hooks";
+import { useDataSource } from "../contexts";
+import { getOrDefault } from "../common";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -14,11 +15,12 @@ const dropdownOpenStyle: CSSProperties = {
 
 export default function ListView() {
   const [actionIsOpen, setActionIsOpen] = useState(false); 
+  const dataSource = useDataSource();
 
-  const licenses = getLicenses();
-  const items = licenses.map<SearchableItem>(item => {
+  const {data: licenses} = dataSource.getLicenses();
+  const items = (licenses || []).map<SearchableItem>(item => {
     const licenseHolderInfo = item.actors.find(r => !r.mednr);
-    const licenseHolder = licenseHolderInfo ? getActor({id: licenseHolderInfo.actorId}) : undefined;
+    const licenseHolder = licenseHolderInfo ? dataSource.getActor({id: licenseHolderInfo.actorId}) : undefined;
     return {
       id: item.id,
       properties: {
@@ -27,12 +29,12 @@ export default function ListView() {
           component: <Link href={`/bird-ringing/license-view/?entryId=${item.id}`}>{item.mnr}</Link>
         },
         "Type": {
-          term: licenseHolder ? licenseHolder.type : "-",
-          component: licenseHolder ? licenseHolder.type : "-"
+          term: getOrDefault(licenseHolder, (lh) => lh.type, "-"),
+          component: getOrDefault(licenseHolder, (lh) => lh.type, "-")
         },
         "License holder": {
-          term: licenseHolder ? licenseHolder.name : "-",
-          component: licenseHolder ? <Link href={`/bird-ringing/actor-view/?entryId=${licenseHolder.id}`}>{licenseHolder.name}</Link> : "-",
+          term: getOrDefault(licenseHolder, (lh) => lh.type, "-"),
+          component: getOrDefault(licenseHolder,  (lh) => <Link href={`/bird-ringing/actor-view/?entryId=${lh.id}`}>{lh.name}</Link>, "-"),
         },
         "Number of helpers": {
           term: String(item.actors.length),

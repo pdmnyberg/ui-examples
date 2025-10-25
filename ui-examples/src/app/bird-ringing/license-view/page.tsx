@@ -1,9 +1,11 @@
 "use client"
-import { getLicense, getActor, License } from "../common";
+import { License } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
+import { useDataSource } from "../contexts";
+import { getOrDefault } from "../common";
 
 function entryToTable(entry: License): Record<string, React.ReactNode> {
   return {
@@ -18,12 +20,24 @@ function entryToTable(entry: License): Record<string, React.ReactNode> {
 }
 
 function EntryViewBase() {
+  const dataSource = useDataSource();
   const searchParams = useSearchParams();
   const entryId = searchParams.get("entryId")
   if (!entryId) {
     notFound();
   }
-  const entry = getLicense({id: entryId});
+  const {data: entry, isLoading} = dataSource.getLicense({id: entryId})
+  if (isLoading) return (
+    <div className="container">
+      <h2>License view</h2>
+      <p>Loading...</p>
+    </div>
+  );
+
+  if (!entry) {
+    notFound();
+  }
+
   const entryTable = entryToTable(entry)
   return (
     <div className="container">
@@ -85,7 +99,7 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {entry.actors.map((r, index) => {
-            const actor = getActor({id: r.actorId})
+            const actor = getOrDefault(dataSource.getActor({id: r.actorId}), (a) => a, {type: "-", id: "-", name: "-"})
             return (
               <tr key={index}>
                 <td>{actor.type}</td>

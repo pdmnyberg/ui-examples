@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASE_PATH: "/ui-examples"
+      NEXT_PUBLIC_API_URL: "/ui-examples"
 
     steps:
       - name: Checkout code
@@ -22,6 +23,10 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        working-directory: ./ui-examples
+
+      - name: Generate example data
+        run: npm run generate-data
         working-directory: ./ui-examples
 
       - name: Build project
