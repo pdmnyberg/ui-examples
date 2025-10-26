@@ -24,11 +24,13 @@ function BasePageLayout({
   const firstNav = path ? path[0]?.id : undefined;
   return (
     <>
-      <aside style={{display: "flex"}}>
-        <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary" style={{width: "280px"}}>
-          <Link href="/bird-ringing" className="d-flex align-items-center p-3 bg-primary text-white text-decoration-none">
-            <i className="bi fs-4 pe-2 bi-check-circle-fill" />
-            <span className="fs-4">{contextTitle}</span>
+      <aside className="d-flex flex-shrink-0">
+        <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary">
+          <Link href="/bird-ringing" className="d-flex align-items-center p-3 pe-5 bg-primary text-white text-decoration-none">
+            <i className="bi fs-4 lh-1 pe-2 bi-check-circle-fill" />
+            <span className="d-flex flex-column">
+              <span className="fs-4 lh-1">{contextTitle}</span>
+            </span>
           </Link>
           <ul className="nav nav-pills p-3 flex-column">
             {navItems.map((ni, index) => {
