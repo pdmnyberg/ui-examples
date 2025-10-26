@@ -2,7 +2,9 @@ body {
   display: flex;
   height: 100vh;
   width: 100vw;
+  --bs-primary-rgb: 20, 72, 54;
   --bs-link-color-rgb: 36, 125, 163;
+  --bs-primary: rgb(var(--bs-primary-rgb));
   --bs-link-color: rgb(var(--bs-link-color-rgb));
 }
 

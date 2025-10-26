@@ -25,10 +25,12 @@ function BasePageLayout({
   return (
     <>
       <aside style={{display: "flex"}}>
-        <div className="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style={{width: "280px"}}>
-          <Link href="/" className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"><span className="fs-4">{contextTitle}</span></Link>
-          <hr />
-          <ul className="nav nav-pills flex-column mb-auto">
+        <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary" style={{width: "280px"}}>
+          <Link href="/bird-ringing" className="d-flex align-items-center p-3 bg-primary text-white text-decoration-none">
+            <i className="bi fs-4 pe-2 bi-check-circle-fill" />
+            <span className="fs-4">{contextTitle}</span>
+          </Link>
+          <ul className="nav nav-pills p-3 flex-column">
             {navItems.map((ni, index) => {
               const isActive = firstNav === ni.id;
               return (
@@ -39,7 +41,7 @@ function BasePageLayout({
           {dropdownItems.length > 0 ? <>
             <hr />
             <div className="dropdown">
-              <a href="#" className="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <a href="#" className="d-flex align-items-center p-3 link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <strong>Utils</strong>
               </a>
               <ul className="dropdown-menu text-small shadow">
