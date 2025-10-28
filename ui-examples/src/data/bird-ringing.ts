@@ -5,6 +5,8 @@ import {
     LicenseStatus,
     License,
     LicenseRelation,
+    LicenseDocument,
+    Species,
 } from "../app/bird-ringing/common";
 import { RandomContext, DataGenerator } from "./common";
 
@@ -349,6 +351,53 @@ function getMoonData(): DataSource {
         "Deep within"
     ]
 
+    const speciesSignifiers = [
+        { "signifier": "Pale", "code": "PLAE", "epithet": "pallida" },
+        { "signifier": "Cinder", "code": "CNDR", "epithet": "cineraria" },
+        { "signifier": "Polar", "code": "PLAR", "epithet": "polaris" },
+        { "signifier": "Solar", "code": "SLAR", "epithet": "solara" },
+        { "signifier": "Dusk", "code": "DSKQ", "epithet": "crepuscula" },
+        { "signifier": "Radiant", "code": "RDNT", "epithet": "radiosa" },
+        { "signifier": "Echo", "code": "ECHO", "epithet": "resonata" },
+        { "signifier": "Crystal", "code": "CRYS", "epithet": "crystallina" },
+        { "signifier": "Void", "code": "VOID", "epithet": "vacua" },
+        { "signifier": "Luminescent", "code": "LMNS", "epithet": "lumina" },
+        { "signifier": "Ashen", "code": "ASHN", "epithet": "cinerea" },
+        { "signifier": "Lowlight", "code": "LWLT", "epithet": "obscura" },
+        { "signifier": "Highdome", "code": "HGDM", "epithet": "altidoma" },
+        { "signifier": "Chroma", "code": "CHRM", "epithet": "chromata" },
+        { "signifier": "Glacial", "code": "GLCL", "epithet": "glacialis" },
+        { "signifier": "Ecliptic", "code": "ECLP", "epithet": "ecliptica" },
+        { "signifier": "Hollow", "code": "HLLO", "epithet": "cavata" },
+        { "signifier": "Vapor", "code": "VAPR", "epithet": "vaporis" },
+        { "signifier": "Dustborne", "code": "DSTB", "epithet": "pulverata" },
+        { "signifier": "Silica", "code": "SLIC", "epithet": "silicata" }
+    ]
+
+    const species = [
+        { "name": "Lunathrush", "code": "LNTH", "scientific": "Avius lunathrusia" },
+        { "name": "Skylume", "code": "SKLM", "scientific": "Caelornis luminis" },
+        { "name": "Dustjay", "code": "DSTJ", "scientific": "Paracorvus pulveris" },
+        { "name": "Orbiter", "code": "ORBT", "scientific": "Aethera orbitale" },
+        { "name": "Moondove", "code": "MNDV", "scientific": "Columba lunara" },
+        { "name": "Kestrelon", "code": "KSTL", "scientific": "Falco minoris" },
+        { "name": "Regolark", "code": "RGLR", "scientific": "Alauda regolithica" },
+        { "name": "Glowfinch", "code": "GLFN", "scientific": "Carduelis lucerna" },
+        { "name": "Terralite", "code": "TRLT", "scientific": "Terravis luminata" },
+        { "name": "Craterhawk", "code": "CRHK", "scientific": "Accipiter crateris" },
+        { "name": "Nimbird", "code": "NMBR", "scientific": "Avis nimbalis" },
+        { "name": "Aetherin", "code": "AETR", "scientific": "Aetherornis tenuis" },
+        { "name": "Echowl", "code": "ECHW", "scientific": "Strix resonata" },
+        { "name": "Spiremag", "code": "SPMG", "scientific": "Pica spiralis" },
+        { "name": "Novarook", "code": "NVRK", "scientific": "Corvus novaris" },
+        { "name": "Lunegret", "code": "LNGR", "scientific": "Ardea lunaris" },
+        { "name": "Vaultwing", "code": "VLWG", "scientific": "Alatus cavarum" },
+        { "name": "Crestorn", "code": "CRST", "scientific": "Aves cristata" },
+        { "name": "Plumetern", "code": "PLMT", "scientific": "Sterna plumatica" },
+        { "name": "Hollowswift", "code": "HLSW", "scientific": "Apus cavalis" }
+    ]
+
+
     return {
         groupNames,
         maleNames,
@@ -361,6 +410,8 @@ function getMoonData(): DataSource {
         emailStatus,
         descriptions,
         permissionTypes,
+        speciesSignifiers,
+        species,
     }
 }
 
@@ -580,12 +631,16 @@ type DataSource = {
     reportStatuses: ReportStatus[];
     emailStatus: string[];
     descriptions: string[];
-    permissionTypes: string[]
+    permissionTypes: string[];
+    speciesSignifiers: {signifier: string, code: string, epithet: string}[];
+    species: {name: string, code: string, scientific: string}[];
 }
 
 export class BirdRingingDataGenerator implements DataGenerator<{
     actors: Record<string, Actor>,
-    licenses: Record<string, License>
+    licenses: Record<string, License>,
+    documents: Record<string, LicenseDocument>,
+    species: Record<string, Species>,
 }> {
     randomContext: RandomContext;
     period: [Date, Date];
@@ -619,7 +674,11 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             const sex: Sex = isOrganization ? "N/A" : (
                 declareSex ? (isMale ? "Male" : "Female") : "Undisclosed"
             )
+            const id: string = `actor-${index}`;
+            const mnr: string = `${String(index).padStart(4, '0')}`;
             return {
+                id,
+                mnr,
                 name,
                 email,
                 sex,
@@ -628,9 +687,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 emailSentAt: updatedAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),
             }
-        }).reduce<Record<string, Actor>>((acc, actor, index) => {
-            const id: string = `actor-${index}`;
-            acc[id] = actor;
+        }).reduce<Record<string, Actor>>((acc, actor) => {
+            acc[actor.id] = actor;
             return acc;
         }, {})
     }
@@ -670,35 +728,23 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 return {
                     role: "Helper",
                     mednr: `${String(index).padStart(4, '0')}`,
-                    actorId,
+                    actor: {id: actorId, type: "actor"},
                     licenseSentAt: createdAt.toISOString(),
                     licenseSentStatus: fixedRandom.choice(emailStatus),
                     status: isActive ? "Active" : "Inactive",
-                    documents: [
-                        {
-                            type: "license",
-                            href: "/mock-license.pdf",
-                            createdAt: createdAt.toISOString(),
-                        }
-                    ]
                 }
             });
             const ringer: LicenseRelation = {
                 role: "Ringer",
-                actorId: ringerId,
+                actor: {id: ringerId, type: "actor"},
                 licenseSentAt: createdAt.toISOString(),
                 licenseSentStatus: fixedRandom.choice(emailStatus),
                 status: "Active",
-                documents: [
-                    {
-                        type: "license",
-                        href: "/mock-license.pdf",
-                        createdAt: createdAt.toISOString(),
-                    }
-                ]
             }
+            const id: string = `license-${index}`;
             return {
-                mnr: `${String(index).padStart(4, '0')}`,
+                id,
+                actor: {id: ringerId, type: "actor"},
                 createdAt: createdAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),
                 expiresAt: expiresAt.toISOString(),
@@ -713,19 +759,58 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 ],
                 reportStatus: fixedRandom.choice(reportStatuses),
             }
-        })).reduce<Record<string, License>>((acc, license, index) => {
-            const id: string = `license-${index}`;
-            acc[id] = license;
+        })).reduce<Record<string, License>>((acc, license) => {
+            acc[license.id] = license;
+            return acc;
+        }, {});
+    }
+
+    createDocuments(licenses: Record<string, License>): Record<string, LicenseDocument> {
+        return Object.values(licenses).flatMap(l => l.actors.map<[License, LicenseRelation]>(r => [l, r])).map<LicenseDocument>(([license, relation], index) => {
+            const id: string = `document-${index}`;
+            return {
+                id,
+                actor: relation.actor,
+                license: {id: license.id, type: "license"},
+                type: "license",
+                href: "/mock-license.pdf",
+                createdAt: license.createdAt,
+            }
+        }).reduce<Record<string, LicenseDocument>>((acc, doc) => {
+            acc[doc.id] = doc;
+            return acc;
+        }, {});
+    }
+
+    createSpecies(numberOfSpecies: number): Record<string, Species> {
+        const fixedRandom = this.randomContext;
+        const {speciesSignifiers, species} = this.dataSource
+        return Array.from({length: numberOfSpecies}).map<Species>((_, index) => {
+            const id: string = `species-${index}`;
+            const speciesBase = fixedRandom.choice(species);
+            const signifier = fixedRandom.choice(speciesSignifiers);
+            return {
+                id,
+                name: `${signifier.signifier} ${speciesBase.name}`,
+                scientificCode: `${signifier.code}-${speciesBase.code}`,
+                scientificName: `${speciesBase.scientific} ${signifier.epithet}`,
+            }
+        }).reduce<Record<string, Species>>((acc, s) => {
+            acc[s.id] = s;
             return acc;
         }, {});
     }
 
     createData() {
         const actors = this.createActors(200, 30);
-        const licenses = this.createLicenses(actors, 100)
+        const licenses = this.createLicenses(actors, 100);
+        const documents = this.createDocuments(licenses);
+        const species = this.createSpecies(50);
         return {
             actors,
             licenses,
+            documents,
+            species,
         }
     }
 }
