@@ -1,5 +1,5 @@
 "use client"
-import { Actor } from "../common";
+import { Actor, getOrDefault } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -77,11 +77,12 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {licenses.map((l) => {
-            const licenseInfo = dataSource.getLicenseInfo(l, actor)
-            const primaryDocument = licenseInfo.documents[0];
+            const licenseInfo = dataSource.getLicenseInfo(l, actor);
+            const primaryDocument = dataSource.getDocuments(l, actor)[0];
+            const mnr = getOrDefault(dataSource.getActor(l.actor), (actor) => actor.mnr, "-");
             return (
               <tr key={l.id}>
-                <th scope="row"><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{l.mnr}</Link></th>
+                <th scope="row"><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{mnr}</Link></th>
                 <td>{licenseInfo ? licenseInfo.role : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.mednr : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.status : "-"}</td>

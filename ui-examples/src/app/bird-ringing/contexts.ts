@@ -13,7 +13,7 @@ type NavInfo = {
 }
 
 export const NavInfoContext = createContext<NavInfo>({setPath: () => {}});
-export const DataSourceContext = createContext<DataSource>(new StaticDataSource({}, {}, true));
+export const DataSourceContext = createContext<DataSource>(new StaticDataSource({}, {}, {}, true));
 
 export function useNavInfo() {
     return useContext(NavInfoContext);

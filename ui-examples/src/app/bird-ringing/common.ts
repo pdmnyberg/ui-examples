@@ -1,4 +1,5 @@
-export type Actor = {
+export type Actor = IdentifiableEntity & {
+    mnr: string;
     name: string;
     email?: string;
     updatedAt: string;
@@ -16,8 +17,14 @@ export type LicenseStatus = "Active" | "Not active" | "Discontinued";
 
 export type LicenseRole = "Ringer" | "Helper";
 
-export type License = {
-    mnr: string;
+export type ActorRef = IdentifiableEntity & {type: "actor"};
+export type LicenseRef = IdentifiableEntity & {type: "license"};
+export type SpeciesRef = IdentifiableEntity & {type: "species"};
+export type PermissionRef = IdentifiableEntity & {type: "permission"};
+export type PermissionPropertyRef = IdentifiableEntity & {type: "permission-property"};
+
+export type License = IdentifiableEntity & {
+    actor: ActorRef;
     createdAt: string;
     updatedAt: string;
     expiresAt: string;
@@ -30,17 +37,46 @@ export type License = {
 }
 
 export type LicenseRelation = {
-    actorId: string;
+    actor: ActorRef;
     mednr?: string;
     role: LicenseRole;
     licenseSentAt: string;
     licenseSentStatus: string;
     status: RelationStatus;
-    documents: {
-        type: string;
-        createdAt: string;
-        href: string;
-    }[];
+}
+
+export type LicenseDocument = IdentifiableEntity & {
+    actor: ActorRef;
+    license: LicenseRef;
+    type: string;
+    createdAt: string;
+    href: string;
+}
+
+export type Species = IdentifiableEntity & {
+    name: string;
+    scientificName: string;
+    scientificCode: string;
+}
+
+export type PermissionType = {
+    name: string;
+    description: string;
+}
+
+export type PermissionTypeProperty = {
+    permissions: PermissionRef[];
+    name: string;
+    description: string;
+}
+
+export type Permission = {
+    type: PermissionRef;
+    speciesList: SpeciesRef[];
+    properties: PermissionPropertyRef[];
+    location: string;
+    description: string;
+    period: [string, string];
 }
 
 export type RelationStatus = "Active" | "Inactive";
@@ -63,47 +99,44 @@ export type DataSource = {
     getLicenseActors(license: IdentifiableEntity, role: LicenseRole): (Actor & IdentifiableEntity)[];
     getActor(actor: IdentifiableEntity): DataLoading<Actor & IdentifiableEntity>;
     getLicense(license: IdentifiableEntity): DataLoading<License & IdentifiableEntity>;
+    getDocuments(license: IdentifiableEntity, actor: IdentifiableEntity): LicenseDocument[];
 }
 
 export class StaticDataSource implements DataSource {
     actors: Record<string, Actor>;
     licenses: Record<string, License>;
+    documents: Record<string, LicenseDocument>;
     isLoading: boolean;
-    constructor(actors: Record<string, Actor>, licenses: Record<string, License>, isLoading: boolean) {
+    constructor(actors: Record<string, Actor>, licenses: Record<string, License>, documents: Record<string, LicenseDocument>, isLoading: boolean) {
         this.actors = actors;
         this.licenses = licenses;
+        this.documents = documents;
         this.isLoading = isLoading;
     }
     getActors() {
         return this.isLoading ? this._getResult([], true) : this._getResult(this._getActors(), false)
     }
-    _getActors(): (Actor & IdentifiableEntity)[] {
-        return Object.entries(this.actors).map(([id, value]) => ({
-            id,
-            ...value
-        }))
+    _getActors(): Actor[] {
+        return Object.values(this.actors);
     }
     getLicenses() {
         return this.isLoading ? this._getResult([], true) : this._getResult(this._getLicenses(), false);
     }
     _getLicenses(): (License & IdentifiableEntity)[] {
-        return Object.entries(this.licenses).map(([id, value]) => ({
-            id,
-            ...value
-        }))
+        return Object.values(this.licenses);
     }
     getActorLicenses(actor: IdentifiableEntity, role?: LicenseRole, status?: RelationStatus): (License & IdentifiableEntity)[] {
         return this._getLicenses().filter(l => l.actors.some(a => (
-            a.actorId === actor.id &&
+            a.actor.id === actor.id &&
             (!role || a.role === role) &&
             (status === undefined || a.status === status)
         )))
     }
     getLicenseInfo(license: License, actor: IdentifiableEntity): LicenseRelation {
-        return license.actors.filter(a => a.actorId === actor.id)[0]
+        return license.actors.filter(a => a.actor.id === actor.id)[0]
     }
     getLicenseActors(license: IdentifiableEntity, role: LicenseRole): (Actor & IdentifiableEntity)[] {
-        return this._getLicense(license).actors.filter(a => a.role === role).map(a => this._getActor({id: a.actorId}))
+        return this._getLicense(license).actors.filter(a => a.role === role).map(a => this._getActor({id: a.actor.id}))
     }
     getActor(identifier: IdentifiableEntity) {
         try {
@@ -112,7 +145,7 @@ export class StaticDataSource implements DataSource {
             return this._getResult(undefined, false, e);
         }
     }
-    _getActor(identifier: IdentifiableEntity): Actor & IdentifiableEntity {
+    _getActor(identifier: IdentifiableEntity): Actor {
         const actor = this.actors[identifier.id];
         if (actor) {
             return {
@@ -129,7 +162,10 @@ export class StaticDataSource implements DataSource {
             return this._getResult(undefined, false, e);
         }
     }
-    _getLicense(identifier: IdentifiableEntity): License & IdentifiableEntity {
+    getDocuments(license: IdentifiableEntity, actor: IdentifiableEntity) {
+        return Object.values(this.documents).filter(d => d.actor.id === actor.id && d.license.id === license.id)
+    }
+    _getLicense(identifier: IdentifiableEntity): License {
         const license = this.licenses[identifier.id];
         if (license) {
             return {

@@ -5,11 +5,12 @@ import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import { useDataSource } from "../contexts";
-import { getOrDefault } from "../common";
+import { getOrDefault, DataSource } from "../common";
 
-function entryToTable(entry: License): Record<string, React.ReactNode> {
+function entryToTable(entry: License, dataSource: DataSource): Record<string, React.ReactNode> {
+  const mnr = getOrDefault(dataSource.getActor(entry.actor), (a) => a.mnr, "-")
   return {
-    "Mnr": entry.mnr,
+    "Mnr": mnr,
     "Created At": entry.createdAt,
     "Updated At": entry.updatedAt,
     "Period": `${entry.startsAt}  to ${entry.expiresAt}`,
@@ -38,7 +39,7 @@ function EntryViewBase() {
     notFound();
   }
 
-  const entryTable = entryToTable(entry)
+  const entryTable = entryToTable(entry, dataSource);
   return (
     <div className="container">
       <Warning>
@@ -99,7 +100,7 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {entry.actors.map((r, index) => {
-            const actor = getOrDefault(dataSource.getActor({id: r.actorId}), (a) => a, {type: "-", id: "-", name: "-"})
+            const actor = getOrDefault(dataSource.getActor({id: r.actor.id}), (a) => a, {type: "-", id: "-", name: "-"})
             return (
               <tr key={index}>
                 <td>{actor.type}</td>

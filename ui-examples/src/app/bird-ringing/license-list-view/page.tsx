@@ -20,13 +20,13 @@ export default function ListView() {
   const {data: licenses} = dataSource.getLicenses();
   const items = (licenses || []).map<SearchableItem>(item => {
     const licenseHolderInfo = item.actors.find(r => !r.mednr);
-    const licenseHolder = licenseHolderInfo ? dataSource.getActor({id: licenseHolderInfo.actorId}) : undefined;
+    const licenseHolder = licenseHolderInfo ? dataSource.getActor(licenseHolderInfo.actor) : undefined;
     return {
       id: item.id,
       properties: {
         "Mnr": {
-          term: item.mnr,
-          component: <Link href={`/bird-ringing/license-view/?entryId=${item.id}`}>{item.mnr}</Link>
+          term: getOrDefault(licenseHolder, (lh) => lh.mnr, "-"),
+          component: <Link href={`/bird-ringing/license-view/?entryId=${item.id}`}>{getOrDefault(licenseHolder, (lh) => lh.mnr, "-")}</Link>
         },
         "Type": {
           term: getOrDefault(licenseHolder, (lh) => lh.type, "-"),

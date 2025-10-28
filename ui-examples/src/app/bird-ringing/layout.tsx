@@ -74,25 +74,28 @@ function NavStateProvider({
   )
 }
 
-function fetchAppData([licensesUrl, actorsUrl]: [string, string]) {
+function fetchAppData([licensesUrl, actorsUrl, documentsUrl]: [string, string, string]) {
   return Promise.all([
     fetchData<StaticDataSource["licenses"]>(licensesUrl),
     fetchData<StaticDataSource["actors"]>(actorsUrl),
+    fetchData<StaticDataSource["documents"]>(documentsUrl),
   ]);
 }
 
 function DataSourceProvider({
   licensesUrl,
   actorsUrl,
+  documentsUrl,
   children,
 }: Readonly<{
   licensesUrl: string,
   actorsUrl: string,
+  documentsUrl: string,
   children: React.ReactNode;
 }>) {
-  const {data, error, isLoading} = useSWR([licensesUrl, actorsUrl], fetchAppData);
+  const {data, error, isLoading} = useSWR([licensesUrl, actorsUrl, documentsUrl], fetchAppData);
   console.log(error);
-  const dataSource = useMemo(() => new StaticDataSource(data ? data[1] : {}, data ? data[0] : {}, isLoading), [data, isLoading])
+  const dataSource = useMemo(() => new StaticDataSource(data ? data[1] : {}, data ? data[0] : {}, data ? data[2] : {}, isLoading), [data, isLoading])
   return (
     <DataSourceContext.Provider value={dataSource}>{children}</DataSourceContext.Provider>
   )
@@ -111,6 +114,7 @@ export default function PageLayout({
           <DataSourceProvider
             licensesUrl={`${basePath}/data/bird-ringing/licenses.json`}
             actorsUrl={`${basePath}/data/bird-ringing/actors.json`}
+            documentsUrl={`${basePath}/data/bird-ringing/documents.json`}
           >
             {children}
           </DataSourceProvider>

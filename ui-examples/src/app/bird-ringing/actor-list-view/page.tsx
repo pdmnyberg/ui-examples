@@ -43,15 +43,17 @@ export default function ListView() {
         "Licenses": {
           term: licenses.map((l) => {
             const info = dataSource.getLicenseInfo(l, item)
+            const mnr = getOrDefault(dataSource.getActor(l.actor), (actor) => actor.mnr, "-");
             return (
-              info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr
+              info.mednr ? `${mnr}:${info.mednr}` : mnr
             );
           }).join(" "),
           component: (
             <>{licenses.map((l, index, list) => {
-              const info = dataSource.getLicenseInfo(l, item)
+              const info = dataSource.getLicenseInfo(l, item);
+              const mnr = getOrDefault(dataSource.getActor(l.actor), (actor) => actor.mnr, "-");
               return (
-                <Fragment key={l.mnr}><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{info.mednr ? `${l.mnr}:${info.mednr}` : l.mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
+                <Fragment key={index}><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{info.mednr ? `${mnr}:${info.mednr}` : mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>
               );
             })}</>
           )
