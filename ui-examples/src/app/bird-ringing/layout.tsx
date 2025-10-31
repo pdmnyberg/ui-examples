@@ -24,7 +24,7 @@ function BasePageLayout({
       <aside className="d-flex flex-shrink-0 sidebar" data-is-open={navIsOpen}>
         <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary sidebar-content">
           <Link href="/bird-ringing" className="d-flex align-items-center p-3 pe-5 bg-primary text-white text-decoration-none">
-            <i className="bi fs-4 lh-1 pe-2 bi-check-circle-fill" />
+            <i className="bi fs-4 lh-1 pe-2 bi-feather" />
             <span className="d-flex flex-column">
               <span className="fs-4 lh-1">{contextTitle}</span>
             </span>
