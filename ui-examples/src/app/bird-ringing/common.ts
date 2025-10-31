@@ -64,7 +64,7 @@ export type PermissionType = {
     description: string;
 }
 
-export type PermissionTypeProperty = {
+export type PermissionProperty = {
     permissions: PermissionRef[];
     name: string;
     description: string;

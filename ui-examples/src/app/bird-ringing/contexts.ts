@@ -12,8 +12,19 @@ type NavInfo = {
     setPath?(path: PathSegment[] | undefined): void;
 }
 
+export type NavItems = (
+    {type: "item", label: string, href: string, id: string} |
+    {type: "separator"} |
+    {type: "heading", label: string}
+)[]
+
 export const NavInfoContext = createContext<NavInfo>({setPath: () => {}});
+export const NavContext = createContext<NavItems>([]);
 export const DataSourceContext = createContext<DataSource>(new StaticDataSource({}, {}, {}, true));
+
+export function useNav() {
+    return useContext(NavContext);
+}
 
 export function useNavInfo() {
     return useContext(NavInfoContext);

@@ -5,9 +5,36 @@ body {
   --bs-primary-rgb: 20, 72, 54;
   --bs-link-color-rgb: 36, 125, 163;
   --bs-primary: rgb(var(--bs-primary-rgb));
+  --bs-primary-hover: rgb(var(--bs-primary-rgb));
   --bs-link-color: rgb(var(--bs-link-color-rgb));
+  --menu-size: 20rem;
 }
 
 .nav-pills {
   --bs-nav-pills-link-active-bg: rgb(var(--bs-link-color-rgb)) !important;
+}
+
+.sidebar {
+  width: var(--menu-size);
+  transition: width 0.1s;
+  overflow: hidden;
+}
+
+.sidebar[data-is-open="false"] {
+  width: 0;
+}
+
+.sidebar-content {
+  width: var(--menu-size);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary) !important;
+  --bs-btn-border-color: var(--bs-primary) !important;
+  --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), 0.8) !important;
+  --bs-btn-hover-border-color: var(--bs-primary) !important;
+  --bs-btn-active-bg: rgba(var(--bs-primary-rgb), 0.9) !important;
+  --bs-btn-active-border-color: var(--bs-primary) !important;
+  --bs-btn-disabled-bg: rgba(var(--bs-primary-rgb), 0.5) !important;
+  --bs-btn-disabled-border-color: var(--bs-primary) !important;
 }

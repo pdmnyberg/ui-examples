@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
-import { useNavInfo, NavInfoContext, toPath, DataSourceContext } from "./contexts";
-import { Suspense, useMemo } from "react";
+import { useNavInfo, NavInfoContext, toPath, DataSourceContext, useNav, NavContext, NavItems } from "./contexts";
+import { Suspense, useMemo, useState } from "react";
 import { usePathname } from 'next/navigation';
 import { StaticDataSource } from "./common";
 import { fetchData } from "../utils";
@@ -14,18 +14,15 @@ function BasePageLayout({
 }>) {
   const {path} = useNavInfo();
   const contextTitle: string = "Bird ringing"
-  const navItems: {label: string, href: string, id: string}[] = [
-    {label: "Actor list view", href: "/bird-ringing/actor-list-view", id: "actor-list-view"},
-    {label: "Actor view", href: "/bird-ringing/actor-view/?entryId=actor-0", id: "actor-view"},
-    {label: "License list view", href: "/bird-ringing/license-list-view", id: "license-list-view"},
-    {label: "License view", href: "/bird-ringing/license-view/?entryId=license-0", id: "license-view"}
-  ]
+  const navItems = useNav();
   const dropdownItems: {label: string, href: string}[] = []
   const firstNav = path ? path[0]?.id : undefined;
+  const [navIsOpen, setNavIsOpen] = useState(true);
+
   return (
     <>
-      <aside className="d-flex flex-shrink-0">
-        <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary">
+      <aside className="d-flex flex-shrink-0 sidebar" data-is-open={navIsOpen}>
+        <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary sidebar-content">
           <Link href="/bird-ringing" className="d-flex align-items-center p-3 pe-5 bg-primary text-white text-decoration-none">
             <i className="bi fs-4 lh-1 pe-2 bi-check-circle-fill" />
             <span className="d-flex flex-column">
@@ -34,10 +31,14 @@ function BasePageLayout({
           </Link>
           <ul className="nav nav-pills p-3 flex-column">
             {navItems.map((ni, index) => {
-              const isActive = firstNav === ni.id;
-              return (
-                <li key={index} className="nav-item"><Link href={ni.href} className={`nav-link ${isActive ? "active" : ""}`} aria-current="page">{ni.label}</Link></li>
-              )
+              if (ni.type === "item") {
+                const isActive = firstNav === ni.id;
+                return <li key={index} className="nav-item"><Link href={ni.href} className={`nav-link ${isActive ? "active" : ""}`} aria-current="page">{ni.label}</Link></li>
+              } else if (ni.type === "separator") {
+                return <li key={index}><hr /></li>
+              } else if (ni.type === "heading") {
+                return <li key={index} className="nav-item"><h3 className="fs-5">{ni.label}</h3></li>
+              }
             })}
           </ul>
           {dropdownItems.length > 0 ? <>
@@ -55,8 +56,13 @@ function BasePageLayout({
           </> : <></>}
         </div>
       </aside>
-      <main className="p-3 flex-grow-1 overflow-auto">
-        {children}
+      <main className="p-3 flex-grow-1 overflow-auto position-relative">
+        <button className="btn btn-primary" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
+          <i className="bi fs-2 bi-list" />
+        </button>
+        <div className="pt-3">
+          {children}
+        </div>
       </main>
     </>
   );
@@ -107,19 +113,30 @@ export default function PageLayout({
   children: React.ReactNode;
 }>) {
   const basePath = process.env.NEXT_PUBLIC_API_URL || "";
+  const navItems: NavItems =  [
+    {type: "heading", label: "Manage licenses"},
+    {type: "item", label: "Actor list", href: "/bird-ringing/actor-list-view", id: "actor-list-view"},
+    {type: "item", label: "License list", href: "/bird-ringing/license-list-view", id: "license-list-view"},
+    {type: "separator"},
+    {type: "heading", label: "Manage details"},
+    {type: "item", label: "Species list", href: "/bird-ringing/species-list-view", id: "species-list-view"},
+    {type: "item", label: "Permissions list", href: "/bird-ringing/permissions-list-view", id: "permissions-list-view"},
+  ]
   return (
-    <Suspense fallback={<BasePageLayout>{children}</BasePageLayout>}>
-      <NavStateProvider>
-        <BasePageLayout>
-          <DataSourceProvider
-            licensesUrl={`${basePath}/data/bird-ringing/licenses.json`}
-            actorsUrl={`${basePath}/data/bird-ringing/actors.json`}
-            documentsUrl={`${basePath}/data/bird-ringing/documents.json`}
-          >
-            {children}
-          </DataSourceProvider>
-        </BasePageLayout>
-      </NavStateProvider>
-    </Suspense>
+    <NavContext.Provider value={navItems}>
+      <Suspense fallback={<BasePageLayout>{children}</BasePageLayout>}>
+        <NavStateProvider>
+          <BasePageLayout>
+            <DataSourceProvider
+              licensesUrl={`${basePath}/data/bird-ringing/licenses.json`}
+              actorsUrl={`${basePath}/data/bird-ringing/actors.json`}
+              documentsUrl={`${basePath}/data/bird-ringing/documents.json`}
+            >
+              {children}
+            </DataSourceProvider>
+          </BasePageLayout>
+        </NavStateProvider>
+      </Suspense>
+    </NavContext.Provider>
   )
 }
