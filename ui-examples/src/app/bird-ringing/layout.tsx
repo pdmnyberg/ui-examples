@@ -57,12 +57,11 @@ function BasePageLayout({
         </div>
       </aside>
       <main className="p-3 flex-grow-1 overflow-auto position-relative">
-        <button className="btn btn-primary" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
+        <button className="btn btn-primary position-fixed z-3" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
           <i className="bi fs-2 bi-list" />
         </button>
-        <div className="pt-3">
-          {children}
-        </div>
+        <div className="py-5" />
+        {children}
       </main>
     </>
   );
