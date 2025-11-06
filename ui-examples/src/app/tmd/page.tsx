@@ -83,7 +83,7 @@ export default function Home() {
       <div className="row my-3">
         <div className="col">
           <div className="input-group">
-            <input type="text" ref={apiRootInputRef} name="api-root" defaultValue={apiRoot} />
+            <input className="form-control" type="text" ref={apiRootInputRef} name="api-root" defaultValue={apiRoot} />
             <button className="btn btn-primary" type="button" onClick={updateRoot}>Change Root</button>
           </div>
         </div>
