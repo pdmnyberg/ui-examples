@@ -26,11 +26,11 @@ type Result<T> = {
 }
 
 async function fetchMetrics([apiRoot, questions]: [string, string[]]): Promise<Result<MetricsData>> {
-  return await (await fetch(`${apiRoot}/metrics/questions?${Array.from(questions).map(q => `ids=${q}`).join("&")}`)).json()
+  return await (await fetch(`${apiRoot}/metrics?questions=${Array.from(questions).join(",")}`)).json()
 }
 
 async function fetchQuestions([apiRoot, questionset]: [string, string[]]): Promise<Result<QuestionData>> {
-  return await (await fetch(`${apiRoot}/properties/sets?ids=${questionset}`)).json()
+  return await (await fetch(`${apiRoot}/properties?question_sets=${questionset}`)).json()
 }
 
 const viewAlternatives: Entry[] = [
