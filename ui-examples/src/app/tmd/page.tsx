@@ -108,8 +108,10 @@ export default function Home() {
         <div className="row my-3">
           {questionData.values.map(question => (
             <div className="col-2" key={question.id}>
-              <input className="form-check-input" type="checkbox" id={question.id} data-entry-id={question.id} onChange={handleQuestionChoice} checked={questions.has(question.id)}/>
-              <label htmlFor={question.id}>{question.label}</label>
+              <div className="form-check">
+                <input className="form-check-input" type="checkbox" id={question.id} data-entry-id={question.id} onChange={handleQuestionChoice} checked={questions.has(question.id)}/>
+                <label className="form-check-label" htmlFor={question.id}>{question.label}</label>
+              </div>
             </div>
           ))}
         </div>
