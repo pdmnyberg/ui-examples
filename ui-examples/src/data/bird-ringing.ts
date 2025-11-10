@@ -715,10 +715,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 declareSex ? (isMale ? "Male" : "Female") : "Undisclosed"
             )
             const id: string = `actor-${index}`;
-            const mnr: string = `${String(index).padStart(4, '0')}`;
             return {
                 id,
-                mnr,
                 name,
                 email,
                 sex,
@@ -760,6 +758,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         ];
         const helperIds = Object.keys(personActors);
         return (Array.from({length: numberOfLicenses}).map<License>((_, index) => {
+            const mnr: string = `${String(index).padStart(4, '0')}`;
             const ringerId = ringerIds[index % ringerIds.length]
             const [createdAt, updatedAt] = fixedRandom.randdaterange(...period);
             const [startsAt, expiresAt] = fixedRandom.randdaterange(...period, maxLicenseLength);
@@ -784,6 +783,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             const id: string = `license-${index}`;
             return {
                 id,
+                mnr,
                 actor: {id: ringerId, type: "actor"},
                 createdAt: createdAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),

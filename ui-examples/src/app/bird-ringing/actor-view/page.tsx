@@ -79,7 +79,7 @@ function EntryViewBase() {
           {licenses.map((l) => {
             const licenseInfo = dataSource.getLicenseInfo(l, actor);
             const primaryDocument = dataSource.getDocuments(l, actor)[0];
-            const mnr = getOrDefault(dataSource.getActor(l.actor), (actor) => actor.mnr, "-");
+            const mnr = l.mnr;
             return (
               <tr key={l.id}>
                 <th scope="row"><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{mnr}</Link></th>

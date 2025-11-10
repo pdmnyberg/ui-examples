@@ -8,7 +8,7 @@ import { useDataSource } from "../contexts";
 import { getOrDefault, DataSource } from "../common";
 
 function entryToTable(entry: License, dataSource: DataSource): Record<string, React.ReactNode> {
-  const mnr = getOrDefault(dataSource.getActor(entry.actor), (a) => a.mnr, "-")
+  const mnr = entry.mnr;
   return {
     "Mnr": mnr,
     "Created At": entry.createdAt,

@@ -25,8 +25,8 @@ export default function ListView() {
       id: item.id,
       properties: {
         "Mnr": {
-          term: getOrDefault(licenseHolder, (lh) => lh.mnr, "-"),
-          component: <Link href={`/bird-ringing/license-view/?entryId=${item.id}`}>{getOrDefault(licenseHolder, (lh) => lh.mnr, "-")}</Link>
+          term: item.mnr,
+          component: <Link href={`/bird-ringing/license-view/?entryId=${item.id}`}>{item.mnr}</Link>
         },
         "Type": {
           term: getOrDefault(licenseHolder, (lh) => lh.type, "-"),

@@ -1,5 +1,4 @@
 export type Actor = IdentifiableEntity & {
-    mnr: string;
     name: string;
     email?: string;
     updatedAt: string;
@@ -24,7 +23,7 @@ export type PermissionRef = IdentifiableEntity & {type: "permission"};
 export type PermissionPropertyRef = IdentifiableEntity & {type: "permission-property"};
 
 export type License = IdentifiableEntity & {
-    actor: ActorRef;
+    mnr: string;
     createdAt: string;
     updatedAt: string;
     expiresAt: string;
