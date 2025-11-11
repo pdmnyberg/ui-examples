@@ -1,0 +1,15 @@
+---
+title: Example diagram
+---
+flowchart TD
+    actor@{ shape: circle, label: "Actor" }
+    intent@{ shape: diamond, label: "Intent" }
+
+    a["Action A"]
+    b["Action B"]
+    c["Action C"]
+
+    actor -- "External event" --> intent
+    intent -- "Something good happened" --> a
+    intent -- "Something bad happened" --> b
+    intent -- "Something neutral happened" --> c
