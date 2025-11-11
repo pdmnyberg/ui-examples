@@ -3,6 +3,7 @@ import { DataSource, StaticDataSource } from "./common";
 
 type PathSegment = {
     id: string;
+    extendedId: string;
     label: string;
     href?: string;
 }
@@ -34,9 +35,10 @@ export function useDataSource() {
     return useContext(DataSourceContext);
 }
 
-export function toPath(list: string[], labels?: Record<string, Omit<PathSegment, "id">>): PathSegment[] {
-    return list.map(s => ({
+export function toPath(list: string[], labels?: Record<string, Omit<PathSegment, "id" | "extendedId">>): PathSegment[] {
+    return list.map((s, index, items) => ({
         id: s,
+        extendedId: items.slice(index).join("/"),
         ...(labels && labels[s] || {label: s})
     }));
 }

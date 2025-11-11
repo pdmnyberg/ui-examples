@@ -16,7 +16,7 @@ function BasePageLayout({
   const contextTitle: string = "Bird ringing"
   const navItems = useNav();
   const dropdownItems: {label: string, href: string}[] = []
-  const firstNav = path ? path[0]?.id : undefined;
+  const firstNav = path ? path[0] : {id: undefined, extendedId: undefined};
   const [navIsOpen, setNavIsOpen] = useState(true);
 
   return (
@@ -32,7 +32,7 @@ function BasePageLayout({
           <ul className="nav nav-pills p-3 flex-column">
             {navItems.map((ni, index) => {
               if (ni.type === "item") {
-                const isActive = firstNav === ni.id;
+                const isActive = firstNav.extendedId === ni.id || firstNav.id === ni.id;
                 return <li key={index} className="nav-item"><Link href={ni.href} className={`nav-link ${isActive ? "active" : ""}`} aria-current="page">{ni.label}</Link></li>
               } else if (ni.type === "separator") {
                 return <li key={index}><hr /></li>
@@ -120,6 +120,9 @@ export default function PageLayout({
     {type: "heading", label: "Manage details"},
     {type: "item", label: "Species list", href: "/bird-ringing/species-list-view", id: "species-list-view"},
     {type: "item", label: "Permissions list", href: "/bird-ringing/permissions-list-view", id: "permissions-list-view"},
+    {type: "heading", label: "Diagrams"},
+    {type: "item", label: "Workflow diagram", href: "/bird-ringing/diagrams/bird-ringing-flowchart", id: "diagrams/bird-ringing-flowchart/"},
+    {type: "item", label: "Workflow sequence", href: "/bird-ringing/diagrams/bird-ringing-sequence", id: "diagrams/bird-ringing-sequence/"},
   ]
   return (
     <NavContext.Provider value={navItems}>
