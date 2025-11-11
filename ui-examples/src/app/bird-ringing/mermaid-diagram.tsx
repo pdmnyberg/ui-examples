@@ -1,7 +1,8 @@
 "use client"
 import useSWR from "swr";
 import mermaid from "mermaid";
-import { useId } from "react";
+import { useId, useCallback } from "react";
+import { downloadData } from "../utils";
 
 mermaid.initialize({ startOnLoad: false })
 
@@ -14,7 +15,7 @@ async function fetchDiagramData([url, renderId, data]: [string, string, undefine
     return {svg, data: sourceData};
 }
 
-export function MermaidDiagram(props: {src: string} | {data: string}) {
+export function MermaidDiagram(props: {id?: string} & ({src: string} | {data: string})) {
   const renderId = useId();
   const {data} = useSWR(
     ["src" in props ? props.src : undefined, renderId, "data" in props ? props.data : undefined],
@@ -22,10 +23,15 @@ export function MermaidDiagram(props: {src: string} | {data: string}) {
     {revalidateOnFocus: false}
   );
   const {svg} = data || {};
+  const handleDownload = useCallback(() => {
+    downloadData(svg || "", "image/svg+xml", props.id ? `${props.id}.svg` : "diagram.svg")
+  }, [svg, props.id])
 
   return (
     <>
       <div dangerouslySetInnerHTML={{__html: svg || ""}}/>
+      <hr />
+      <button className="btn btn-primary" onClick={handleDownload}>Download diagram</button>
       <hr />
       <pre>{svg}</pre>
     </>

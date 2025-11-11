@@ -5,13 +5,13 @@ import fs from "fs";
 import path from "path";
 
 
-function DiagramBase({src}: {src: string}) {
+function DiagramBase({src, id}: {src: string, id?: string}) {
   return (
     <div className="container">
       <Warning>
         <p>Using flowcharts from <a href="https://mermaid.js.org/syntax/flowchart.html">mermaid</a>. Also consider using sequence diagram from <a href="https://mermaid.js.org/syntax/sequenceDiagram.html">mermaid</a>.</p>
       </Warning>
-      <MermaidDiagram src={src} />
+      <MermaidDiagram src={src} id={id} />
     </div>
   )
 }
@@ -25,13 +25,13 @@ export function generateStaticParams() {
 };
 
 
-export default async function Page({params}: {params: Promise<{ id: string[] }>}) {
+export default async function Page({params}: {params: Promise<{ id: string }>}) {
   const {id} = await params;
   const basePath = process.env.NEXT_PUBLIC_API_URL || "";
   const src = `${basePath}/diagrams/${id}.mermaid`;
   return (
     <Suspense>
-      <DiagramBase src={src}/>
+      <DiagramBase src={src} id={id}/>
     </Suspense>
   )
 }
