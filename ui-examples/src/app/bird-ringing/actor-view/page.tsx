@@ -1,5 +1,5 @@
 "use client"
-import { Actor, getOrDefault } from "../common";
+import { Actor } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";

@@ -5,9 +5,9 @@ import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import { useDataSource } from "../contexts";
-import { getOrDefault, DataSource } from "../common";
+import { getOrDefault } from "../common";
 
-function entryToTable(entry: License, dataSource: DataSource): Record<string, React.ReactNode> {
+function entryToTable(entry: License): Record<string, React.ReactNode> {
   const mnr = entry.mnr;
   return {
     "Mnr": mnr,
@@ -39,7 +39,7 @@ function EntryViewBase() {
     notFound();
   }
 
-  const entryTable = entryToTable(entry, dataSource);
+  const entryTable = entryToTable(entry);
   return (
     <div className="container">
       <Warning>
