@@ -16,11 +16,18 @@ async function fetchDiagramData([url, renderId, data]: [string, string, undefine
 
 export function MermaidDiagram(props: {src: string} | {data: string}) {
   const renderId = useId();
-  const {data} = useSWR(["src" in props ? props.src : undefined, renderId, "data" in props ? props.data : undefined], fetchDiagramData);
+  const {data} = useSWR(
+    ["src" in props ? props.src : undefined, renderId, "data" in props ? props.data : undefined],
+    fetchDiagramData,
+    {revalidateOnFocus: false}
+  );
   const {svg} = data || {};
 
   return (
-    svg ? <div dangerouslySetInnerHTML={{__html: svg}}/> : <></>
+    <>
+      <div dangerouslySetInnerHTML={{__html: svg || ""}}/>
+      <hr />
+      <pre>{svg}</pre>
+    </>
   )
 }
-
