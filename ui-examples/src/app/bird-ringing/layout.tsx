@@ -120,9 +120,9 @@ export default function PageLayout({
     {type: "heading", label: "Manage details"},
     {type: "item", label: "Species list", href: "/bird-ringing/species-list-view", id: "species-list-view"},
     {type: "item", label: "Permissions list", href: "/bird-ringing/permissions-list-view", id: "permissions-list-view"},
+    {type: "separator"},
     {type: "heading", label: "Diagrams"},
-    {type: "item", label: "Workflow diagram", href: "/bird-ringing/diagrams/bird-ringing-flowchart", id: "diagrams/bird-ringing-flowchart/"},
-    {type: "item", label: "Workflow sequence", href: "/bird-ringing/diagrams/bird-ringing-sequence", id: "diagrams/bird-ringing-sequence/"},
+    {type: "item", label: "User workflow", href: "/bird-ringing/diagrams/bird-ringing-user-workflow", id: "diagrams/bird-ringing-user-workflow/"},
   ]
   return (
     <NavContext.Provider value={navItems}>

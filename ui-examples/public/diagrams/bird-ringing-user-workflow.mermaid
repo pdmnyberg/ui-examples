@@ -1,0 +1,67 @@
+---
+title: User Workflow
+---
+flowchart LR
+    admin@{ shape: circle, label: "Admin" }
+    intent@{ shape: diamond, label: "Intent" }
+
+    subgraph license_list_view["License list view"]
+        llist[License list]
+        lselection[License selection]
+    end
+
+    lgenerate["Generate license(s)"]
+    lsend["Send license(s)"]
+
+    subgraph actor_list_view["Actor list view"]
+        alist[Actor list]
+        aselection[Actor selection]
+    end
+
+    subgraph actor_view["Actor view"]
+        actor[Actor]
+        allist[Actor license list]
+        adetails[Actor Details]
+        acomstatus[Actor communication status]
+        adlist[Actor document list]
+    end
+
+
+    subgraph license_view["License view"]
+        license[License]
+        lalist[License actor list]
+        lplist[License permission list]
+        ldetails[License Details]
+    end
+
+    admin --> intent
+    intent -- "License has changed" --> llist
+    intent -- "License summary needed" --> llist
+    llist -- "Select licenses" --> lselection
+    llist -- "View license" --> license
+
+    intent -- "Actor details needed" --> alist
+    intent -- "Actor license communication needed" --> alist
+    alist -- "Select actors" --> aselection
+    alist -- "View actor" --> actor
+
+    license -- "View actors" --> lalist
+    lalist -- "View actor" --> actor
+    license -- "View permissions" --> lplist
+    license -- "View details" --> ldetails
+
+    license -- "Generate license" --> lgenerate
+    license -- "Send license" --> lsend
+
+    lselection -- "Generate licenses" --> lgenerate
+    lselection -- "Send licenses" --> lsend
+
+    actor -- "Generate license" --> lgenerate
+    actor -- "Send license" --> lsend
+    actor -- "View licenses" --> allist
+    actor -- "View details" --> adetails
+    actor -- "View communication status" --> acomstatus
+    actor -- "View document list" --> adlist
+
+    aselection -- "Generate licenses" --> lgenerate
+    aselection -- "Send licenses" --> lsend
