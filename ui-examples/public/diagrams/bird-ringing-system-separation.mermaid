@@ -1,0 +1,40 @@
+---
+title: System separation
+---
+
+flowchart LR
+    admin@{ shape: circle, label: "Admin" }
+    intent@{ shape: diamond, label: "Intent" }
+
+    subgraph nrm_bird_ringing["NRM Bird Ringing (Legacy)"]
+        nrm_entrypoint["Entrypoint"]
+        nrm_data@{ shape: lin-cyl, label: "NRM Database" }
+    end
+
+    subgraph nbis_bird_ringing["NBIS Bird Ringing (New system)"]
+        nbis_entrypoint["Entrypoint"]
+        nbis_data@{ shape: lin-cyl, label: "NBIS Database" }
+    end
+
+    one_way_push["One way push of data"]
+
+    admin --> intent
+
+    intent -- "Update licenses" --> nrm_entrypoint
+    intent -- "Update actors" --> nrm_entrypoint
+    intent -- "Update other content" --> nrm_entrypoint
+
+    nrm_entrypoint -. "Perform operations" .-> nrm_data
+    nrm_data -. "Show results" .-> nrm_entrypoint
+
+
+    intent -- "Communicate license informatio" --> nrm_entrypoint
+    intent -- "Send reminders" --> nbis_entrypoint
+    intent -- "Inspect licenses" --> nbis_entrypoint
+    intent -- "Inspect actors" --> nbis_entrypoint
+
+    nbis_entrypoint -. "Perform operations" .-> nbis_data
+    nbis_data -. "Show results" .-> nbis_entrypoint
+
+    nrm_data -. "Data was updated or period of time passed" .-> one_way_push
+    one_way_push -. "Data transformed to new data model" .-> nbis_data

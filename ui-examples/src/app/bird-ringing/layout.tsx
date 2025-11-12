@@ -123,6 +123,7 @@ export default function PageLayout({
     {type: "separator"},
     {type: "heading", label: "Diagrams"},
     {type: "item", label: "User workflow", href: "/bird-ringing/diagrams/bird-ringing-user-workflow", id: "diagrams/bird-ringing-user-workflow/"},
+    {type: "item", label: "System separation", href: "/bird-ringing/diagrams/bird-ringing-system-separation", id: "diagrams/bird-ringing-system-separation/"},
   ]
   return (
     <NavContext.Provider value={navItems}>
