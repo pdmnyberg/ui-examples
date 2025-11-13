@@ -33,7 +33,7 @@ export default function ListView() {
           component: getOrDefault(licenseHolder, (lh) => lh.type, "-")
         },
         "License holder": {
-          term: getOrDefault(licenseHolder, (lh) => lh.type, "-"),
+          term: getOrDefault(licenseHolder, (lh) => lh.name, "-"),
           component: getOrDefault(licenseHolder,  (lh) => <Link href={`/bird-ringing/actor-view/?entryId=${lh.id}`}>{lh.name}</Link>, "-"),
         },
         "Number of helpers": {
