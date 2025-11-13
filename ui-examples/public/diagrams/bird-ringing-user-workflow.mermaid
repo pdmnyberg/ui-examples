@@ -25,7 +25,6 @@ flowchart LR
         lsend@{ shape: lin-rect , label: "Send license(s)"}
         ldownload@{ shape: lin-rect , label: "Downoad license(s)"}
         listemails@{ shape: lin-rect , label: "Get list of email addresses"}
-        lsendreminder@{ shape: lin-rect , label: "Send reminder(s)"}
     end
 
     subgraph actor_list_view["Actor list view"]
@@ -74,15 +73,11 @@ flowchart LR
     license -. "Generate license" .-> lgenerate
     license -. "Send license" .-> lsend
     license -. "Download license" .-> ldownload
-    license -. "Send report reminder" .-> lsendreminder
-    license -. "Send renewal reminder" .-> lsendreminder
     
 
     lselection -. "Generate licenses" .-> lgenerate
     lselection -. "Send licenses" .-> lsend
     lselection -. "Download licenses" .-> ldownload
-    lselection -. "Send report reminders" .-> lsendreminder
-    lselection -. "Send renewal reminders" .-> lsendreminder
 
     actor -. "Generate licenses" .-> lgenerate
     actor -. "Send licenses" .-> lsend
