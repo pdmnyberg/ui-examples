@@ -7,6 +7,7 @@ import {
     LicenseRelation,
     LicenseDocument,
     Species,
+    LicenseRole,
 } from "../app/bird-ringing/common";
 import { RandomContext, DataGenerator } from "./common";
 
@@ -724,6 +725,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 emailStatus: fixedRandom.choice(emailStatus),
                 emailSentAt: updatedAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),
+                city: fixedRandom.choice(this.dataSource.regionNames),
+                birtDate: fixedRandom.randdate(...period)
             }
         }).reduce<Record<string, Actor>>((acc, actor) => {
             acc[actor.id] = actor;
@@ -757,6 +760,11 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             ...Object.keys(organizationActors)
         ];
         const helperIds = Object.keys(personActors);
+        const helperVariants: LicenseRole[] = [
+            "Helper",
+            "Associate",
+            "Communication"
+        ]
         return (Array.from({length: numberOfLicenses}).map<License>((_, index) => {
             const mnr: string = `${String(index).padStart(4, '0')}`;
             const ringerId = ringerIds[index % ringerIds.length]
@@ -765,7 +773,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             const helpers = fixedRandom.choices(helperIds.filter(id => id !== ringerId), fixedRandom.randint(2, 5)).map<LicenseRelation>((actorId, index, list) => {
                 const isActive = index > 0.5 * list.length
                 return {
-                    role: "Helper",
+                    role: fixedRandom.choice(helperVariants),
                     mednr: `${String(index).padStart(4, '0')}`,
                     actor: {id: actorId, type: "actor"},
                     licenseSentAt: createdAt.toISOString(),
@@ -855,9 +863,15 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     }
 }
 
-export const generator = new BirdRingingDataGenerator(
-    new RandomContext(getRandomBase()),
-    getMoonData(),
-    [new Date("2020-01-01T00:00:00.000Z"), new Date("2025-01-01T00:00:00.000Z")],
-    new Date("2020-06-01T00:00:00.000Z").getTime() - new Date("2020-01-01T00:00:00.000Z").getTime(),
-)
+export function getFixedRandom() {
+    return new RandomContext(getRandomBase())
+}
+
+export function getGenerator() {
+    return new BirdRingingDataGenerator(
+        getFixedRandom(),
+        getMoonData(),
+        [new Date("2020-01-01T00:00:00.000Z"), new Date("2025-01-01T00:00:00.000Z")],
+        new Date("2020-06-01T00:00:00.000Z").getTime() - new Date("2020-01-01T00:00:00.000Z").getTime(),
+    )
+}

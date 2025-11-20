@@ -4,6 +4,8 @@ export type Actor = IdentifiableEntity & {
     updatedAt: string;
     type: ActorType;
     sex: Sex,
+    city: string;
+    birtDate?: Date;
 }
 
 export type Sex = "Male" | "Female" | "Undisclosed" | "N/A"
@@ -14,7 +16,7 @@ export type ReportStatus = "Yes" | "No" | "Incomplete";
 
 export type LicenseStatus = "Active" | "Not active" | "Discontinued";
 
-export type LicenseRole = "Ringer" | "Helper";
+export type LicenseRole = "Ringer" | "Helper" | "Associate" | "Communication";
 
 export type ActorRef = IdentifiableEntity & {type: "actor"};
 export type LicenseRef = IdentifiableEntity & {type: "license"};
@@ -24,6 +26,7 @@ export type PermissionPropertyRef = IdentifiableEntity & {type: "permission-prop
 
 export type License = IdentifiableEntity & {
     mnr: string;
+    status: LicenseStatus,
     createdAt: string;
     updatedAt: string;
     expiresAt: string;
@@ -124,11 +127,12 @@ export class StaticDataSource implements DataSource {
     _getLicenses(): (License & IdentifiableEntity)[] {
         return Object.values(this.licenses);
     }
-    getActorLicenses(actor: IdentifiableEntity, role?: LicenseRole, status?: RelationStatus): (License & IdentifiableEntity)[] {
+    getActorLicenses(actor: IdentifiableEntity, role?: LicenseRole, status?: RelationStatus, filter: (r: LicenseRelation) => boolean = () => true): (License & IdentifiableEntity)[] {
         return this._getLicenses().filter(l => l.actors.some(a => (
             a.actor.id === actor.id &&
             (!role || a.role === role) &&
-            (status === undefined || a.status === status)
+            (status === undefined || a.status === status) &&
+            filter(a)
         )))
     }
     getLicenseInfo(license: License, actor: IdentifiableEntity): LicenseRelation {
