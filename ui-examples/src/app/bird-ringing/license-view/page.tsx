@@ -14,7 +14,7 @@ function entryToTable(entry: License): Record<string, React.ReactNode> {
     "Created At": entry.createdAt,
     "Updated At": entry.updatedAt,
     "Period": `${entry.startsAt}  to ${entry.expiresAt}`,
-    "Description": entry.description,
+    "Description": <pre style={{fontFamily: "inherit", fontSize: "inherit"}}>{entry.description}</pre>,
     "Region": entry.region,
     "Final Report Status": entry.reportStatus,
   }

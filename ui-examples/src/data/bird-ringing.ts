@@ -265,12 +265,36 @@ function getMoonData(): DataSource {
     ]
 
     const descriptions = [
-        "Stationsmärkning",
-        "Artprojekt",
-        "Standardiserad slöjnät",
-        "Fälla",
-        "Boungemärkning",
-        "Rehabiliterade fåglar",
+        "population monitoring",
+        "migration pattern tracking",
+        "health assessment",
+        "juvenile development study",
+        "nesting site documentation",
+        "habitat impact observation",
+        "behavioral pattern analysis",
+        "diet and foraging survey",
+        "species distribution mapping",
+        "flight adaptation research",
+        "environmental stress evaluation",
+        "biosphere stability monitoring",
+        "subspecies differentiation study",
+        "genetic diversity sampling",
+        "breeding success assessment",
+        "post-release recovery observation",
+        "disease and parasite screening",
+        "tag integrity inspection",
+        "long-term data archiving",
+        "avian rescue and rehabilitation support",
+        "invasive interaction tracking",
+        "climate cycle correlation study",
+        "artificial-gravity adaptation research",
+        "light-cycle influence assessment",
+        "avian acoustics monitoring",
+        "nocturnal activity study",
+        "territorial behavior observation",
+        "ring recovery and verification",
+        "training and mentorship of novice ringers",
+        "collaboration with inter-city ecological projects"
     ]
 
     const permissionTypes = [
@@ -798,7 +822,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 expiresAt: expiresAt.toISOString(),
                 startsAt: startsAt.toISOString(),
                 permissions: fixedRandom.choices(permissionTypes, 5),
-                description: fixedRandom.choices(descriptions, fixedRandom.randint(1, 3)).join(", "),
+                description: "Within this license the actors will perform:\n" + fixedRandom.choices(descriptions, fixedRandom.randint(1, 3)).map(d => `- ${d}`).join("\n"),
                 status: fixedRandom.choice(licenseStatuses),
                 region: `${fixedRandom.choice(regionDescriptors)} ${fixedRandom.choice(regionNames)}`,
                 actors: [
