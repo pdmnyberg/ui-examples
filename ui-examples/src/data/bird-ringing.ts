@@ -750,7 +750,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 emailSentAt: updatedAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),
                 city: fixedRandom.choice(this.dataSource.regionNames),
-                birtDate: fixedRandom.randdate(...period)
+                birthDate: fixedRandom.randdate(...period)
             }
         }).reduce<Record<string, Actor>>((acc, actor) => {
             acc[actor.id] = actor;

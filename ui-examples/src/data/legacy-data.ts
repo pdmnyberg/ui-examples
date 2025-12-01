@@ -234,7 +234,7 @@ export function contentToLegacyData() {
             Spr: fixedRandom.choice(["SV", "EN"]),
             Greenwich: "",
             Sex: parseSex(licenseActor.sex),
-            Fyr: fixedRandom.randint(1996, 2025),
+            Fyr: licenseActor.birthDate ? licenseActor.birthDate.getFullYear() : undefined,
             AdrMnr: adrMnr,
             AssMnr1: assMnrs[0],
             AssMnr2: assMnrs[1],
@@ -263,7 +263,7 @@ export function contentToLegacyData() {
                 "FNamn": fnamn,
                 "ENamn": enamn,
                 "Fritext": "",
-                "Fyr": actor.birtDate ? actor.birtDate.getFullYear() : undefined,
+                "Fyr": actor.birthDate ? actor.birthDate.getFullYear() : undefined,
                 "Sex": parseSex(actor.sex),
             }
         })
@@ -273,7 +273,7 @@ export function contentToLegacyData() {
         const startYear = fixedRandom.randint(1996, 2025)
         const years = Array.from({length: fixedRandom.randint(4, 10)}).map((_, index) => startYear + index)
         return years.map<MarkAssYr>((year) => ({
-            "Ar": year,
+            "Ar": year, 
             "Mednr": helper.Mednr,
             "Mnr": helper.Mnr
         }))

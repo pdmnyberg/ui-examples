@@ -5,7 +5,7 @@ export type Actor = IdentifiableEntity & {
     type: ActorType;
     sex: Sex,
     city: string;
-    birtDate?: Date;
+    birthDate?: Date;
 }
 
 export type Sex = "Male" | "Female" | "Undisclosed" | "N/A"
