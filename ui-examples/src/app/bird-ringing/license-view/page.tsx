@@ -68,6 +68,7 @@ function EntryViewBase() {
       <table className="table">
         <thead>
           <tr>
+            <th scope="col">Description</th>
             <th scope="col">Type</th>
             <th scope="col">Properties</th>
             <th scope="col">Species list</th>
@@ -78,11 +79,16 @@ function EntryViewBase() {
         <tbody>
           {entry.permissions.map((p, index) => (
             <tr key={index}>
-              <td>{p}</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
+              <td>{p.description || "-"}</td>
+              <td>{p.type.name}</td>
+              <td><ul>{p.properties.map(p => (
+                <li key={p.id}>{p.name}</li>
+              ))}</ul></td>
+              <td><ul>{p.species.map(s => (
+                <li key={s.id}>{s.name}</li>
+              ))}</ul></td>
+              <td>{p.location}</td>
+              <td>{p.period[0]} to {p.period[1]}</td>
             </tr>
           ))}
         </tbody>

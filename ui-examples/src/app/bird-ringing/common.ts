@@ -31,7 +31,14 @@ export type License = IdentifiableEntity & {
     updatedAt: string;
     expiresAt: string;
     startsAt: string;
-    permissions: string[];
+    permissions: {
+        description: string;
+        type: {id: string, name: string; description: string};
+        properties: {id: string, name: string; description: string}[];
+        species: {id: string, name: string}[];
+        location: string;
+        period: [string, string];
+    }[];
     region: string;
     description: string;
     actors: LicenseRelation[];
