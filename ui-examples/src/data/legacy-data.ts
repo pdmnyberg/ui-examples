@@ -206,7 +206,7 @@ function parseSex(sex: Actor["sex"]): Maerkare["Sex"] {
 export function contentToLegacyData() {
     const generator = getBirdRinging()
     const content = generator.createData();
-    const dataSource = new StaticDataSource(content.actors, content.licenses, content.documents, false);
+    const dataSource = new StaticDataSource(content.actors, content.licenses, content.documents, content.permissionTypes, content.permissionProperties, content.species, false);
     const fixedRandom = getFixedRandom();
 
     const licenseList = Object.values(dataSource.licenses);
