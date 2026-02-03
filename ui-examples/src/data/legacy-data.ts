@@ -160,6 +160,30 @@ type BaseArtlista = {
     PLnamn: string; // Polish name
 }
 
+type TillstTyp = {
+    type_code: string;
+    name: string;
+    description: string;
+}
+
+type TillstProp = {
+    property_code: string;
+    name: string;
+    description: string;
+    related_type_code: string;
+}
+
+type Tillstand = {
+    license_mnr: string;
+    type_code: string;
+    starts_at: string;
+    ends_at: string;
+    location: string;
+    description: string;
+    species_codes: string;
+    property_codes: string;
+}
+
 export type Artilista = Pick<
     BaseArtlista,
     "VetKod" | "VetNamn" | "SVnamn"
@@ -192,6 +216,11 @@ function padZero(value: number, length: number = 2) {
 function parseDateTime(date: Date) {
     // 1999-03-15 00:00:00.000
     return `${date.getFullYear()}-${padZero(date.getMonth() + 1)}-${padZero(date.getDate())} 00:00:00.000`
+}
+
+function parseDate(date: Date) {
+    // 1999-03-15
+    return `${date.getFullYear()}-${padZero(date.getMonth() + 1)}-${padZero(date.getDate())}`
 }
 
 function parseSex(sex: Actor["sex"]): Maerkare["Sex"] {
@@ -287,11 +316,40 @@ export function contentToLegacyData() {
         }
     })
 
+    const permissionTypes = Object.keys(content.permissionTypes).map(key => content.permissionTypes[key]).map<TillstTyp>(pt => ({
+        type_code: pt.id,
+        name: pt.name,
+        description: pt.description,
+    }))
+
+    const properties = Object.keys(content.permissionProperties).map(key => content.permissionProperties[key]).map<TillstProp>(pp => ({
+        property_code: pp.id,
+        name: pp.name,
+        description: pp.description,
+        related_type_code: pp.permissionType.id,
+    }))
+
+    const permissions = Object.keys(content.licenses).map(key => content.licenses[key]).flatMap(license => license.permissions.map<Tillstand>(lp => {
+        return {
+            license_mnr: license.mnr,
+            type_code: lp.type.id,
+            starts_at: parseDate(new Date(lp.period[0])),
+            ends_at: parseDate(new Date(lp.period[1])),
+            location: lp.location,
+            description: lp.description,
+            species_codes: lp.speciesList.map(s => dataSource.getSpecies(s).scientificCode).join(";"),
+            property_codes: lp.properties.map(p => p.id).join(";"),
+        }
+    }))
+
     return {
         "br-ex-Maerkare": licenses,
         "br-ex-MarkAss": helpers,
         "br-ex-MarkAssYr": helperYears,
-        "br-ex-Artlista": species
+        "br-ex-Artlista": species,
+        "br-ex-Tillstand": permissions,
+        "br-ex-TillstProp": properties,
+        "br-ex-TillstTyp": permissionTypes,
     }
 }
 
