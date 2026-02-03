@@ -213,3 +213,11 @@ export class StaticDataSource implements DataSource {
 export function getOrDefault<T, V, D>(value: DataLoading<T> | undefined, getter: (x: T) => V, defaultValue: D): V | D {
     return value && value.data ? getter(value.data) : defaultValue;
 }
+
+export function toLocalDate(d: string) {
+    return new Date(d).toLocaleDateString()
+}
+
+export function toLocalTime(d: string) {
+    return new Date(d).toLocaleString()
+}

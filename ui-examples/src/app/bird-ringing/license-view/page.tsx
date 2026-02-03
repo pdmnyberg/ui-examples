@@ -1,5 +1,5 @@
 "use client"
-import { License } from "../common";
+import { License, toLocalDate, toLocalTime } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -11,9 +11,9 @@ function entryToTable(entry: License): Record<string, React.ReactNode> {
   const mnr = entry.mnr;
   return {
     "Mnr": mnr,
-    "Created At": entry.createdAt,
-    "Updated At": entry.updatedAt,
-    "Period": `${entry.startsAt}  to ${entry.expiresAt}`,
+    "Created At": toLocalTime(entry.createdAt),
+    "Updated At": toLocalTime(entry.updatedAt),
+    "Period": `${toLocalDate(entry.startsAt)}  to ${toLocalDate(entry.expiresAt)}`,
     "Description": <pre style={{fontFamily: "inherit", fontSize: "inherit"}}>{entry.description}</pre>,
     "Region": entry.region,
     "Final Report Status": entry.reportStatus,
@@ -38,7 +38,6 @@ function EntryViewBase() {
   if (!entry) {
     notFound();
   }
-
   const entryTable = entryToTable(entry);
   return (
     <div className="container">
@@ -93,7 +92,7 @@ function EntryViewBase() {
                   <li key={s.id}>{s.name}</li>
                 ))}</ul></td>
                 <td>{p.location}</td>
-                <td>{p.period[0]} to {p.period[1]}</td>
+                <td>{toLocalDate(p.period[0])} to {toLocalDate(p.period[1])}</td>
               </tr>
             );
           })}

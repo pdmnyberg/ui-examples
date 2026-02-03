@@ -1,5 +1,5 @@
 "use client"
-import { Actor } from "../common";
+import { Actor, toLocalTime, toLocalDate } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -12,7 +12,7 @@ function entryToTable(entry: Actor): Record<string, React.ReactNode> {
     "Type": entry.type,
     "E-mail": entry.email,
     "Sex": entry.sex,
-    "Updated At": entry.updatedAt,
+    "Updated At": toLocalTime(entry.updatedAt),
     "Details of Ringer": "-",
   }
 }
@@ -86,10 +86,10 @@ function EntryViewBase() {
                 <td>{licenseInfo ? licenseInfo.role : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.mednr : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.status : "-"}</td>
-                <td>{l.startsAt}</td>
-                <td>{l.expiresAt}</td>
+                <td>{toLocalDate(l.startsAt)}</td>
+                <td>{toLocalDate(l.expiresAt)}</td>
                 <td>{primaryDocument ? <Link href={primaryDocument.href}>License document</Link> : "-"}</td>
-                <td>{licenseInfo ? licenseInfo.licenseSentAt : "-"}</td>
+                <td>{licenseInfo ? toLocalTime(licenseInfo.licenseSentAt) : "-"}</td>
                 <td>{licenseInfo ? licenseInfo.licenseSentStatus : "-"}</td>
                 <td><button className="btn btn-outline-secondary btn-sm" type="button">Resend</button></td>
               </tr>

@@ -5,7 +5,7 @@ import Warning from "../warning";
 import { Fragment } from "react";
 import { useItemSelections, useFilter, SearchableItem } from "../hooks";
 import { useDataSource } from "../contexts";
-import { getOrDefault } from "../common";
+import { getOrDefault, toLocalTime } from "../common";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -67,8 +67,8 @@ export default function ListView() {
           component: item.sex
         },
         "Updated At": {
-          term: item.updatedAt,
-          component: item.updatedAt
+          term: toLocalTime(item.updatedAt),
+          component: toLocalTime(item.updatedAt)
         },
       }
     }
