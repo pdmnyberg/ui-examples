@@ -21,7 +21,7 @@ export type LicenseRole = "Ringer" | "Helper" | "Associate" | "Communication";
 export type ActorRef = IdentifiableEntity & {type: "actor"};
 export type LicenseRef = IdentifiableEntity & {type: "license"};
 export type SpeciesRef = IdentifiableEntity & {type: "species"};
-export type PermissionRef = IdentifiableEntity & {type: "permission"};
+export type PermissionTypeRef = IdentifiableEntity & {type: "permission-type"};
 export type PermissionPropertyRef = IdentifiableEntity & {type: "permission-property"};
 
 export type License = IdentifiableEntity & {
@@ -31,14 +31,7 @@ export type License = IdentifiableEntity & {
     updatedAt: string;
     expiresAt: string;
     startsAt: string;
-    permissions: {
-        description: string;
-        type: {id: string, name: string; description: string};
-        properties: {id: string, name: string; description: string}[];
-        species: {id: string, name: string}[];
-        location: string;
-        period: [string, string];
-    }[];
+    permissions: Permission[];
     region: string;
     description: string;
     actors: LicenseRelation[];
@@ -68,19 +61,19 @@ export type Species = IdentifiableEntity & {
     scientificCode: string;
 }
 
-export type PermissionType = {
+export type PermissionType = IdentifiableEntity & {
     name: string;
     description: string;
 }
 
-export type PermissionProperty = {
-    permissions: PermissionRef[];
+export type PermissionProperty = IdentifiableEntity & {
+    permissionType: PermissionTypeRef;
     name: string;
     description: string;
 }
 
 export type Permission = {
-    type: PermissionRef;
+    type: PermissionTypeRef;
     speciesList: SpeciesRef[];
     properties: PermissionPropertyRef[];
     location: string;
@@ -109,17 +102,35 @@ export type DataSource = {
     getActor(actor: IdentifiableEntity): DataLoading<Actor & IdentifiableEntity>;
     getLicense(license: IdentifiableEntity): DataLoading<License & IdentifiableEntity>;
     getDocuments(license: IdentifiableEntity, actor: IdentifiableEntity): LicenseDocument[];
+    getPermissionType(permission: IdentifiableEntity): PermissionType;
+    getPermissionProperty(property: IdentifiableEntity): PermissionProperty;
+    getSpecies(species: IdentifiableEntity): Species;
 }
 
 export class StaticDataSource implements DataSource {
     actors: Record<string, Actor>;
     licenses: Record<string, License>;
     documents: Record<string, LicenseDocument>;
+    permissionTypes: Record<string, PermissionType>;
+    permissionProperties: Record<string, PermissionProperty>;
+    species: Record<string, Species>;
     isLoading: boolean;
-    constructor(actors: Record<string, Actor>, licenses: Record<string, License>, documents: Record<string, LicenseDocument>, isLoading: boolean) {
+
+    constructor(
+        actors: Record<string, Actor>,
+        licenses: Record<string, License>,
+        documents: Record<string, LicenseDocument>,
+        permissionTypes: Record<string, PermissionType>,
+        permissionProperties: Record<string, PermissionProperty>,
+        species: Record<string, Species>,
+        isLoading: boolean
+    ) {
         this.actors = actors;
         this.licenses = licenses;
         this.documents = documents;
+        this.permissionTypes = permissionTypes;
+        this.permissionProperties = permissionProperties;
+        this.species = species;
         this.isLoading = isLoading;
     }
     getActors() {
@@ -154,6 +165,15 @@ export class StaticDataSource implements DataSource {
         } catch (e) {
             return this._getResult(undefined, false, e);
         }
+    }
+    getPermissionType(permission: IdentifiableEntity): PermissionType {
+        return this.permissionTypes[permission.id];
+    }
+    getPermissionProperty(property: IdentifiableEntity): PermissionProperty {
+        return this.permissionProperties[property.id];
+    }
+    getSpecies(species: IdentifiableEntity): Species {
+        return this.species[species.id];
     }
     _getActor(identifier: IdentifiableEntity): Actor {
         const actor = this.actors[identifier.id];

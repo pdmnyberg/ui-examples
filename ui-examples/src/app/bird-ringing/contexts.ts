@@ -21,7 +21,7 @@ export type NavItems = (
 
 export const NavInfoContext = createContext<NavInfo>({setPath: () => {}});
 export const NavContext = createContext<NavItems>([]);
-export const DataSourceContext = createContext<DataSource>(new StaticDataSource({}, {}, {}, true));
+export const DataSourceContext = createContext<DataSource>(new StaticDataSource({}, {}, {}, {}, {}, {}, true));
 
 export function useNav() {
     return useContext(NavContext);

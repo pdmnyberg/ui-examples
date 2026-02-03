@@ -77,20 +77,26 @@ function EntryViewBase() {
           </tr>
         </thead>
         <tbody>
-          {entry.permissions.map((p, index) => (
-            <tr key={index}>
-              <td>{p.description || "-"}</td>
-              <td>{p.type.name}</td>
-              <td><ul>{p.properties.map(p => (
-                <li key={p.id}>{p.name}</li>
-              ))}</ul></td>
-              <td><ul>{p.species.map(s => (
-                <li key={s.id}>{s.name}</li>
-              ))}</ul></td>
-              <td>{p.location}</td>
-              <td>{p.period[0]} to {p.period[1]}</td>
-            </tr>
-          ))}
+          {entry.permissions.map((p, index) => {
+            const type = dataSource.getPermissionType(p.type);
+            const species = p.speciesList.map(s => dataSource.getSpecies(s));
+            const properties = p.properties.map(pp => dataSource.getPermissionProperty(pp));
+
+            return (
+              <tr key={index}>
+                <td>{p.description || "-"}</td>
+                <td>{type.name}</td>
+                <td><ul>{properties.map(pp => (
+                  <li key={pp.id}>{pp.name}</li>
+                ))}</ul></td>
+                <td><ul>{species.map(s => (
+                  <li key={s.id}>{s.name}</li>
+                ))}</ul></td>
+                <td>{p.location}</td>
+                <td>{p.period[0]} to {p.period[1]}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       <h2>Helpers</h2>

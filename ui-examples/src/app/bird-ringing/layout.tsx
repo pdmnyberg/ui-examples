@@ -79,11 +79,14 @@ function NavStateProvider({
   )
 }
 
-function fetchAppData([licensesUrl, actorsUrl, documentsUrl]: [string, string, string]) {
+function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl, permissionPropertiesUrl, speciesUrl]: [string, string, string, string, string, string]) {
   return Promise.all([
     fetchData<StaticDataSource["licenses"]>(licensesUrl),
     fetchData<StaticDataSource["actors"]>(actorsUrl),
     fetchData<StaticDataSource["documents"]>(documentsUrl),
+    fetchData<StaticDataSource["permissionTypes"]>(permissionTypesUrl),
+    fetchData<StaticDataSource["permissionProperties"]>(permissionPropertiesUrl),
+    fetchData<StaticDataSource["species"]>(speciesUrl),
   ]);
 }
 
@@ -91,16 +94,37 @@ function DataSourceProvider({
   licensesUrl,
   actorsUrl,
   documentsUrl,
+  permissionTypesUrl,
+  permissionPropertiesUrl,
+  speciesUrl,
   children,
 }: Readonly<{
   licensesUrl: string,
   actorsUrl: string,
   documentsUrl: string,
+  permissionTypesUrl: string,
+  permissionPropertiesUrl: string,
+  speciesUrl: string,
   children: React.ReactNode;
 }>) {
-  const {data, error, isLoading} = useSWR([licensesUrl, actorsUrl, documentsUrl], fetchAppData);
+  const {data, error, isLoading} = useSWR([
+    licensesUrl,
+    actorsUrl,
+    documentsUrl,
+    permissionTypesUrl,
+    permissionPropertiesUrl,
+    speciesUrl,
+  ], fetchAppData);
   console.log(error);
-  const dataSource = useMemo(() => new StaticDataSource(data ? data[1] : {}, data ? data[0] : {}, data ? data[2] : {}, isLoading), [data, isLoading])
+  const dataSource = useMemo(() => new StaticDataSource(
+    data ? data[1] : {},
+    data ? data[0] : {},
+    data ? data[2] : {},
+    data ? data[3] : {},
+    data ? data[4] : {},
+    data ? data[5] : {},
+    isLoading
+  ), [data, isLoading])
   return (
     <DataSourceContext.Provider value={dataSource}>{children}</DataSourceContext.Provider>
   )
@@ -134,6 +158,9 @@ export default function PageLayout({
               licensesUrl={`${basePath}/data/bird-ringing/licenses.json`}
               actorsUrl={`${basePath}/data/bird-ringing/actors.json`}
               documentsUrl={`${basePath}/data/bird-ringing/documents.json`}
+              permissionTypesUrl={`${basePath}/data/bird-ringing/permissionTypes.json`}
+              permissionPropertiesUrl={`${basePath}/data/bird-ringing/permissionProperties.json`}
+              speciesUrl={`${basePath}/data/bird-ringing/species.json`}
             >
               {children}
             </DataSourceProvider>

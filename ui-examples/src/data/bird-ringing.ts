@@ -8,6 +8,8 @@ import {
     LicenseDocument,
     Species,
     LicenseRole,
+    PermissionType,
+    PermissionProperty,
 } from "../app/bird-ringing/common";
 import { RandomContext, DataGenerator } from "./common";
 
@@ -297,7 +299,7 @@ function getMoonData(): DataSource {
         "collaboration with inter-city ecological projects"
     ]
 
-    const permissionTypeBase = [
+    const permissionTypes: PermissionType[] = [
         { "id": "capture-and-physical-restraint", "name": "Capture and Physical Restraint", "description": "Authorizes the intentional interruption of a bird’s freedom of movement through capture, holding, or physical restraint. Covers direct handling that may stress, injure, or alter natural behavior." },
         { "id": "temporary-displacement-or-relocation", "name": "Temporary Displacement or Relocation", "description": "Permits moving birds from their usual territory or dome habitat, temporarily or permanently, with or without human assistance." },
         { "id": "nest-access-and-modification", "name": "Nest Access and Modification", "description": "Covers direct interaction with nests, including entry, alteration, or temporary removal, potentially affecting parental care or nest integrity." },
@@ -320,778 +322,769 @@ function getMoonData(): DataSource {
         { "id": "extended-or-repeated-contact-authorization", "name": "Extended or Repeated Contact Authorization", "description": "Permits sustained or repeated interaction with the same individuals beyond standard contact thresholds." }
     ]
 
-    const permissionProperties = [
+    const permissionProperties: PermissionProperty[] = [
         {
             "id": "manual-handling-required",
             "name": "manual handling required",
             "description": "The activity requires physically holding the bird with hands, directly controlling its movement.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "mechanical-restraint-permitted",
             "name": "mechanical restraint permitted",
             "description": "Use of devices such as nets, cages, or other mechanical methods to restrain birds is allowed.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "sedation-permitted",
             "name": "sedation permitted",
             "description": "Temporary pharmacological restraint is allowed to reduce stress or facilitate handling.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "handling-exceeds-standard-duration",
             "name": "handling exceeds standard duration",
             "description": "The bird may be held or manipulated for longer than baseline welfare guidelines suggest.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "repeat-capture-allowed",
             "name": "repeat capture allowed",
             "description": "The same individual may be captured multiple times for study or monitoring purposes.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "juveniles-included",
             "name": "juveniles included",
             "description": "Dependent young birds may be captured and handled under this permit.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "breeding-individuals-included",
             "name": "breeding individuals included",
             "description": "Adult birds engaged in mating, nesting, or incubation may be captured or handled.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "capture-during-active-flight",
             "name": "capture during active flight",
             "description": "Capture may occur while the bird is in motion, such as flying or hopping between perches.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "capture-during-rest-phase",
             "name": "capture during rest phase",
             "description": "Birds may be captured while resting, sleeping, or in low activity periods.",
-            "applies_to": ["capture-and-physical-restraint"]
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
 
         {
             "id": "displacement-beyond-home-range",
             "name": "displacement beyond home range",
             "description": "Birds may be moved outside their habitual territory or typical activity zone.",
-            "applies_to": ["temporary-displacement-or-relocation"]
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
         {
             "id": "relocation-between-habitat-zones",
             "name": "relocation between habitat zones",
             "description": "Transfer of birds between distinct habitat zones or ecological areas is permitted.",
-            "applies_to": ["temporary-displacement-or-relocation"]
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
         {
             "id": "return-to-origin-site-required",
             "name": "return to origin site required",
             "description": "Birds must be returned to their original capture site after displacement or relocation.",
-            "applies_to": ["temporary-displacement-or-relocation"]
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
         {
             "id": "human-assisted-transport-required",
             "name": "human-assisted transport required",
             "description": "Birds must be moved using human assistance rather than allowing them to move themselves.",
-            "applies_to": ["temporary-displacement-or-relocation"]
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
         {
             "id": "relocation-exceeds-one-circadian-cycle",
             "name": "relocation exceeds one circadian cycle",
             "description": "Birds may be displaced for longer than a single day-night cycle within the lunar habitat.",
-            "applies_to": ["temporary-displacement-or-relocation"]
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
         {
             "id": "group-displacement-permitted",
             "name": "group displacement permitted",
             "description": "Multiple birds may be moved together as a cohort rather than individually.",
-            "applies_to": ["temporary-displacement-or-relocation"]
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
         {
             "id": "juveniles-subject-to-relocation",
             "name": "juveniles subject to relocation",
             "description": "Dependent young may be included in relocation or temporary displacement activities.",
-            "applies_to": ["temporary-displacement-or-relocation"]
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
 
         {
             "id": "physical-nest-entry-required",
             "name": "physical nest entry required",
             "description": "Access inside the nest structure is necessary, potentially exposing eggs or chicks to disturbance.",
-            "applies_to": ["nest-access-and-modification"]
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "structural-alteration-permitted",
             "name": "structural alteration permitted",
             "description": "Modifications to the nest’s physical structure are allowed, including reinforcement or minor reshaping.",
-            "applies_to": ["nest-access-and-modification"]
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "temporary-nest-removal-allowed",
             "name": "temporary nest removal allowed",
             "description": "The nest may be temporarily removed from its location for inspection, study, or relocation.",
-            "applies_to": ["nest-access-and-modification"]
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "artificial-support-added",
             "name": "artificial support added",
             "description": "Non-native materials may be added to stabilize or reinforce the nest structure.",
-            "applies_to": ["nest-access-and-modification"]
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "parental-presence-disrupted",
             "name": "parental presence disrupted",
             "description": "Access may occur even if it temporarily deters parent birds from caring for the nest.",
-            "applies_to": ["nest-access-and-modification"]
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "access-during-incubation",
             "name": "access during incubation",
             "description": "Nests may be entered while eggs are being incubated, potentially affecting temperature or attendance.",
-            "applies_to": ["nest-access-and-modification"]
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "access-during-feeding-phase",
             "name": "access during feeding phase",
             "description": "Nests may be accessed while adults are feeding chicks, potentially disturbing feeding behavior.",
-            "applies_to": ["nest-access-and-modification"]
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "direct-egg-contact-permitted",
             "name": "direct egg contact permitted",
             "description": "Handling eggs directly by hand is allowed for study, relocation, or measurement purposes.",
-            "applies_to": ["egg-and-hatchling-handling"]
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
         {
             "id": "egg-relocation-permitted",
             "name": "egg relocation permitted",
             "description": "Eggs may be moved to a different nest or controlled environment for monitoring or protection.",
-            "applies_to": ["egg-and-hatchling-handling"]
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
         {
             "id": "hatchling-removal-permitted",
             "name": "hatchling removal permitted",
             "description": "Chicks may be temporarily removed from the nest for study, tagging, or health checks.",
-            "applies_to": ["egg-and-hatchling-handling"]
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
         {
             "id": "artificial-incubation-involved",
             "name": "artificial incubation involved",
             "description": "Eggs may be placed in artificial incubation devices to ensure development outside natural conditions.",
-            "applies_to": ["egg-and-hatchling-handling"]
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
         {
             "id": "handling-prior-to-imprinting",
             "name": "handling prior to imprinting",
             "description": "Chicks may be handled before species-specific imprinting occurs, affecting future behavioral responses.",
-            "applies_to": ["egg-and-hatchling-handling"]
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
         {
             "id": "handling-after-imprinting",
             "name": "handling after imprinting",
             "description": "Chicks may be handled even after imprinting has begun, potentially affecting social or ecological behaviors.",
-            "applies_to": ["egg-and-hatchling-handling"]
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
         {
             "id": "clutch-size-modification-allowed",
             "name": "clutch size modification allowed",
             "description": "Adding or removing eggs from a nest is permitted under controlled study or management conditions.",
-            "applies_to": ["egg-and-hatchling-handling"]
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
 
         {
             "id": "interruption-during-courtship",
             "name": "interruption during courtship",
             "description": "Activities may interfere with mating displays or partner selection behaviors.",
-            "applies_to": ["lifecycle-stage-interruption"]
+            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
         },
         {
             "id": "interruption-during-incubation",
             "name": "interruption during incubation",
             "description": "Activities may affect birds while they are incubating eggs, potentially impacting development or survival.",
-            "applies_to": ["lifecycle-stage-interruption"]
+            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
         },
         {
             "id": "interruption-during-fledging",
             "name": "interruption during fledging",
             "description": "Interventions may affect chicks leaving the nest or developing flight capabilities.",
-            "applies_to": ["lifecycle-stage-interruption"]
+            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
         },
         {
             "id": "interruption-during-molt",
             "name": "interruption during molt",
             "description": "Activities may disrupt the natural feather replacement process, affecting flight, insulation, or display.",
-            "applies_to": ["lifecycle-stage-interruption"]
+            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
         },
         {
             "id": "interruption-during-migration-behavior",
             "name": "interruption during migration behavior",
             "description": "Birds may be disturbed while performing natural migratory movements, orientation, or stopover behavior.",
-            "applies_to": ["lifecycle-stage-interruption"]
+            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
         },
         {
             "id": "forced-phase-delay-permitted",
             "name": "forced phase delay permitted",
             "description": "Deliberate interventions may delay a lifecycle stage for research or management purposes.",
-            "applies_to": ["lifecycle-stage-interruption"]
+            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
         },
         {
             "id": "external-tag-attached",
             "name": "external tag attached",
             "description": "An external identifier such as a band, ring, or flag is attached for tracking and identification.",
-            "applies_to": ["artificial-marking-or-tagging"]
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         {
             "id": "subcutaneous-implant-allowed",
             "name": "subcutaneous implant allowed",
             "description": "Subcutaneous or internal implants are permitted for identification, tracking, or physiological monitoring.",
-            "applies_to": ["artificial-marking-or-tagging"]
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         {
             "id": "temporary-marker-used",
             "name": "temporary marker used",
             "description": "Non-permanent markers can be applied for short-term identification purposes.",
-            "applies_to": ["artificial-marking-or-tagging"]
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         {
             "id": "permanent-marker-used",
             "name": "permanent marker used",
             "description": "Permanent markings can be applied for long-term identification and study.",
-            "applies_to": ["artificial-marking-or-tagging"]
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         {
             "id": "tag-weight-exceeds-baseline-threshold",
             "name": "tag weight exceeds baseline threshold",
             "description": "The attached tag or device may exceed recommended weight limits, potentially affecting behavior or flight.",
-            "applies_to": ["artificial-marking-or-tagging"]
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         {
             "id": "tag-removal-planned",
             "name": "tag removal planned",
             "description": "The marker is intended to be removed after the study or tracking period.",
-            "applies_to": ["artificial-marking-or-tagging"]
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         {
             "id": "tag-removal-not-required",
             "name": "tag removal not required",
             "description": "Markers may remain permanently on the bird without removal after study completion.",
-            "applies_to": ["artificial-marking-or-tagging"]
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         
         {
             "id": "blood-sampling-permitted",
             "name": "blood sampling permitted",
             "description": "Collection of blood is authorized for research or monitoring purposes.",
-            "applies_to": ["biological-sample-extraction"]
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
         {
             "id": "feather-sampling-permitted",
             "name": "feather sampling permitted",
             "description": "Feathers may be collected for genetic, hormonal, or health analysis.",
-            "applies_to": ["biological-sample-extraction"]
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
         {
             "id": "tissue-sampling-permitted",
             "name": "tissue sampling permitted",
             "description": "Small tissue samples may be taken for diagnostic or experimental purposes, avoiding lethal impact.",
-            "applies_to": ["biological-sample-extraction"]
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
         {
             "id": "non-lethal-extraction-only",
             "name": "non-lethal extraction only",
             "description": "All biological sampling must not cause death or permanent impairment of the bird.",
-            "applies_to": ["biological-sample-extraction"]
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
         {
             "id": "repeat-sampling-allowed",
             "name": "repeat sampling allowed",
             "description": "The same individual may be sampled multiple times across the study period.",
-            "applies_to": ["biological-sample-extraction"]
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
         {
             "id": "sampling-during-active-illness",
             "name": "sampling during active illness",
             "description": "Birds may be sampled even if exhibiting signs of illness, for health monitoring or treatment purposes.",
-            "applies_to": ["biological-sample-extraction"]
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
         {
             "id": "sampling-during-breeding-phase",
             "name": "sampling during breeding phase",
             "description": "Sampling may occur while birds are incubating eggs or caring for chicks, with appropriate care.",
-            "applies_to": ["biological-sample-extraction"]
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
 
         {
             "id": "behavior-induced-intentionally",
             "name": "behavior induced intentionally",
             "description": "The bird’s behavior is deliberately provoked for observation or experimentation.",
-            "applies_to": ["induced-behavioral-response"]
+            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
             "id": "response-triggered-via-stimulus",
             "name": "response triggered via stimulus",
             "description": "Specific stimuli (visual, auditory, or tactile) are used to elicit particular behaviors.",
-            "applies_to": ["induced-behavioral-response"]
+            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
             "id": "training-or-conditioning-involved",
             "name": "training or conditioning involved",
             "description": "Structured behavioral conditioning or training protocols may be applied.",
-            "applies_to": ["induced-behavioral-response"]
+            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
             "id": "aversive-stimulus-permitted",
             "name": "aversive stimulus permitted",
             "description": "Unpleasant or mildly stressful stimuli may be applied to modify behavior under controlled conditions.",
-            "applies_to": ["induced-behavioral-response"]
+            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
             "id": "reward-based-stimulus-permitted",
             "name": "reward-based stimulus permitted",
             "description": "Positive reinforcement or rewarding stimuli may be applied to encourage behavior.",
-            "applies_to": ["induced-behavioral-response"]
+            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
             "id": "behavior-change-expected-to-persist",
             "name": "behavior change expected to persist",
             "description": "Behavioral changes may last beyond the immediate experimental or observational period.",
-            "applies_to": ["induced-behavioral-response"]
+            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
 
         {
             "id": "flight-restriction-applied",
             "name": "flight restriction applied",
             "description": "Birds’ ability to fly may be temporarily limited or constrained for study, safety, or management purposes.",
-            "applies_to": ["alteration-of-flight-or-movement"]
+            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
             "id": "flight-enhancement-applied",
             "name": "flight enhancement applied",
             "description": "Flight performance may be temporarily augmented, for example via reduced gravity environments or support systems.",
-            "applies_to": ["alteration-of-flight-or-movement"]
+            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
             "id": "movement-corridor-altered",
             "name": "movement corridor altered",
             "description": "Paths or routes normally used by birds within a habitat may be modified or redirected.",
-            "applies_to": ["alteration-of-flight-or-movement"]
+            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
             "id": "gravity-assisted-intervention",
             "name": "gravity-assisted intervention",
             "description": "Bird movement is modified using controlled gravitational manipulations in the lunar habitat.",
-            "applies_to": ["alteration-of-flight-or-movement"]
+            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
             "id": "repeated-movement-trials-required",
             "name": "repeated movement trials required",
             "description": "Birds may be subjected to multiple trials to observe or test locomotion and flight behavior.",
-            "applies_to": ["alteration-of-flight-or-movement"]
+            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
             "id": "movement-suppression-permitted",
             "name": "movement suppression permitted",
             "description": "Temporary restriction of voluntary movement is allowed, for research or control purposes.",
-            "applies_to": ["alteration-of-flight-or-movement"]
+            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
             "id": "vegetation-displacement-permitted",
             "name": "vegetation displacement permitted",
             "description": "Plant structures or artificial foliage may be moved or removed, altering perching or shelter areas.",
-            "applies_to": ["habitat-structure-disturbance"]
+            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
         },
         {
             "id": "perching-structures-altered",
             "name": "perching structures altered",
             "description": "Artificial or natural perches may be modified or removed, affecting roosting or resting behavior.",
-            "applies_to": ["habitat-structure-disturbance"]
+            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
         },
         {
             "id": "nesting-substrate-modified",
             "name": "nesting substrate modified",
             "description": "Ground or surface materials used for nesting may be altered or replaced for study or maintenance.",
-            "applies_to": ["habitat-structure-disturbance"]
+            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
         },
         {
             "id": "temporary-disturbance-only",
             "name": "temporary disturbance only",
             "description": "Habitat changes are short-term and must be restored to baseline conditions after intervention.",
-            "applies_to": ["habitat-structure-disturbance"]
+            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
         },
         {
             "id": "permanent-modification-allowed",
             "name": "permanent modification allowed",
             "description": "Permanent structural changes are permitted under controlled ecological management plans.",
-            "applies_to": ["habitat-structure-disturbance"]
+            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
         },
         {
             "id": "disturbance-during-breeding-season",
             "name": "disturbance during breeding season",
             "description": "Alterations may occur even during the breeding season, potentially affecting nesting success.",
-            "applies_to": ["habitat-structure-disturbance"]
+            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
         },
 
         {
             "id": "temperature-altered",
             "name": "temperature altered",
             "description": "Ambient temperature within the habitat may be deliberately increased or decreased for experimental or management purposes.",
-            "applies_to": ["environmental-condition-manipulation"]
+            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
         },
         {
             "id": "humidity-altered",
             "name": "humidity altered",
             "description": "Relative humidity levels may be modified, affecting microclimate conditions for the birds.",
-            "applies_to": ["environmental-condition-manipulation"]
+            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
         },
         {
             "id": "atmospheric-composition-altered",
             "name": "atmospheric composition altered",
             "description": "The levels of oxygen, carbon dioxide, or other gases may be intentionally adjusted within the habitat.",
-            "applies_to": ["environmental-condition-manipulation"]
+            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
         },
         {
             "id": "condition-change-exceeds-baseline-variance",
             "name": "condition change exceeds baseline variance",
             "description": "Environmental changes may go beyond normal natural fluctuations for experimental study.",
-            "applies_to": ["environmental-condition-manipulation"]
+            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
         },
         {
             "id": "conditions-restored-post-intervention",
             "name": "conditions restored post-intervention",
             "description": "Environmental parameters must be returned to baseline conditions after the experiment or activity.",
-            "applies_to": ["environmental-condition-manipulation"]
+            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
         },
         {
             "id": "long-term-alteration-permitted",
             "name": "long-term alteration permitted",
             "description": "Sustained changes to environmental conditions may be maintained for extended study or management.",
-            "applies_to": ["environmental-condition-manipulation"]
+            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
         },
         {
             "id": "light-intensity-altered",
             "name": "light intensity altered",
             "description": "The brightness of artificial or natural light may be increased or decreased to influence behavior or physiology.",
-            "applies_to": ["light-and-circadian-cycle-interference"]
+            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
         },
         {
             "id": "light-spectrum-altered",
             "name": "light spectrum altered",
             "description": "The spectral composition of light may be modified to mimic or deviate from natural conditions.",
-            "applies_to": ["light-and-circadian-cycle-interference"]
+            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
         },
         {
             "id": "photoperiod-length-altered",
             "name": "photoperiod length altered",
             "description": "The duration of light and dark periods may be changed, potentially shifting circadian rhythms.",
-            "applies_to": ["light-and-circadian-cycle-interference"]
+            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
         },
         {
             "id": "intervention-during-rest-phase",
             "name": "intervention during rest phase",
             "description": "Environmental or light manipulations may occur while birds are normally resting.",
-            "applies_to": ["light-and-circadian-cycle-interference"]
+            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
         },
         {
             "id": "intervention-during-active-phase",
             "name": "intervention during active phase",
             "description": "Manipulations may occur while birds are normally active, potentially affecting behavior.",
-            "applies_to": ["light-and-circadian-cycle-interference"]
+            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
         },
         {
             "id": "circadian-shift-exceeds-one-cycle",
             "name": "circadian shift exceeds one cycle",
             "description": "The alteration in daily or lunar cycles may exceed one full circadian rhythm period.",
-            "applies_to": ["light-and-circadian-cycle-interference"]
+            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
         },
 
         {
             "id": "artificial-vocalization-used",
             "name": "artificial vocalization used",
             "description": "Synthetic sounds or calls are emitted to influence bird behavior or simulate communication.",
-            "applies_to": ["acoustic-or-signal-emission"]
+            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
         },
         {
             "id": "signal-mimics-natural-call",
             "name": "signal mimics natural call",
             "description": "Emitted signals replicate natural vocalizations to elicit responses from birds.",
-            "applies_to": ["acoustic-or-signal-emission"]
+            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
         },
         {
             "id": "signal-exceeds-natural-volume",
             "name": "signal exceeds natural volume",
             "description": "Acoustic emissions may be louder than natural calls, potentially affecting multiple individuals.",
-            "applies_to": ["acoustic-or-signal-emission"]
+            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
         },
         {
             "id": "continuous-emission-permitted",
             "name": "continuous emission permitted",
             "description": "Sound or signal may be broadcast continuously for extended observation or conditioning.",
-            "applies_to": ["acoustic-or-signal-emission"]
+            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
         },
         {
             "id": "directional-emission-required",
             "name": "directional emission required",
             "description": "Acoustic signals must be aimed or focused to target specific birds or groups.",
-            "applies_to": ["acoustic-or-signal-emission"]
+            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
         },
         {
             "id": "cross-species-signal-exposure-allowed",
             "name": "cross-species signal exposure allowed",
             "description": "Signals may be broadcast in ways that affect other species present in the habitat.",
-            "applies_to": ["acoustic-or-signal-emission"]
+            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
         },
         {
             "id": "sex-ratio-intentionally-altered",
             "name": "sex ratio intentionally altered",
             "description": "The ratio of males to females in a population may be modified to study ecological or behavioral effects.",
-            "applies_to": ["population-structure-intervention"]
+            "permissionType": {"type": "permission-type", "id": "population-structure-intervention"}
         },
         {
             "id": "age-distribution-altered",
             "name": "age distribution altered",
             "description": "Population demographics may be adjusted to favor or limit certain age classes.",
-            "applies_to": ["population-structure-intervention"]
+            "permissionType": {"type": "permission-type", "id": "population-structure-intervention"}
         },
         {
             "id": "selective-exclusion-applied",
             "name": "selective exclusion applied",
             "description": "Certain individuals or subgroups may be prevented from accessing parts of the habitat or population.",
-            "applies_to": ["population-structure-intervention"]
+            "permissionType": {"type": "permission-type", "id": "population-structure-intervention"}
         },
         {
             "id": "selective-encouragement-applied",
             "name": "selective encouragement applied",
             "description": "Certain individuals or subgroups may be preferentially supported, guided, or relocated to influence population structure.",
-            "applies_to": ["population-structure-intervention"]
+            "permissionType": {"type": "permission-type", "id": "population-structure-intervention"}
         },
         {
             "id": "intervention-affects-multiple-generations",
             "name": "intervention affects multiple generations",
             "description": "Actions may have consequences that influence the population over more than one breeding cycle or generation.",
-            "applies_to": ["population-structure-intervention"]
+            "permissionType": {"type": "permission-type", "id": "population-structure-intervention"}
         },
 
         {
             "id": "selective-breeding-permitted",
             "name": "selective breeding permitted",
             "description": "Individuals may be paired or managed to favor specific genetic traits for research or population management.",
-            "applies_to": ["genetic-lineage-influence"]
+            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
         },
         {
             "id": "lineage-isolation-enforced",
             "name": "lineage isolation enforced",
             "description": "Certain genetic lines may be isolated to prevent mixing with other populations.",
-            "applies_to": ["genetic-lineage-influence"]
+            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
         },
         {
             "id": "hybridization-permitted",
             "name": "hybridization permitted",
             "description": "Crossing between genetically distinct lines or species is allowed under controlled conditions.",
-            "applies_to": ["genetic-lineage-influence"]
+            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
         },
         {
             "id": "genetic-traits-amplified",
             "name": "genetic traits amplified",
             "description": "Specific traits may be selected or enhanced over successive generations.",
-            "applies_to": ["genetic-lineage-influence"]
+            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
         },
         {
             "id": "genetic-traits-suppressed",
             "name": "genetic traits suppressed",
             "description": "Specific traits may be intentionally reduced or eliminated from the population.",
-            "applies_to": ["genetic-lineage-influence"]
+            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
         },
         {
             "id": "intervention-persists-beyond-one-generation",
             "name": "intervention persists beyond one generation",
             "description": "Effects of the intervention may influence multiple successive generations.",
-            "applies_to": ["genetic-lineage-influence"]
+            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
         },
         {
             "id": "transfer-between-biospheres",
             "name": "transfer between biospheres",
             "description": "Birds may be moved from one controlled biosphere or dome to another for management, research, or population support.",
-            "applies_to": ["cross-habitat-transfer"]
+            "permissionType": {"type": "permission-type", "id": "cross-habitat-transfer"}
         },
         {
             "id": "transfer-between-domes",
             "name": "transfer between domes",
             "description": "Relocation of birds between domed habitats within the same mega-city is permitted.",
-            "applies_to": ["cross-habitat-transfer"]
+            "permissionType": {"type": "permission-type", "id": "cross-habitat-transfer"}
         },
         {
             "id": "transfer-across-gravity-gradients",
             "name": "transfer across gravity gradients",
             "description": "Birds may be moved across areas with different gravity or simulated gravitational environments.",
-            "applies_to": ["cross-habitat-transfer"]
+            "permissionType": {"type": "permission-type", "id": "cross-habitat-transfer"}
         },
         {
             "id": "transfer-involves-quarantine",
             "name": "transfer involves quarantine",
             "description": "Relocated birds must undergo quarantine or isolation protocols before integration.",
-            "applies_to": ["cross-habitat-transfer"]
+            "permissionType": {"type": "permission-type", "id": "cross-habitat-transfer"}
         },
         {
             "id": "return-transfer-guaranteed",
             "name": "return transfer guaranteed",
             "description": "Birds must be returned to their origin habitat after the study or intervention period.",
-            "applies_to": ["cross-habitat-transfer"]
+            "permissionType": {"type": "permission-type", "id": "cross-habitat-transfer"}
         },
         {
             "id": "permanent-relocation-permitted",
             "name": "permanent relocation permitted",
             "description": "Birds may be permanently transferred to a new habitat or biosphere.",
-            "applies_to": ["cross-habitat-transfer"]
+            "permissionType": {"type": "permission-type", "id": "cross-habitat-transfer"}
         },
 
         {
             "id": "medical-treatment-applied",
             "name": "medical treatment applied",
             "description": "Birds may receive direct medical interventions, including medication, surgery, or therapeutic care.",
-            "applies_to": ["post-injury-or-post-illness-intervention"]
+            "permissionType": {"type": "permission-type", "id": "post-injury-or-post-illness-intervention"}
         },
         {
             "id": "assisted-recovery-required",
             "name": "assisted recovery required",
             "description": "Birds may need human support during healing or rehabilitation before returning to natural behavior.",
-            "applies_to": ["post-injury-or-post-illness-intervention"]
+            "permissionType": {"type": "permission-type", "id": "post-injury-or-post-illness-intervention"}
         },
         {
             "id": "release-timing-controlled",
             "name": "release timing controlled",
             "description": "The timing of release back into the habitat is managed to optimize survival and reintegration.",
-            "applies_to": ["post-injury-or-post-illness-intervention"]
+            "permissionType": {"type": "permission-type", "id": "post-injury-or-post-illness-intervention"}
         },
         {
             "id": "post-treatment-monitoring-required",
             "name": "post-treatment monitoring required",
             "description": "Birds are monitored after intervention to track recovery, health, or behavioral changes.",
-            "applies_to": ["post-injury-or-post-illness-intervention"]
+            "permissionType": {"type": "permission-type", "id": "post-injury-or-post-illness-intervention"}
         },
         {
             "id": "reintegration-assistance-provided",
             "name": "reintegration assistance provided",
             "description": "Support is given to help birds re-adapt to their habitat after injury or illness.",
-            "applies_to": ["post-injury-or-post-illness-intervention"]
+            "permissionType": {"type": "permission-type", "id": "post-injury-or-post-illness-intervention"}
         },
         {
             "id": "long-term-captivity-permitted",
             "name": "long-term captivity permitted",
             "description": "Birds may remain in controlled care for extended periods if necessary for recovery or research.",
-            "applies_to": ["post-injury-or-post-illness-intervention"]
+            "permissionType": {"type": "permission-type", "id": "post-injury-or-post-illness-intervention"}
         },
         {
             "id": "standard-restrictions-suspended",
             "name": "standard restrictions suspended",
             "description": "Normal regulatory limitations may be temporarily lifted to respond to urgent ecological or population threats.",
-            "applies_to": ["emergency-ecological-override"]
+            "permissionType": {"type": "permission-type", "id": "emergency-ecological-override"}
         },
         {
             "id": "rapid-intervention-authorized",
             "name": "rapid intervention authorized",
             "description": "Immediate actions may be taken to prevent imminent harm to the ecosystem or bird populations.",
-            "applies_to": ["emergency-ecological-override"]
+            "permissionType": {"type": "permission-type", "id": "emergency-ecological-override"}
         },
         {
             "id": "retrospective-review-required",
             "name": "retrospective review required",
             "description": "All emergency interventions must be reviewed after the fact to ensure compliance and accountability.",
-            "applies_to": ["emergency-ecological-override"]
+            "permissionType": {"type": "permission-type", "id": "emergency-ecological-override"}
         },
         {
             "id": "data-logging-mandatory",
             "name": "data logging mandatory",
             "description": "Comprehensive records of interventions, procedures, and outcomes must be maintained.",
-            "applies_to": ["emergency-ecological-override"]
+            "permissionType": {"type": "permission-type", "id": "emergency-ecological-override"}
         },
         {
             "id": "intervention-affects-protected-species",
             "name": "intervention affects protected species",
             "description": "Emergency actions may involve species that are normally protected under regulations.",
-            "applies_to": ["emergency-ecological-override"]
+            "permissionType": {"type": "permission-type", "id": "emergency-ecological-override"}
         },
         {
             "id": "override-duration-limited",
             "name": "override duration limited",
             "description": "The period during which normal restrictions are suspended is explicitly bounded.",
-            "applies_to": ["emergency-ecological-override"]
+            "permissionType": {"type": "permission-type", "id": "emergency-ecological-override"}
         },
 
         {
             "id": "species-classified-as-protected",
             "name": "species classified as protected",
             "description": "Interactions are limited because the species is legally or environmentally designated as protected.",
-            "applies_to": ["restricted-species-interaction"]
+            "permissionType": {"type": "permission-type", "id": "restricted-species-interaction"}
         },
         {
             "id": "species-classified-as-experimental",
             "name": "species classified as experimental",
             "description": "Species used in research or pilot studies may have interaction restrictions to ensure controlled conditions.",
-            "applies_to": ["restricted-species-interaction"]
+            "permissionType": {"type": "permission-type", "id": "restricted-species-interaction"}
         },
         {
             "id": "interaction-quota-applies",
             "name": "interaction quota applies",
             "description": "A maximum number of allowed interactions with the species is set to prevent over-handling or stress.",
-            "applies_to": ["restricted-species-interaction"]
+            "permissionType": {"type": "permission-type", "id": "restricted-species-interaction"}
         },
         {
             "id": "senior-authorization-required",
             "name": "senior authorization required",
             "description": "High-level or supervisory approval is necessary before interaction can occur.",
-            "applies_to": ["restricted-species-interaction"]
+            "permissionType": {"type": "permission-type", "id": "restricted-species-interaction"}
         },
         {
             "id": "public-disclosure-restricted",
             "name": "public disclosure restricted",
             "description": "Information about interactions with the species may not be shared publicly without approval.",
-            "applies_to": ["restricted-species-interaction"]
+            "permissionType": {"type": "permission-type", "id": "restricted-species-interaction"}
         },
         {
             "id": "multiple-contacts-per-individual-permitted",
             "name": "multiple contacts per individual permitted",
             "description": "An individual bird may be handled or studied more than once under the terms of the permit.",
-            "applies_to": ["extended-or-repeated-contact-authorization"]
+            "permissionType": {"type": "permission-type", "id": "extended-or-repeated-contact-authorization"}
         },
         {
             "id": "contact-spans-multiple-lifecycle-stages",
             "name": "contact spans multiple lifecycle stages",
             "description": "Interactions may occur with the same individual at different stages such as juvenile, adult, or breeding phases.",
-            "applies_to": ["extended-or-repeated-contact-authorization"]
+            "permissionType": {"type": "permission-type", "id": "extended-or-repeated-contact-authorization"}
         },
         {
             "id": "longitudinal-study-authorized",
             "name": "longitudinal study authorized",
             "description": "Permits allow long-term tracking and observation of individuals over time.",
-            "applies_to": ["extended-or-repeated-contact-authorization"]
+            "permissionType": {"type": "permission-type", "id": "extended-or-repeated-contact-authorization"}
         },
         {
             "id": "continuous-monitoring-applied",
             "name": "continuous monitoring applied",
             "description": "Birds may be under ongoing observation or data collection throughout the study period.",
-            "applies_to": ["extended-or-repeated-contact-authorization"]
+            "permissionType": {"type": "permission-type", "id": "extended-or-repeated-contact-authorization"}
         },
         {
             "id": "contact-frequency-exceeds-baseline-limits",
             "name": "contact frequency exceeds baseline limits",
             "description": "The number of interactions may surpass standard guidelines for normal handling or monitoring.",
-            "applies_to": ["extended-or-repeated-contact-authorization"]
+            "permissionType": {"type": "permission-type", "id": "extended-or-repeated-contact-authorization"}
         }
     ]
-
-    const permissionTypes = permissionTypeBase.map<DataSource["permissionTypes"][number]>((pt) => {
-        return {
-            id: pt.id,
-            name: pt.name,
-            description: pt.description,
-            properties: permissionProperties.filter(pp => pp.applies_to.includes(pt.id))
-        }
-    });
 
     const lunarRegions = {
         "Selena Prime": [
@@ -1248,6 +1241,7 @@ function getMoonData(): DataSource {
         emailStatus,
         descriptions,
         permissionTypes,
+        permissionProperties,
         speciesSignifiers,
         species,
     }
@@ -1469,16 +1463,8 @@ type DataSource = {
     reportStatuses: ReportStatus[];
     emailStatus: string[];
     descriptions: string[];
-    permissionTypes: {
-        id: string,
-        name: string;
-        description: string;
-        properties: {
-            id: string;
-            name: string;
-            description: string;
-        }[];
-    }[];
+    permissionTypes: PermissionType[];
+    permissionProperties: PermissionProperty[];
     speciesSignifiers: {signifier: string, code: string, epithet: string}[];
     species: {name: string, code: string, scientific: string}[];
 }
@@ -1540,7 +1526,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         }, {})
     }
 
-    createLicenses(actors: Record<string, Actor>, numberOfLicenses: number) {
+    createLicenses(actors: Record<string, Actor>, species: Record<string, Species>, numberOfLicenses: number) {
         const fixedRandom = this.randomContext;
         const period = this.period;
         const maxLicenseLength = this.maxLicenseLength;
@@ -1603,7 +1589,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 updatedAt: updatedAt.toISOString(),
                 expiresAt: expiresAt.toISOString(),
                 startsAt: startsAt.toISOString(),
-                permissions: this.createPermissions(regionName, [startsAt, expiresAt], fixedRandom.randint(3, 5)),
+                permissions: this.createPermissions(regionName, [startsAt, expiresAt], species, fixedRandom.randint(3, 5)),
                 description: "Within this license the actors will perform:\n" + fixedRandom.choices(descriptions, fixedRandom.randint(1, 3)).map(d => `- ${d}`).join("\n"),
                 status: fixedRandom.choice(licenseStatuses),
                 region: `${fixedRandom.choice(regionDescriptors)} ${regionName}`,
@@ -1619,30 +1605,44 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         }, {});
     }
 
-    createPermissions(regionName: string, period: [Date, Date], count: number): License["permissions"] {
-        const {permissionTypes, regionDescriptors, species} = this.dataSource;
+    createPermissions(regionName: string, period: [Date, Date], species: Record<string, Species>, count: number): License["permissions"] {
+        const {permissionTypes, permissionProperties, regionDescriptors} = this.dataSource;
         const fixedRandom = this.randomContext;
+        const speciesList = Object.keys(species).map(key => species[key])
         return Array.from({length: count}).map(() => {
             const permissionType = fixedRandom.choice(permissionTypes);
             const permissionPeriod = fixedRandom.randdaterange(...period);
+            const currentPermissionProperties = permissionProperties.filter(pp => pp.permissionType.id === permissionType.id)
             const permission: License["permissions"][number] = {
                 description: "",
                 type: {
+                    type: "permission-type",
                     id: permissionType.id,
-                    name: permissionType.name,
-                    description: permissionType.description,
                 },
-                properties: fixedRandom.choices(permissionType.properties, Math.floor(permissionType.properties.length * 0.5)).map(pp => ({
+                properties: fixedRandom.choices(currentPermissionProperties, Math.floor(currentPermissionProperties.length * 0.5)).map(pp => ({
+                    type: "permission-property",
                     id: pp.id,
-                    name: pp.name,
-                    description: pp.description,
                 })),
-                species: fixedRandom.choices(species, fixedRandom.randint(3, 5)).map(s => ({id: s.code, name: s.name})),
+                speciesList: fixedRandom.choices(speciesList, fixedRandom.randint(3, 5)).map(s => ({type: "species", id: s.id})),
                 location: `${fixedRandom.choice(regionDescriptors)} ${regionName}`,
                 period: [permissionPeriod[0].toISOString(), permissionPeriod[1].toISOString()]
             };
             return permission;
         })
+    }
+
+    createPermissionTypes() {
+        return this.dataSource.permissionTypes.reduce<Record<string, PermissionType>>((acc, pt) => {
+            acc[pt.id] = pt;
+            return acc;
+        }, {});
+    }
+
+    createPermissionProperties() {
+        return this.dataSource.permissionProperties.reduce<Record<string, PermissionProperty>>((acc, pp) => {
+            acc[pp.id] = pp;
+            return acc;
+        }, {});
     }
 
     createDocuments(licenses: Record<string, License>): Record<string, LicenseDocument> {
@@ -1683,14 +1683,18 @@ export class BirdRingingDataGenerator implements DataGenerator<{
 
     createData() {
         const actors = this.createActors(200, 30);
-        const licenses = this.createLicenses(actors, 100);
-        const documents = this.createDocuments(licenses);
         const species = this.createSpecies(50);
+        const licenses = this.createLicenses(actors, species, 100);
+        const documents = this.createDocuments(licenses);
+        const permissionTypes = this.createPermissionTypes();
+        const permissionProperties = this.createPermissionProperties();
         return {
             actors,
             licenses,
             documents,
             species,
+            permissionTypes,
+            permissionProperties
         }
     }
 }
