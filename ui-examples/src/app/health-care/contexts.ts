@@ -1,9 +1,17 @@
 import { createContext, useContext } from "react";
 import { EntityRef, Log, Notification } from "./common";
 
+export type SearchParams<T> = {
+    search?: string;
+    properties?: {[P in keyof Omit<T, "type">]: T[P] | T[P][]};
+    orderBy?: string | string[];
+    start?: number;
+    limit?: number;
+}
+
 export interface DataSource<T extends EntityRef<V>, V extends string = T["type"]> {
     get(ref: EntityRef<V>): T;
-    find(search: string, properties: {[P in keyof Omit<T, "type">]: T[P] | T[P][]}): T[];
+    find(params: SearchParams<T>): T[];
     all(): T[]
 }
 
@@ -39,8 +47,24 @@ export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type
         return this._record[ref.id];
     }
 
-    find(_search: string, _properties: {[P in keyof Omit<T, "type">]: T[P] | T[P][]}) {
-        return this._data;
+    find({orderBy, limit, start}: SearchParams<T>) {
+        const sorted = Array.isArray(orderBy) ? this._data : this._data.sort((a, b) => {
+            const aVal = a[orderBy as keyof (typeof a)]
+            const bVal = b[orderBy as keyof (typeof b)]
+
+            if (typeof aVal === "number" && typeof bVal === "number") {
+                return aVal - bVal;
+            }
+            if (typeof aVal === "string" && typeof bVal === "string") {
+                return aVal.localeCompare(bVal);
+            }
+            if (aVal instanceof Date && bVal instanceof Date) {
+                return aVal.getTime() - bVal.getTime();
+            }
+            return 0;
+        });
+        const selectedStart = start || 0;
+        return limit === undefined ? sorted : sorted.slice(selectedStart, selectedStart + limit);
     }
 
     all() {

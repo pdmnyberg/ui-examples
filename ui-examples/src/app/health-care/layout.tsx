@@ -32,8 +32,8 @@ export default function PageLayout({
       type: "log",
       id: `log-${index}`,
       content: item,
-      created_by: user,
-      created_at: new Date()
+      createdBy: user,
+      createdAt: new Date()
     })))
   }
   const navItems: NavItems =  [
@@ -57,17 +57,17 @@ export default function PageLayout({
   };
   return (
     <NavContext.Provider value={navItems}>
-      <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
-        <NavStateProvider>
-          <Sidebar {...sidebarProps}>
-            <DataContext.Provider value={data}>
+      <DataContext.Provider value={data}>
+        <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
+          <NavStateProvider>
+            <Sidebar {...sidebarProps}>
               <div className="container">
                 {children}
               </div>
-            </DataContext.Provider>
-          </Sidebar>
-        </NavStateProvider>
-      </Suspense>
+            </Sidebar>
+          </NavStateProvider>
+        </Suspense>
+      </DataContext.Provider>
     </NavContext.Provider>
   )
 }

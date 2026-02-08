@@ -12,8 +12,8 @@ export type NotificationRef = EntityRef<"notification">;
 export type LogRef = EntityRef<"log">;
 
 export type CreateTracking = {
-    created_by: UserRef;
-    created_at: Date;
+    createdBy: UserRef;
+    createdAt: Date;
 }
 
 export type Organization = OrganizationRef & {

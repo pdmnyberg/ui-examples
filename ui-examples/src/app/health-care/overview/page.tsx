@@ -32,10 +32,10 @@ export default function Overview() {
     content: "Meddelande"
   };
 
-  const logList: Log[] = logs.all();
+  const logList: Log[] = logs.find({limit: 3, orderBy: "createdAt"});
   const logColumns: ColumnSpec<Log> = {
     content: "Händelse",
-    created_at: "Tidpunkt"
+    createdAt: "Tidpunkt"
   };
   return (
     <>
