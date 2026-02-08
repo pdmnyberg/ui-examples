@@ -1,83 +1,13 @@
 "use client"
-import Link from "next/link";
-import { useNavInfo, NavInfoContext, toPath, DataSourceContext, useNav, NavContext, NavItems } from "./contexts";
-import { Suspense, useMemo, useState } from "react";
-import { usePathname } from 'next/navigation';
+import { Suspense, useMemo } from "react";
 import { StaticDataSource } from "./common";
 import { fetchData } from "../utils";
 import useSWR from 'swr';
+import { DataSourceContext } from "./contexts";
+import { NavContext, NavItems } from "@/contexts";
+import { Sidebar } from "@/components/Sidebar";
+import { NavStateProvider } from "@/components/NavStateProvider";
 
-function BasePageLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const {path} = useNavInfo();
-  const contextTitle: string = "Bird ringing"
-  const navItems = useNav();
-  const dropdownItems: {label: string, href: string}[] = []
-  const firstNav = path ? path[0] : {id: undefined, extendedId: undefined};
-  const [navIsOpen, setNavIsOpen] = useState(true);
-
-  return (
-    <>
-      <aside className="d-flex flex-shrink-0 sidebar" data-is-open={navIsOpen}>
-        <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary sidebar-content">
-          <Link href="/bird-ringing" className="d-flex align-items-center p-3 pe-5 bg-primary text-white text-decoration-none">
-            <i className="bi fs-4 lh-1 pe-2 bi-feather" />
-            <span className="d-flex flex-column">
-              <span className="fs-4 lh-1">{contextTitle}</span>
-            </span>
-          </Link>
-          <ul className="nav nav-pills p-3 flex-column">
-            {navItems.map((ni, index) => {
-              if (ni.type === "item") {
-                const isActive = firstNav.extendedId === ni.id || firstNav.id === ni.id;
-                return <li key={index} className="nav-item"><Link href={ni.href} className={`nav-link ${isActive ? "active" : ""}`} aria-current="page">{ni.label}</Link></li>
-              } else if (ni.type === "separator") {
-                return <li key={index}><hr /></li>
-              } else if (ni.type === "heading") {
-                return <li key={index} className="nav-item"><h3 className="fs-5">{ni.label}</h3></li>
-              }
-            })}
-          </ul>
-          {dropdownItems.length > 0 ? <>
-            <hr />
-            <div className="dropdown">
-              <a href="#" className="d-flex align-items-center p-3 link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <strong>Utils</strong>
-              </a>
-              <ul className="dropdown-menu text-small shadow">
-                {dropdownItems.map((ddi, index) => (
-                  <li key={index}><Link className="dropdown-item" href={ddi.href}>{ddi.label}</Link></li>
-                ))}
-              </ul>
-            </div>
-          </> : <></>}
-        </div>
-      </aside>
-      <main className="p-3 flex-grow-1 overflow-auto position-relative">
-        <button className="btn btn-primary position-fixed z-3" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
-          <i className="bi fs-2 bi-list" />
-        </button>
-        <div className="py-5" />
-        {children}
-      </main>
-    </>
-  );
-}
-
-function NavStateProvider({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const pathname = usePathname();
-  const path = useMemo(() => toPath(pathname.split("/").slice(2)), [pathname]);
-  return (
-    <NavInfoContext.Provider value={{path}}>{children}</NavInfoContext.Provider>
-  )
-}
 
 function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl, permissionPropertiesUrl, speciesUrl]: [string, string, string, string, string, string]) {
   return Promise.all([
@@ -149,11 +79,17 @@ export default function PageLayout({
     {type: "item", label: "User workflow", href: "/bird-ringing/diagrams/bird-ringing-user-workflow", id: "diagrams/bird-ringing-user-workflow/"},
     {type: "item", label: "System separation", href: "/bird-ringing/diagrams/bird-ringing-system-separation", id: "diagrams/bird-ringing-system-separation/"},
   ]
+
+  const sidebarProps = {
+    title: "Bird ringing",
+    rootHref: "/bird-ringing",
+    iconRef: "bi-feather",
+  };
   return (
     <NavContext.Provider value={navItems}>
-      <Suspense fallback={<BasePageLayout>{children}</BasePageLayout>}>
+      <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
         <NavStateProvider>
-          <BasePageLayout>
+          <Sidebar {...sidebarProps}>
             <DataSourceProvider
               licensesUrl={`${basePath}/data/bird-ringing/licenses.json`}
               actorsUrl={`${basePath}/data/bird-ringing/actors.json`}
@@ -164,7 +100,7 @@ export default function PageLayout({
             >
               {children}
             </DataSourceProvider>
-          </BasePageLayout>
+          </Sidebar>
         </NavStateProvider>
       </Suspense>
     </NavContext.Provider>

@@ -1,6 +1,6 @@
 "use client"
+import { useNav } from "@/contexts";
 import Link from "next/link";
-import { useNav } from "./contexts";
 
 export default function Home() {
   const navItems = useNav();
