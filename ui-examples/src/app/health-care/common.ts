@@ -1,4 +1,4 @@
-type EntityRef<T> = {
+export type EntityRef<T> = {
     id: string;
     type: T;
 }
@@ -58,12 +58,14 @@ export type ContactInformation = {
     phoneNumber: string;
 }
 
+export type Priority = "primary" | "secondary" | "success" | "danger" | "warning" | "info";
+
 export type Activity = ActivityRef & CreateTracking & {
     recipient: UserRef;
     title: string;
     content: string;
     timeNeeded: number;
-    priority: "could" | "should" | "must" | "critical";
+    priority: Priority;
     status: "new" | "accepted" | "done";
 }
 
@@ -94,12 +96,13 @@ export type Message = CreateTracking & {
 export type Notification = NotificationRef & {
     user: UserRef;
     content: string;
-    target: EntityRef<any>;
+    target?: EntityRef<any>;
+    priority: Priority;
 }
 
 export type Log = LogRef & CreateTracking & {
     content: string;
-    target: EntityRef<any>;
+    target?: EntityRef<any>;
 }
 
 export type Period = {

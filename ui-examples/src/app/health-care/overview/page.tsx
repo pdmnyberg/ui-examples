@@ -5,6 +5,7 @@ import { ColumnSpec, Table } from "@/components/Table";
 import { NavItem, useNav } from "@/contexts";
 import Link from "next/link";
 import React from "react";
+import { useData } from "../contexts";
 
 type EntryPoint = {
   id: string;
@@ -14,6 +15,7 @@ type EntryPoint = {
 
 export default function Overview() {
   const navItems = useNav();
+  const {notifications, logs} = useData();
   const entryPoints: EntryPoint[] = navItems.filter((item): item is NavItem => item.type === "item").filter(item => item.tags && item.tags.includes("overview")).map(item => ({
     id: item.id,
     name: item.label,
@@ -24,11 +26,17 @@ export default function Overview() {
     href: "Gå dit",
   };
 
-  const notifications: Notification[] = [];
-  const notificationColumns: ColumnSpec<Notification> = {};
+  const notificationList = notifications.all();
+  const notificationColumns: ColumnSpec<Notification> = {
+    priority: "Prioritering",
+    content: "Meddelande"
+  };
 
-  const logs: Log[] = [];
-  const logColumns: ColumnSpec<Log> = {};
+  const logList: Log[] = logs.all();
+  const logColumns: ColumnSpec<Log> = {
+    content: "Händelse",
+    created_at: "Tidpunkt"
+  };
   return (
     <>
       <h2>Översikt</h2>
@@ -36,10 +44,10 @@ export default function Overview() {
       <Table items={entryPoints} columns={entryPointColumns} />
 
       <h3>Notifieringar</h3>
-      <Table items={notifications} columns={notificationColumns} />
+      <Table items={notificationList} columns={notificationColumns} />
 
       <h3>Händelser</h3>
-      <Table items={logs} columns={logColumns} />
+      <Table items={logList} columns={logColumns} />
     </>
   )
 }

@@ -3,12 +3,39 @@ import { Suspense } from "react";
 import { NavContext, NavItems } from "@/contexts";
 import { Sidebar } from "@/components/Sidebar";
 import { NavStateProvider } from "@/components/NavStateProvider";
+import { DataContext, HealtCareData, StaticDataSource } from "./contexts";
+import { Log, Notification, User, UserRef } from "./common";
 
 export default function PageLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user: UserRef = {type: "user", id: "current-user"}
+  const data: HealtCareData = {
+    notifications: new StaticDataSource<Notification>([
+      "Det finns saker att göra",
+      "Det finns saker att titta på",
+      "Det finns saker att tänka på"
+    ].map<Notification>((item, index) => ({
+      type: "notification",
+      id: `notification-${index}`,
+      content: item,
+      priority: "info",
+      user,
+    }))),
+    logs: new StaticDataSource<Log>([
+      "Vårdare besökte vårdtagare",
+      "Vårdtagare tog medicin",
+      "Vårdare uträttade ärende 'Inköp'"
+    ].map<Log>((item, index) => ({
+      type: "log",
+      id: `log-${index}`,
+      content: item,
+      created_by: user,
+      created_at: new Date()
+    })))
+  }
   const navItems: NavItems =  [
     {type: "heading", label: "Anhörig"},
     {type: "item", label: "Översikt", href: "/health-care/overview", id: "overview"},
@@ -33,9 +60,11 @@ export default function PageLayout({
       <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
         <NavStateProvider>
           <Sidebar {...sidebarProps}>
-            <div className="container">
+            <DataContext.Provider value={data}>
+              <div className="container">
                 {children}
-            </div>
+              </div>
+            </DataContext.Provider>
           </Sidebar>
         </NavStateProvider>
       </Suspense>
