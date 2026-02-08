@@ -1,0 +1,108 @@
+type EntityRef<T> = {
+    id: string;
+    type: T;
+}
+
+export type ActivityRef = EntityRef<"activity">;
+export type MessageContextRef = EntityRef<"message-context">;
+export type UserRef = EntityRef<"user">;
+export type PersonRef = EntityRef<"person">;
+export type OrganizationRef = EntityRef<"organization">;
+export type NotificationRef = EntityRef<"notification">;
+export type LogRef = EntityRef<"log">;
+
+export type CreateTracking = {
+    created_by: UserRef;
+    created_at: Date;
+}
+
+export type Organization = OrganizationRef & {
+    name: string;
+    subjects: UserRef[];
+}
+
+export type UserRole = {
+    type: "care-recipient";
+} | {
+    type: "care-recipient-relation";
+    recipient: UserRef;
+} | {
+    type: "care-taker";
+    organization: OrganizationRef;
+}
+
+export type User = UserRef & {
+    username: string;
+    roles: UserRole[];
+    person: PersonRef;
+}
+
+export type Person = PersonRef & {
+    name: string;
+    fullName: string;
+    contact?: ContactInformation;
+    notes: string;
+    medication?: Medication[];
+}
+
+export type Medication = {
+    period: Period;
+    name: string;
+}
+
+export type ContactInformation = {
+    city?: string;
+    address?: string;
+    postalCode?: string;
+    email?: string;
+    phoneNumber: string;
+}
+
+export type Activity = ActivityRef & CreateTracking & {
+    recipient: UserRef;
+    title: string;
+    content: string;
+    timeNeeded: number;
+    priority: "could" | "should" | "must" | "critical";
+    status: "new" | "accepted" | "done";
+}
+
+export type ScheduleSpecification = {
+    certainty: "certain";
+    time: Date;
+} | {
+    uncertain: "uncertain";
+    time: Date;
+    timeRange: number;
+};
+
+export type ScheduledActivity = CreateTracking & {
+    activity: ActivityRef;
+    schedule: ScheduleSpecification;
+}
+
+export type MessageContext = MessageContextRef & {
+    target: "activity";
+    activity: ActivityRef;
+}
+
+export type Message = CreateTracking & {
+    context: MessageContextRef;
+    content: string;
+}
+
+export type Notification = NotificationRef & {
+    user: UserRef;
+    content: string;
+    target: EntityRef<any>;
+}
+
+export type Log = LogRef & CreateTracking & {
+    content: string;
+    target: EntityRef<any>;
+}
+
+export type Period = {
+    startsAt: Date;
+    endsAt: Date;
+}

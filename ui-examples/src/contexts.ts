@@ -12,8 +12,10 @@ type NavInfo = {
     setPath?(path: PathSegment[] | undefined): void;
 }
 
+export type NavItem = {type: "item", label: string, href: string, id: string, tags?: string[]};
+
 export type NavItems = (
-    {type: "item", label: string, href: string, id: string} |
+    NavItem |
     {type: "separator"} |
     {type: "heading", label: string}
 )[]
