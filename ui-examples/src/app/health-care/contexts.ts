@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { EntityRef, Log, Notification } from "./common";
+import { Activity, EntityRef, Log, Notification } from "./common";
 
 export type SearchParams<T> = {
     search?: string;
@@ -18,6 +18,7 @@ export interface DataSource<T extends EntityRef<V>, V extends string = T["type"]
 export type HealtCareData = {
     notifications: DataSource<Notification>,
     logs: DataSource<Log>;
+    activities: DataSource<Activity>;
 };
 
 export const DataContext = createContext<HealtCareData | null>(null);

@@ -67,6 +67,7 @@ export type Activity = ActivityRef & CreateTracking & {
     timeNeeded: number;
     priority: Priority;
     status: "new" | "accepted" | "done";
+    schedule?: ScheduleSpecification;
 }
 
 export type ScheduleSpecification = {
@@ -77,11 +78,6 @@ export type ScheduleSpecification = {
     time: Date;
     timeRange: number;
 };
-
-export type ScheduledActivity = CreateTracking & {
-    activity: ActivityRef;
-    schedule: ScheduleSpecification;
-}
 
 export type MessageContext = MessageContextRef & {
     target: "activity";
