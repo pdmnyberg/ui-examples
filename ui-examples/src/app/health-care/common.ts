@@ -18,11 +18,11 @@ export type CreateTracking = {
 
 export type Organization = OrganizationRef & {
     name: string;
-    subjects: UserRef[];
 }
 
 export type UserRole = {
     type: "care-recipient";
+    organization: OrganizationRef;
 } | {
     type: "care-recipient-relation";
     recipient: UserRef;
@@ -74,7 +74,7 @@ export type ScheduleSpecification = {
     certainty: "certain";
     time: Date;
 } | {
-    uncertain: "uncertain";
+    certainty: "uncertain";
     time: Date;
     timeRange: number;
 };

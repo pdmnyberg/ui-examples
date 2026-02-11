@@ -13,7 +13,7 @@ import {
 } from "../app/bird-ringing/common";
 import { RandomContext, DataGenerator } from "./common";
 
-function getMoonData(): DataSource {
+export function getMoonData(): DataSource {
     const groupNames = [
         "Skywatchers",
         "Avians",
@@ -1452,7 +1452,7 @@ function getRandomBase() {
     ]
 }
 
-type DataSource = {
+export type DataSource = {
     groupNames: string[];
     maleNames: string[];
     femaleNames: string[];

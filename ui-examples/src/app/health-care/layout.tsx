@@ -4,7 +4,11 @@ import { NavContext, NavItems } from "@/contexts";
 import { Sidebar } from "@/components/Sidebar";
 import { NavStateProvider } from "@/components/NavStateProvider";
 import { DataContext, HealtCareData, StaticDataSource } from "./contexts";
-import { Activity, Log, Notification, User, UserRef } from "./common";
+import { Activity, Log, Notification, UserRef } from "./common";
+import { getGenerator } from "@/data/health-care";
+
+const generator = getGenerator();
+const dataset = generator.createData();
 
 export default function PageLayout({
   children,
@@ -36,50 +40,7 @@ export default function PageLayout({
       createdBy: user,
       createdAt: new Date()
     }))),
-    activities: new StaticDataSource<Activity>([
-      ...([
-        "Något planerat att göra",
-        "Något mer planerat",
-        "Ytterligare planerat"
-      ].map<Activity>((title, index) => {
-        const a: Activity = {
-          type: "activity",
-          id: `planned-activity-${index}`,
-          recipient: recipient,
-          title: title,
-          content: "",
-          timeNeeded: 1 * 3600,
-          priority: "primary",
-          status: "new",
-          schedule: {
-            certainty: "certain",
-            time: new Date(Date.UTC(new Date().getFullYear(), index, 1))
-          },
-          createdBy: user,
-          createdAt: new Date()
-        };
-        return a;
-      })),
-      ...([
-        "Något oplanerat att göra",
-        "Något mera oplanerat",
-        "Ytterligare oplanerat"
-      ].map<Activity>((title, index) => {
-        const a: Activity = {
-          type: "activity",
-          id: `activity-${index}`,
-          recipient: recipient,
-          title: title,
-          content: "",
-          timeNeeded: 1 * 3600,
-          priority: "primary",
-          status: "new",
-          createdBy: user,
-          createdAt: new Date()
-        };
-        return a;
-      }))
-    ])
+    activities: new StaticDataSource<Activity>(Object.keys(dataset.activities).map((key) => dataset.activities[key]))
   }
   const navItems: NavItems =  [
     {type: "heading", label: "Anhörig"},
