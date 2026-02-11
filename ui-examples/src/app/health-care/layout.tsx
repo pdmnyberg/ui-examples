@@ -61,7 +61,7 @@ export default function PageLayout({
         <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
           <NavStateProvider>
             <Sidebar {...sidebarProps}>
-              <div className="container">
+              <div className="container-xxl p-0 md-p3">
                 {children}
               </div>
             </Sidebar>

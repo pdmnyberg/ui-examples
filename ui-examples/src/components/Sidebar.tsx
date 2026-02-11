@@ -56,7 +56,7 @@ export function Sidebar({
           </> : <></>}
         </div>
       </aside>
-      <main className="p-3 flex-grow-1 overflow-auto position-relative">
+      <main className="p-1 sm-p-3 flex-grow-1 overflow-auto position-relative">
         <button className="btn btn-primary position-fixed z-3" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
           <i className="bi fs-2 bi-list" />
         </button>
