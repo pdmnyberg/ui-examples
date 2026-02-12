@@ -32,17 +32,7 @@ export default function PageLayout({
       priority: "info",
       user,
     }))),
-    logs: new StaticDataSource<Log>([
-      "Vårdare besökte vårdtagare",
-      "Vårdtagare tog medicin",
-      "Vårdare uträttade ärende 'Inköp'"
-    ].map<Log>((item, index) => ({
-      type: "log",
-      id: `log-${index}`,
-      content: item,
-      createdBy: user,
-      createdAt: new Date()
-    }))),
+    logs: new StaticDataSource<Log>(toList(dataset.logs)),
     users: new StaticDataSource<User>(toList(dataset.users)),
     activities: new StaticDataSource<Activity>(toList(dataset.activities)),
     people: new StaticDataSource<Person>(toList(dataset.people)),
