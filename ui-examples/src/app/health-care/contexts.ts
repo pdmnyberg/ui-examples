@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { Activity, EntityRef, Log, Notification } from "./common";
+import { Activity, EntityRef, Log, Notification, Person, User } from "./common";
 
 export type SearchParams<T> = {
     search?: string;
@@ -8,6 +8,8 @@ export type SearchParams<T> = {
     start?: number;
     limit?: number;
 }
+
+export type SearchFunction<T, SP> = (value: T, props: SearchParams<T & SP>["properties"]) => boolean;
 
 export interface DataSource<T extends EntityRef<V>, V extends string = T["type"]> {
     get(ref: EntityRef<V>): T;
@@ -19,6 +21,8 @@ export type HealtCareData = {
     notifications: DataSource<Notification>,
     logs: DataSource<Log>;
     activities: DataSource<Activity>;
+    users: DataSource<User>;
+    people: DataSource<Person>;
 };
 
 export const DataContext = createContext<HealtCareData | null>(null);
@@ -33,10 +37,12 @@ export function useData(): HealtCareData {
     return data;
 }
 
-export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type"]> implements DataSource<T> {
+export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type"], SP extends object = object> implements DataSource<T> {
     private _data: T[];
     private _record: Record<string, T>;
-    constructor(data: T[]) {
+    private _customSearch?: SearchFunction<T, SP>;
+    constructor(data: T[], customSearch?: SearchFunction<T, SP>) {
+        this._customSearch = customSearch;
         this._data = data;
         this._record = data.reduce<Record<string, T>>((acc, d) => {
             acc[d.id] = d;
@@ -48,8 +54,10 @@ export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type
         return this._record[ref.id];
     }
 
-    find({orderBy, limit, start}: SearchParams<T>) {
-        const sorted = Array.isArray(orderBy) ? this._data : this._data.sort((a, b) => {
+    find({orderBy, limit, start, properties}: SearchParams<T & SP>) {
+        const filter = this._customSearch === undefined ? () => true : this._customSearch;
+        const data = this._data.filter(item => filter(item, properties))
+        const sorted = Array.isArray(orderBy) ? data : data.sort((a, b) => {
             const aVal = a[orderBy as keyof (typeof a)]
             const bVal = b[orderBy as keyof (typeof b)]
 

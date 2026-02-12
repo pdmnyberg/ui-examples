@@ -47,7 +47,9 @@ export type Person = PersonRef & {
 
 export type Medication = {
     period: Period;
+    dosage: string;
     name: string;
+    usage: string;
 }
 
 export type ContactInformation = {

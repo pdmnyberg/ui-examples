@@ -4,18 +4,22 @@ import { NavContext, NavItems } from "@/contexts";
 import { Sidebar } from "@/components/Sidebar";
 import { NavStateProvider } from "@/components/NavStateProvider";
 import { DataContext, HealtCareData, StaticDataSource } from "./contexts";
-import { Activity, Log, Notification, UserRef } from "./common";
+import { Activity, Log, Notification, Person, User, UserRef } from "./common";
 import { getGenerator } from "@/data/health-care";
 
 const generator = getGenerator();
 const dataset = generator.createData();
+
+function toList<T extends Record<string, T[keyof T]>>(record: T): T[keyof T][] {
+  return Object.keys(record).map((key) => record[key])
+}
 
 export default function PageLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user: UserRef = {type: "user", id: "current-user"}
+  const user: UserRef = toList(dataset.users).filter(u => u.roles.some(r => r.type === "care-recipient-relation"))[0];
   const data: HealtCareData = {
     notifications: new StaticDataSource<Notification>([
       "Det finns saker att göra",
@@ -39,7 +43,9 @@ export default function PageLayout({
       createdBy: user,
       createdAt: new Date()
     }))),
-    activities: new StaticDataSource<Activity>(Object.keys(dataset.activities).map((key) => dataset.activities[key]))
+    users: new StaticDataSource<User>(toList(dataset.users)),
+    activities: new StaticDataSource<Activity>(toList(dataset.activities)),
+    people: new StaticDataSource<Person>(toList(dataset.people)),
   }
   const navItems: NavItems =  [
     {type: "heading", label: "Anhörig"},

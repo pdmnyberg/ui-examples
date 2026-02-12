@@ -1,6 +1,50 @@
-import { Activity, Log, Organization, Person, Priority, ScheduleSpecification, User, UserRef, UserRole } from "@/app/health-care/common";
+import { Activity, Log, Medication, Organization, Person, Priority, ScheduleSpecification, User } from "@/app/health-care/common";
 import { DataGenerator, getFixedRandom, RandomContext } from "./common";
 import { CommonDataSource, getCommonData } from "./common-data";
+
+type HealthCareDataSource = CommonDataSource & {
+    medication: {name: string, related_diseases: string[], common_dosages: string}[]
+}
+
+function getHealthCareData(): HealthCareDataSource {
+    const medication = [
+        { "name": "Paracetamol", "related_diseases": ["Smärta", "Feber", "Artros"], "common_dosages": "500 mg - 1000 mg var 6-8 timme" },
+        { "name": "Acetylsalicylsyra", "related_diseases": ["Ischemisk hjärtsjukdom", "Stroke", "Trombos"], "common_dosages": "75 mg - 160 mg en gång dagligen" },
+        { "name": "Metoprolol", "related_diseases": ["Hypertoni", "Hjärtsvikt", "Förmaksflimmer", "Kärlkramp"], "common_dosages": "50 mg - 100 mg två gånger dagligen" },
+        { "name": "Enalapril", "related_diseases": ["Hypertoni", "Hjärtsvikt"], "common_dosages": "5 mg - 20 mg en eller två gånger dagligen" },
+        { "name": "Ramipril", "related_diseases": ["Hypertoni", "Hjärtsvikt", "Diabetisk nefropati"], "common_dosages": "2,5 mg - 10 mg en gång dagligen" },
+        { "name": "Amlodipin", "related_diseases": ["Hypertoni", "Kärlkramp"], "common_dosages": "5 mg - 10 mg en gång dagligen" },
+        { "name": "Furosemid", "related_diseases": ["Hjärtsvikt", "Ödem"], "common_dosages": "20 mg - 80 mg en eller två gånger dagligen" },
+        { "name": "Spironolakton", "related_diseases": ["Hjärtsvikt", "Ascites"], "common_dosages": "25 mg - 100 mg en gång dagligen" },
+        { "name": "Warfarin", "related_diseases": ["Förmaksflimmer", "Djup ventrombos", "Lungemboli"], "common_dosages": "2 mg - 10 mg dagligen (justeras efter INR)" },
+        { "name": "Apixaban", "related_diseases": ["Förmaksflimmer", "Djup ventrombos", "Lungemboli"], "common_dosages": "2,5 mg - 5 mg två gånger dagligen" },
+        { "name": "Atorvastatin", "related_diseases": ["Hyperlipidemi", "Ischemisk hjärtsjukdom"], "common_dosages": "10 mg - 80 mg en gång dagligen" },
+        { "name": "Simvastatin", "related_diseases": ["Hyperlipidemi", "Ischemisk hjärtsjukdom"], "common_dosages": "10 mg - 40 mg en gång dagligen" },
+        { "name": "Metformin", "related_diseases": ["Typ 2-diabetes"], "common_dosages": "500 mg - 1000 mg två gånger dagligen" },
+        { "name": "Insulin glargin", "related_diseases": ["Typ 1-diabetes", "Typ 2-diabetes"], "common_dosages": "10 enheter en gång dagligen (justeras individuellt)" },
+        { "name": "Levotyroxin", "related_diseases": ["Hypotyreos"], "common_dosages": "25 µg - 200 µg en gång dagligen" },
+        { "name": "Omeprazol", "related_diseases": ["Gastroesofageal refluxsjukdom", "Magsår"], "common_dosages": "20 mg - 40 mg en gång dagligen" },
+        { "name": "Pantoprazol", "related_diseases": ["Gastroesofageal refluxsjukdom", "Magsår"], "common_dosages": "20 mg - 40 mg en gång dagligen" },
+        { "name": "Sertralin", "related_diseases": ["Depression", "Ångestsyndrom"], "common_dosages": "25 mg - 100 mg en gång dagligen" },
+        { "name": "Citalopram", "related_diseases": ["Depression", "Ångestsyndrom"], "common_dosages": "10 mg - 40 mg en gång dagligen" },
+        { "name": "Mirtazapin", "related_diseases": ["Depression", "Sömnstörning"], "common_dosages": "15 mg - 45 mg en gång dagligen" },
+        { "name": "Zopiklon", "related_diseases": ["Insomni"], "common_dosages": "3,75 mg - 7,5 mg vid sänggående" },
+        { "name": "Oxazepam", "related_diseases": ["Ångest", "Oro"], "common_dosages": "10 mg - 30 mg 2-3 gånger dagligen" },
+        { "name": "Morfin", "related_diseases": ["Svår smärta", "Cancerrelaterad smärta"], "common_dosages": "10 mg - 30 mg var 4:e timme (oral)" },
+        { "name": "Oxykodon", "related_diseases": ["Svår smärta", "Cancerrelaterad smärta"], "common_dosages": "5 mg - 20 mg var 4-6 timme" },
+        { "name": "Alendronat", "related_diseases": ["Osteoporos"], "common_dosages": "70 mg en gång i veckan" },
+        { "name": "Kalcium + vitamin D", "related_diseases": ["Osteoporos", "Vitamin D-brist"], "common_dosages": "Kalcium 500-1000 mg + Vitamin D 800 IE dagligen" },
+        { "name": "Digoxin", "related_diseases": ["Hjärtsvikt", "Förmaksflimmer"], "common_dosages": "0,125 mg - 0,25 mg en gång dagligen" },
+        { "name": "Tamsulosin", "related_diseases": ["Benign prostatahyperplasi"], "common_dosages": "0,4 mg en gång dagligen" },
+        { "name": "Laktulos", "related_diseases": ["Förstoppning"], "common_dosages": "15 ml - 45 ml dagligen, uppdelat på doser" },
+        { "name": "Salbutamol", "related_diseases": ["KOL", "Astma"], "common_dosages": "100 µg - 200 µg var 4-6 timme (inhalation)" }
+    ];
+    const common = getCommonData();
+    return {
+        ...common,
+        medication,
+    }
+}
 
 export class HealtCareDataGenerator implements DataGenerator<{
     users: Record<string, User>,
@@ -12,9 +56,9 @@ export class HealtCareDataGenerator implements DataGenerator<{
 }> {
     randomContext: RandomContext;
     period: [Date, Date];
-    dataSource: CommonDataSource;
+    dataSource: HealthCareDataSource;
 
-    constructor(randomContext: RandomContext, dataSource: CommonDataSource, period: [Date, Date]) {
+    constructor(randomContext: RandomContext, dataSource: HealthCareDataSource, period: [Date, Date]) {
         this.randomContext = randomContext;
         this.dataSource = dataSource;
         this.period = period;
@@ -36,6 +80,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
     createPeople(numberOfPeople: number): Person[] {
         const givenNames = [...this.dataSource.maleNames, ...this.dataSource.femaleNames];
         const familyNames = this.dataSource.familyNames;
+        const medication = this.dataSource.medication;
         return Array.from({length: numberOfPeople}).map<Person>((_, index) => {
             const name = this.randomContext.choice(givenNames);
             const fullName = `${name} ${this.randomContext.choice(familyNames)}`;
@@ -45,6 +90,15 @@ export class HealtCareDataGenerator implements DataGenerator<{
                 name,
                 fullName,
                 notes: "",
+                medication: this.randomContext.choices(medication, 8).map<Medication>(m => {
+                    const [startsAt, endsAt] = this.randomContext.randdaterange(this.period[0], this.period[1]);
+                    return {
+                        name: m.name,
+                        period: {startsAt, endsAt},
+                        dosage: m.common_dosages,
+                        usage: this.randomContext.choice(m.related_diseases)
+                    }
+                })
             }
         })
     }
@@ -55,20 +109,33 @@ export class HealtCareDataGenerator implements DataGenerator<{
                 type: "user",
                 id: `user-${index}`,
                 username: person.fullName.toLowerCase().replaceAll(" ", "-"),
-                person: {type: "person", id: person.id}
+                person: {type: "person", id: person.id},
             }
         });
 
-        return users.map<User>(user => {
-            return {
-                ...user,
-                roles: this.randomContext.choices<UserRole>([
-                    {type: "care-recipient", organization: this.randomContext.choice(organizations)},
-                    {type: "care-recipient-relation", recipient: this.randomContext.choice(users.filter(u => u.id !== user.id).map<UserRef>(u => ({type: "user", id: u.id})))},
-                    {type: "care-taker", organization: this.randomContext.choice(organizations)}
-                ], this.randomContext.randint(1, 2))
-            }
-        });
+        const numberOfRecipients = Math.floor(users.length * 0.25);
+        const numberOfRelatives = 1;
+        const recipients = users.slice(0, numberOfRecipients).map<User>(user => ({
+            ...user,
+            roles: [{type: "care-recipient", organization: this.randomContext.choice(organizations)}]
+        }));
+        const relatives = users.slice(numberOfRecipients, numberOfRecipients + numberOfRelatives).map<User>((user, index) => ({
+            ...user,
+            roles: [{
+                type: "care-recipient-relation",
+                recipient: {type: "user", id: recipients[Math.floor(index * 0.5)].id}
+            }]
+        }));
+        const careTakers = users.slice(numberOfRecipients + numberOfRelatives).map<User>(user => ({
+            ...user,
+            roles: [{type: "care-taker", organization: this.randomContext.choice(organizations)}]
+        }));
+
+        return [
+            ...recipients,
+            ...relatives,
+            ...careTakers,
+        ]
     }
 
     createActivities(numberOfActivities: number, users: User[]): Activity[] {
@@ -118,7 +185,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
     }
 
     createData() {
-        const people = this.createPeople(100);
+        const people = this.createPeople(8);
         const organizations = this.createOrganizations(5);
         const users = this.createUsers(people, organizations);
         return {
@@ -135,7 +202,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
 export function getGenerator() {
     return new HealtCareDataGenerator(
         getFixedRandom(),
-        getCommonData(),
+        getHealthCareData(),
         [new Date("2026-01-01T00:00:00.000Z"), new Date("2027-01-01T00:00:00.000Z")],
     )
 }

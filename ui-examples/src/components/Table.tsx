@@ -28,3 +28,32 @@ export function Table<TData extends {id: string}>({items, columns}: {items: TDat
     </table>
   )
 }
+
+export function VerticalTable<TData extends {id: string}>({items, columns, param}: {items: TData[], columns:ColumnSpec<TData>, param: React.ReactNode}) {
+  return (
+    <table className="table">
+      <thead>
+        <tr>
+          <th scope="col">{param}</th>
+          {items.map((item) => <th key={item.id} scope="col">{item.id}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {Object.keys(columns).map(c => {
+          return (
+            <tr key={c}>
+              <td>{columns[c as keyof TData]}</td>
+              {items.map(item => {
+                const value = item[c as keyof TData];
+                const content = React.isValidElement(value) ? value : String(value);
+                return (
+                  <td key={item.id}>{content}</td>
+                )
+              })}
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
+  )
+}
