@@ -61,6 +61,16 @@ export type DataGenerator<T extends object> = {
     createData(): T;
 }
 
+function extendRandomBase(values: number[]): number[] {
+    return [
+        ...values,
+        ...values.map(i => Math.sin(i)),
+        ...values.map(i => Math.cos(i)),
+        ...values.map(i => Math.sin(i + 0.5)),
+        ...values.map(i => Math.cos(i + 0.5))
+    ]
+}
+
 export function getFixedRandom() {
-    return new RandomContext(getRandomBase())
+    return new RandomContext(extendRandomBase(extendRandomBase(getRandomBase())))
 }

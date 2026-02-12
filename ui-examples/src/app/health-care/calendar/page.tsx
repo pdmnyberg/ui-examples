@@ -2,6 +2,8 @@
 
 import React, { Suspense, useState } from "react";
 import dynamic from 'next/dynamic';
+import { useData } from "../contexts";
+import { Activity } from "../common";
 
 function getCalendarWeekDays(month: number, year: number = new Date().getFullYear()) {
   const monthStart = new Date(Date.UTC(year, month, 1));
@@ -52,12 +54,22 @@ function CalendarDay({active, date, children}: {active: boolean, date: Date, chi
         <span className="card-header flex-fill p-1 text-center">{dayMap[date.getDay()]}</span>
         <span className="card-header flex-fill p-1 text-center">{dateStr(date)}</span>
       </div>
-      <div className="card-body">{children}</div>
+      <div className="card-body p-0">{children}</div>
     </div>
   )
 }
 
-function _BaseCalendar({dates, month, selectMonth}: {dates: Date[], month: number, selectMonth: (m: number) => void}) {
+function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: number, selectMonth: (m: number) => void}) {
+  const { activities } = useData();
+  const starts = dates[0];
+  const ends = dates[dates.length - 1];
+  const currentActivities = activities.all().filter(a => a.schedule && (a.schedule.time >= starts && a.schedule.time <= ends));
+  const activityMap = currentActivities.reduce<Record<string, Activity[]>>((acc, a) => {
+    const key = a.schedule!.time.toLocaleDateString();
+    const alist = acc[key] || [];
+    acc[key] = [...alist, a];
+    return acc;
+  }, {})
   return (
     <>
       <h2>Kalender</h2>
@@ -74,9 +86,13 @@ function _BaseCalendar({dates, month, selectMonth}: {dates: Date[], month: numbe
       <div style={{gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr 1fr"}} className="d-grid gap-2">
       {dates.map(d => {
         const inMonth = d.getMonth() === month;
+        const key = d.toLocaleDateString();
+        const alist = activityMap[key] || [];
         return (
           <CalendarDay key={d.getTime()} active={inMonth} date={d}>
-            <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <div style={{gridTemplateColumns: "1fr 1fr"}}  className="d-grid gap-2 p-2">
+              {alist.map(a => <span key={a.id} className={`badge text-bg-${a.priority}`}>{a.status}</span>)}
+            </div>
           </CalendarDay>
         )
       })}
@@ -85,7 +101,7 @@ function _BaseCalendar({dates, month, selectMonth}: {dates: Date[], month: numbe
   )
 }
 
-export const BaseCalendar = dynamic(() => Promise.resolve(_BaseCalendar), {
+export const BaseCalendar = dynamic(() => Promise.resolve(ClientBaseCalendar), {
   ssr: false,
 });
 

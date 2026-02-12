@@ -192,7 +192,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
             organizations: this._toRecord(organizations),
             people: this._toRecord(people),
             users: this._toRecord(users),
-            activities: this._toRecord(this.createActivities(1000, users)),
+            activities: this._toRecord(this.createActivities(800, users)),
             logs: {},
             notifications: {}
         }
