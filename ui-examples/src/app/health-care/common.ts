@@ -92,13 +92,13 @@ export type Message = CreateTracking & {
 export type Notification = NotificationRef & {
     user: UserRef;
     content: string;
-    target?: EntityRef<any>;
+    target?: EntityRef<unknown>;
     priority: Priority;
 }
 
 export type Log = LogRef & CreateTracking & {
     content: string;
-    target?: EntityRef<any>;
+    target?: EntityRef<unknown>;
 }
 
 export type Period = {

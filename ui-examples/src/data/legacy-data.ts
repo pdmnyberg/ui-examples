@@ -1,5 +1,6 @@
-import { getGenerator as getBirdRinging, getFixedRandom } from "./bird-ringing";
+import { getGenerator as getBirdRinging } from "./bird-ringing";
 import { StaticDataSource, Actor, LicenseStatus, ActorType } from "../app/bird-ringing/common";
+import { getFixedRandom } from "./common";
 
 type MNR = string; // Ringer number, identifier for a ringer.
 type YesNo = "J" | "N"; // J = Yes, N = No

@@ -1,3 +1,5 @@
+import { getRandomBase } from "./common-data";
+
 export class RandomContext {
     private _items: number[];
     private _ticker: number = 0;
@@ -57,4 +59,8 @@ export class RandomContext {
 
 export type DataGenerator<T extends object> = {
     createData(): T;
+}
+
+export function getFixedRandom() {
+    return new RandomContext(getRandomBase())
 }

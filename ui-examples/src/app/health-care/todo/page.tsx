@@ -1,6 +1,5 @@
 "use client"
 
-import { Activity } from "@/app/health-care/common";
 import { ColumnSpec, Table } from "@/components/Table";
 import React from "react";
 import { useData } from "../contexts";

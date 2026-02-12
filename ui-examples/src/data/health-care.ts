@@ -1,6 +1,6 @@
 import { Activity, Log, Organization, Person, Priority, ScheduleSpecification, User, UserRef, UserRole } from "@/app/health-care/common";
-import { DataGenerator, RandomContext } from "./common";
-import { DataSource, getFixedRandom, getMoonData } from "./bird-ringing";
+import { DataGenerator, getFixedRandom, RandomContext } from "./common";
+import { CommonDataSource, getCommonData } from "./common-data";
 
 export class HealtCareDataGenerator implements DataGenerator<{
     users: Record<string, User>,
@@ -12,8 +12,9 @@ export class HealtCareDataGenerator implements DataGenerator<{
 }> {
     randomContext: RandomContext;
     period: [Date, Date];
-    dataSource: DataSource;
-    constructor(randomContext: RandomContext, dataSource: DataSource, period: [Date, Date]) {
+    dataSource: CommonDataSource;
+
+    constructor(randomContext: RandomContext, dataSource: CommonDataSource, period: [Date, Date]) {
         this.randomContext = randomContext;
         this.dataSource = dataSource;
         this.period = period;
@@ -109,7 +110,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
         }, {})
     }
 
-    _toRef<T extends {id: string, type: any}>(obj: T): Pick<T, "id" | "type"> {
+    _toRef<T extends {id: string, type: unknown}>(obj: T): Pick<T, "id" | "type"> {
         return {
             id: obj.id,
             type: obj.type
@@ -134,7 +135,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
 export function getGenerator() {
     return new HealtCareDataGenerator(
         getFixedRandom(),
-        getMoonData(),
+        getCommonData(),
         [new Date("2026-01-01T00:00:00.000Z"), new Date("2027-01-01T00:00:00.000Z")],
     )
 }

@@ -16,7 +16,6 @@ export default function PageLayout({
   children: React.ReactNode;
 }>) {
   const user: UserRef = {type: "user", id: "current-user"}
-  const recipient: UserRef = {type: "user", id: "recipient-user"}
   const data: HealtCareData = {
     notifications: new StaticDataSource<Notification>([
       "Det finns saker att göra",
