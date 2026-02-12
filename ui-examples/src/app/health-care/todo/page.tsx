@@ -17,7 +17,7 @@ type ActivityTable = {
 
 export default function Todo() {
   const {activities, users} = useData();
-  const plannedActivities = activities.all().filter(a => a.schedule).map<ActivityTable>(a => {
+  const plannedActivities = activities.all().filter(a => a.schedule).sort((a, b) => a.schedule!.time.getTime() - b.schedule!.time.getTime()).map<ActivityTable>(a => {
     const recipient = users.get(a.recipient);
     return {
       id: a.id,
