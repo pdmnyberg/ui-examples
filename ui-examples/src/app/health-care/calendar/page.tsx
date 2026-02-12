@@ -3,7 +3,7 @@
 import React, { Suspense, useState } from "react";
 import dynamic from 'next/dynamic';
 import { useData } from "../contexts";
-import { Activity } from "../common";
+import { Activity, User, UserRef } from "../common";
 
 function getCalendarWeekDays(month: number, year: number = new Date().getFullYear()) {
   const monthStart = new Date(Date.UTC(year, month, 1));
@@ -60,11 +60,17 @@ function CalendarDay({active, date, children}: {active: boolean, date: Date, chi
 }
 
 function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: number, selectMonth: (m: number) => void}) {
-  const { activities } = useData();
+  const { activities, users, people } = useData();
+  const [ recipient, setRecipient ] = useState<UserRef | null>(null);
   const starts = dates[0];
   const ends = dates[dates.length - 1];
   const currentActivities = activities.all().filter(a => a.schedule && (a.schedule.time >= starts && a.schedule.time <= ends));
-  const activityMap = currentActivities.reduce<Record<string, Activity[]>>((acc, a) => {
+  const recipients = Object.values(currentActivities.reduce<Record<string, User>>((acc, a) => {
+    const recipient = acc[a.recipient.id] || users.get(a.recipient);
+    acc[recipient.id] = recipient;
+    return acc;
+  }, {})).sort((a, b) => a.username.localeCompare(b.username));
+  const activityMap = currentActivities.filter(a => recipient === null || recipient.id === a.recipient.id).reduce<Record<string, Activity[]>>((acc, a) => {
     const key = a.schedule!.time.toLocaleDateString();
     const alist = acc[key] || [];
     acc[key] = [...alist, a];
@@ -73,6 +79,16 @@ function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: 
   return (
     <>
       <h2>Kalender</h2>
+      <div className="btn-group mb-2 overflow-auto" role="group">
+        <span className="input-group-text">Välj vårdtagare</span>
+        {recipients.map((r, m) => {
+          const active = r.id === (recipient && recipient.id);
+          const person = people.get(r.person)
+          return (
+            <button key={m} onClick={() => active ? setRecipient(null) : setRecipient(r)} className={`btn btn-info ${active ? "active" : ""}`}>{person.fullName}</button>
+          )
+        })}
+      </div>
       <div className="btn-group-vertical mb-2 d-flex d-md-none" role="group">
       {Array.from({length: 12}).map((_, m) => (
         <button key={m} onClick={() => selectMonth(m)} className={`btn btn-secondary ${month === m ? "active" : ""}`}>{monthMap[m]}</button>
