@@ -50,7 +50,7 @@ const dayMap = [
 function CalendarDay({active, date, children}: {active: boolean, date: Date, children?: React.ReactNode}) {
   return (
     <div className={`card md-mx-2 ${active ? "" : "opacity-25"}`}>
-      <div className="d-flex flex-column flex-md-row">
+      <div className="d-flex flex-column flex-sm-row">
         <span className="card-header flex-fill p-1 text-center">{dayMap[date.getDay()]}</span>
         <span className="card-header flex-fill p-1 text-center">{dateStr(date)}</span>
       </div>
@@ -73,23 +73,36 @@ function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: 
   return (
     <>
       <h2>Kalender</h2>
-      <div className="btn-group-vertical mb-2 d-flex d-sm-none" role="group">
+      <div className="btn-group-vertical mb-2 d-flex d-md-none" role="group">
       {Array.from({length: 12}).map((_, m) => (
         <button key={m} onClick={() => selectMonth(m)} className={`btn btn-secondary ${month === m ? "active" : ""}`}>{monthMap[m]}</button>
       ))}
       </div>
-      <div className="btn-group mb-2 d-none d-sm-flex" role="group">
+      <div className="btn-group mb-2 d-none d-md-flex" role="group">
       {Array.from({length: 12}).map((_, m) => (
         <button key={m} onClick={() => selectMonth(m)} className={`btn btn-secondary ${month === m ? "active" : ""}`}>{monthMap[m]}</button>
       ))}
       </div>
-      <div style={{gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr 1fr"}} className="d-grid gap-2">
+      <div style={{gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr 1fr"}} className="gap-2 d-none d-lg-grid">
       {dates.map(d => {
         const inMonth = d.getMonth() === month;
         const key = d.toLocaleDateString();
         const alist = activityMap[key] || [];
         return (
           <CalendarDay key={d.getTime()} active={inMonth} date={d}>
+            <div style={{gridTemplateColumns: "1fr 1fr"}}  className="d-grid gap-2 p-2">
+              {alist.map(a => <span key={a.id} className={`badge text-bg-${a.priority}`}>{a.status}</span>)}
+            </div>
+          </CalendarDay>
+        )
+      })}
+      </div>
+      <div style={{gridTemplateColumns: "1fr 1fr"}} className="gap-2 d-grid d-lg-none">
+      {dates.filter(d => d.getMonth() === month).map(d => {
+        const key = d.toLocaleDateString();
+        const alist = activityMap[key] || [];
+        return (
+          <CalendarDay key={d.getTime()} active={true} date={d}>
             <div style={{gridTemplateColumns: "1fr 1fr"}}  className="d-grid gap-2 p-2">
               {alist.map(a => <span key={a.id} className={`badge text-bg-${a.priority}`}>{a.status}</span>)}
             </div>
