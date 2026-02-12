@@ -17,7 +17,7 @@ type ActivityTable = {
 
 export default function Todo() {
   const {activities, users} = useData();
-  const plannedActivities = activities.all().filter(a => a.schedule).sort((a, b) => a.schedule!.time.getTime() - b.schedule!.time.getTime()).map<ActivityTable>(a => {
+  const plannedActivities = activities.all().filter(a => a.schedule && a.status !== "done").sort((a, b) => a.schedule!.time.getTime() - b.schedule!.time.getTime()).map<ActivityTable>(a => {
     const recipient = users.get(a.recipient);
     return {
       id: a.id,
@@ -28,7 +28,7 @@ export default function Todo() {
       schedule: a.schedule?.time.toISOString(),
     }
   });
-  const unplannedActivities = activities.all().filter(a => !a.schedule).map<ActivityTable>(a => {
+  const unplannedActivities = activities.all().filter(a => !a.schedule && a.status !== "done").map<ActivityTable>(a => {
     const recipient = users.get(a.recipient);
     return {
       id: a.id,
