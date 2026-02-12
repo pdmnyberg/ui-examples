@@ -101,6 +101,7 @@ export type Notification = NotificationRef & {
 export type Log = LogRef & CreateTracking & {
     content: string;
     target?: EntityRef<unknown>;
+    recipient: UserRef;
 }
 
 export type Period = {

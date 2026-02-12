@@ -434,6 +434,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
             createdAt: a.createdAt,
             createdBy: a.createdBy,
             content: a.content,
+            recipient: a.recipient,
         }))
     }
 
