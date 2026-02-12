@@ -143,7 +143,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
         const careTakers = users.filter(user => user.roles.some(r => r.type === "care-taker"));
         return Array.from({length: numberOfActivities}).map<Activity>((_, index) => {
             const recipient = this.randomContext.choice(recipients);
-            const useSchedule = this.randomContext.randbool();
+            const useSchedule = this.randomContext.randint(0, 100) > 10;
             const isCertain = this.randomContext.randbool()
             const schedule: ScheduleSpecification = isCertain ? {
                 certainty: "certain",
@@ -192,7 +192,7 @@ export class HealtCareDataGenerator implements DataGenerator<{
             organizations: this._toRecord(organizations),
             people: this._toRecord(people),
             users: this._toRecord(users),
-            activities: this._toRecord(this.createActivities(800, users)),
+            activities: this._toRecord(this.createActivities(300, users)),
             logs: {},
             notifications: {}
         }
