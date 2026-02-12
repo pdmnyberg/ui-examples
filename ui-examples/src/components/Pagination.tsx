@@ -37,7 +37,7 @@ export const Pagination = ({
 }) => {
   return (
     <nav aria-label={label || "Pagination"}>
-      <ul className="pagination">
+      <ul className="pagination overflow-auto">
         {pages.map((page, index) => (
           <li
             key={index}

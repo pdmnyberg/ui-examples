@@ -78,7 +78,7 @@ function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: 
         <button key={m} onClick={() => selectMonth(m)} className={`btn btn-secondary ${month === m ? "active" : ""}`}>{monthMap[m]}</button>
       ))}
       </div>
-      <div className="btn-group mb-2 d-none d-md-flex" role="group">
+      <div className="btn-group mb-2 d-none d-md-flex overflow-auto" role="group">
       {Array.from({length: 12}).map((_, m) => (
         <button key={m} onClick={() => selectMonth(m)} className={`btn btn-secondary ${month === m ? "active" : ""}`}>{monthMap[m]}</button>
       ))}
