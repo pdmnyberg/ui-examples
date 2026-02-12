@@ -13,9 +13,15 @@ type EntryPoint = {
   href: React.ReactNode;
 }
 
+type LogEntry = {
+  id: string;
+  content: string;
+  createdAt: string;
+}
+
 export default function Overview() {
   const navItems = useNav();
-  const {notifications, logs} = useData();
+  const {notifications, logs, users, people} = useData();
   const entryPoints: EntryPoint[] = navItems.filter((item): item is NavItem => item.type === "item").filter(item => item.tags && item.tags.includes("overview")).map(item => ({
     id: item.id,
     name: item.label,
@@ -32,10 +38,20 @@ export default function Overview() {
     content: "Meddelande"
   };
 
-  const logList: Log[] = logs.find({limit: 3, orderBy: "createdAt"});
+  const logList: LogEntry[] = logs.find({limit: 3, orderBy: "createdAt"}).map<LogEntry>(l => {
+    const user = users.get(l.createdBy);
+    const person = people.get(user.person)
+    return {
+      id: l.id,
+      content: l.content,
+      createdAt: l.createdAt.toLocaleString(),
+      createdBy: person.fullName
+    }
+  });
   const logColumns: ColumnSpec<Log> = {
     content: "Händelse",
-    createdAt: "Tidpunkt"
+    createdAt: "Tidpunkt",
+    createdBy: "Skapare"
   };
   return (
     <>
