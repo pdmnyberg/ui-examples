@@ -418,13 +418,23 @@ export class HealtCareDataGenerator implements DataGenerator<{
                 createdBy: this._toRef(this.randomContext.choice(careTakers)),
                 recipient: this._toRef(recipient),
                 title: actiivity.name,
-                content: [actiivity.description, ...this.randomContext.choices(actiivity.sub_activities, this.randomContext.randint(1, actiivity.sub_activities.length))],
+                content: [actiivity.description, ...this.randomContext.choices(actiivity.sub_activities, this.randomContext.randint(1, actiivity.sub_activities.length))].join("\n"),
                 timeNeeded: this.randomContext.randint(1, 5) * 3600,
                 priority: this.randomContext.choice<Priority>(["danger", "info", "primary", "secondary", "success", "warning"]),
                 status: this.randomContext.choice<Activity["status"]>(["accepted", "done", "new"]),
                 schedule: useSchedule ? schedule : undefined,
             }
         })
+    }
+
+    createLogs(activities: Activity[]): Log[] {
+        return activities.filter(a => a.status === "done").map<Log>((a, index) => ({
+            type: "log",
+            id: `log-${index}`,
+            createdAt: a.createdAt,
+            createdBy: a.createdBy,
+            content: a.content,
+        }))
     }
 
     _toRecord<T extends { id: string }>(items: T[]): Record<string, T> {
@@ -445,12 +455,13 @@ export class HealtCareDataGenerator implements DataGenerator<{
         const people = this.createPeople(8);
         const organizations = this.createOrganizations(5);
         const users = this.createUsers(people, organizations);
+        const activities = this.createActivities(300, users);
         return {
             organizations: this._toRecord(organizations),
             people: this._toRecord(people),
             users: this._toRecord(users),
-            activities: this._toRecord(this.createActivities(300, users)),
-            logs: {},
+            activities: this._toRecord(activities),
+            logs: this._toRecord(this.createLogs(activities)),
             notifications: {}
         }
     }
