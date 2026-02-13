@@ -64,10 +64,10 @@ export type DataGenerator<T extends object> = {
 function extendRandomBase(values: number[]): number[] {
     return [
         ...values,
-        ...values.map(i => Math.sin(i)),
-        ...values.map(i => Math.cos(i)),
-        ...values.map(i => Math.sin(i + 0.5)),
-        ...values.map(i => Math.cos(i + 0.5))
+        ...values.map(i => Math.pow(Math.sin(i * 2 * Math.PI), 2)),
+        ...values.map(i => Math.pow(Math.cos(i * 2 * Math.PI + 0.25), 2)),
+        ...values.map(i => Math.pow(Math.sin(i * 2 * Math.PI + 0.5), 2)),
+        ...values.map(i => Math.pow(Math.cos(i * 2 * Math.PI + 0.75), 2))
     ]
 }
 

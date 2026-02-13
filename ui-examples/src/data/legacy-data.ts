@@ -243,8 +243,9 @@ export function contentToLegacyData() {
     const licenses: Maerkare[] = licenseList.map<Maerkare>((license) => {
         const licenseActor = dataSource.getLicenseActors(license, "Ringer")[0];
         const [fnamn, enamn] = parseNames(licenseActor);
-        const adrMnr = fixedRandom.randbool() ? fixedRandom.choice(licenseList).mnr : "NULL";
-        const assMnrs = Array.from({length: 3}).map<string>(() => fixedRandom.randbool() ? fixedRandom.choice(licenseList).mnr : "NULL")
+        const assistantList = licenseList.filter(l => l.mnr !== license.mnr);
+        const adrMnr = fixedRandom.randbool() ? fixedRandom.choice(assistantList).mnr : "NULL";
+        const assMnrs = fixedRandom.choices(assistantList, fixedRandom.randint(0, 3)).map(a => a.mnr)
         const yesNo: YesNo[] = ["J", "N"]
         const refNames = ["Central Archive", `${licenseActor.city} Archive`, "Bunker Archive", "Lunar Archive"]
         return {
@@ -266,9 +267,9 @@ export function contentToLegacyData() {
             Sex: parseSex(licenseActor.sex),
             Fyr: licenseActor.birthDate ? licenseActor.birthDate.getFullYear() : undefined,
             AdrMnr: adrMnr,
-            AssMnr1: assMnrs[0],
-            AssMnr2: assMnrs[1],
-            AssMnr3: assMnrs[2],
+            AssMnr1: assMnrs[0] || "NULL",
+            AssMnr2: assMnrs[1] || "NULL",
+            AssMnr3: assMnrs[2] || "NULL",
             Mistnet: fixedRandom.choice(yesNo),
             Ljud: fixedRandom.choice(yesNo),
             Trap: fixedRandom.choice(yesNo),
