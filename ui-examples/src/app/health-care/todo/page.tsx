@@ -1,19 +1,13 @@
 "use client"
 
-import { ColumnSpec, Table } from "@/components/Table";
+import { ColumnSpec, DataSpec, Table } from "@/components/Table";
 import React from "react";
 import { useData } from "../contexts";
 import { Pagination, usePagination } from "@/components/Pagination";
 import Link from "next/link";
+import { Activity } from "../common";
 
-type ActivityTable = {
-  id: string;
-  title: string;
-  status: string;
-  recipient: React.ReactNode;
-  priority: React.ReactNode;
-  schedule?: React.ReactNode;
-}
+type ActivityTable = DataSpec<Activity>;
 
 export default function Todo() {
   const {activities, users} = useData();
@@ -21,7 +15,7 @@ export default function Todo() {
     const recipient = users.get(a.recipient);
     return {
       id: a.id,
-      title: a.title,
+      title: <Link href={`entry/?entryId=${a.id}`}>{a.title}</Link>,
       status: a.status,
       priority: <span className={`badge text-bg-${a.priority}`}>{a.priority}</span>,
       recipient: <Link href={`/health-care/care-recipients/entry/?entryId=${recipient.username}`}>{recipient.username}</Link>,
@@ -32,7 +26,7 @@ export default function Todo() {
     const recipient = users.get(a.recipient);
     return {
       id: a.id,
-      title: a.title,
+      title: <Link href={`entry/?entryId=${a.id}`}>{a.title}</Link>,
       status: a.status,
       priority: <span className={`badge text-bg-${a.priority}`}>{a.priority}</span>,
       recipient: <Link href={`/health-care/care-recipients/entry/?entryId=${recipient.username}`}>{recipient.username}</Link>,

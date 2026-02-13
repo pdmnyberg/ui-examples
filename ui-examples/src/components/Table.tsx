@@ -1,6 +1,7 @@
 import React from "react";
 
 export type ColumnSpec<TData> = Partial<Record<keyof TData, string | React.ReactNode>>;
+export type DataSpec<TData> = Partial<Record<keyof TData, string | React.ReactNode>> & {id: string};
 
 export function Table<TData extends {id: string}>({items, columns}: {items: TData[], columns:ColumnSpec<TData>}) {
   return (
