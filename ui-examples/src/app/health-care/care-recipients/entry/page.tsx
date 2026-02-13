@@ -5,6 +5,7 @@ import React from "react";
 import { useData } from "../../contexts";
 import { ColumnSpec, Table, VerticalTable } from "@/components/Table";
 import { Person } from "../../common";
+import { toLocalDate } from "../../utils";
 
 type MedicationEntry = {
   id: string,
@@ -32,7 +33,7 @@ function EntryViewBase() {
     id: m.name,
     name: m.name,
     usage: m.usage,
-    period: `${m.period.startsAt.toLocaleDateString()} - ${m.period.endsAt.toLocaleDateString()}`,
+    period: `${toLocalDate(m.period.startsAt)} - ${toLocalDate(m.period.endsAt)}`,
     dosage: m.dosage
   }))
   const medicationColumns: ColumnSpec<MedicationEntry> = {

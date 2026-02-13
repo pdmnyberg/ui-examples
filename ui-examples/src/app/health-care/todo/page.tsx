@@ -6,6 +6,7 @@ import { useData } from "../contexts";
 import { Pagination, usePagination } from "@/components/Pagination";
 import Link from "next/link";
 import { Activity } from "../common";
+import { toLocalTime } from "../utils";
 
 type ActivityTable = DataSpec<Activity>;
 
@@ -19,7 +20,7 @@ export default function Todo() {
       status: a.status,
       priority: <span className={`badge text-bg-${a.priority}`}>{a.priority}</span>,
       recipient: <Link href={`/health-care/care-recipients/entry/?entryId=${recipient.username}`}>{recipient.username}</Link>,
-      schedule: a.schedule?.time.toISOString(),
+      schedule: toLocalTime(a.schedule!.time),
     }
   });
   const unplannedActivities = activities.all().filter(a => !a.schedule && a.status !== "done").map<ActivityTable>(a => {

@@ -3,9 +3,10 @@ import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
 import React from "react";
 import { useData } from "../../contexts";
-import { ColumnSpec, DataSpec, Table, VerticalTable } from "@/components/Table";
+import { ColumnSpec, DataSpec, VerticalTable } from "@/components/Table";
 import { Activity } from "../../common";
 import Link from "next/link";
+import { toLocalTime } from "../../utils";
 
 
 
@@ -20,17 +21,19 @@ function EntryViewBase() {
 
   const creator = users.get(activity.createdBy);
   const recipient = users.get(activity.recipient);
-  const activityColumns: ColumnSpec<Activity> = {
+  const activityColumns: ColumnSpec<Activity & {time: string}> = {
     title: "Titel",
+    time: "Tidpunkt",
     content: "Beskrivning",
     recipient: "Vårdtagare",
     priority: "Prioritet",
     status: "Status",
     createdBy: "Skapare",
   }
-  const activityView: DataSpec<Activity> = {
+  const activityView: DataSpec<Activity & {time: string}> = {
     id: activity.id,
     title: activity.title,
+    time: activity.schedule ? toLocalTime(activity.schedule.time) : "-",
     content: activity.content,
     recipient: <Link href={`/health-care/care-recipients/entry/?entryId=${recipient.username}`}>{recipient.username}</Link>,
     priority: <span className={`badge text-bg-${activity.priority}`}>{activity.priority}</span>,
@@ -39,7 +42,7 @@ function EntryViewBase() {
   }
   return (
     <>
-      <h2>Aktivitet {activity.schedule ? activity.schedule.time.toLocaleString() : "(Icke schemalagd)"}</h2>
+      <h2>Aktivitet {activity.schedule ? `planerad till ${toLocalTime(activity.schedule.time)}` : "(Icke schemalagd)"}</h2>
       <h3>Detaljer</h3>
       <VerticalTable items={[activityView]} columns={activityColumns} param="Param"/>
     </>

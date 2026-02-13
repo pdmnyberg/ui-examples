@@ -4,6 +4,7 @@ import React, { Suspense, useState } from "react";
 import dynamic from 'next/dynamic';
 import { useData } from "../contexts";
 import { Activity, User, UserRef } from "../common";
+import { toLocalDate } from "../utils";
 
 function getCalendarWeekDays(month: number, year: number = new Date().getFullYear()) {
   const monthStart = new Date(Date.UTC(year, month, 1));
@@ -71,7 +72,7 @@ function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: 
     return acc;
   }, {})).sort((a, b) => a.username.localeCompare(b.username));
   const activityMap = currentActivities.filter(a => recipient === null || recipient.id === a.recipient.id).reduce<Record<string, Activity[]>>((acc, a) => {
-    const key = a.schedule!.time.toLocaleDateString();
+    const key = toLocalDate(a.schedule!.time);
     const alist = acc[key] || [];
     acc[key] = [...alist, a];
     return acc;
@@ -102,7 +103,7 @@ function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: 
       <div style={{gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr 1fr"}} className="gap-2 d-none d-lg-grid">
       {dates.map(d => {
         const inMonth = d.getMonth() === month;
-        const key = d.toLocaleDateString();
+        const key = toLocalDate(d);
         const alist = activityMap[key] || [];
         return (
           <CalendarDay key={d.getTime()} active={inMonth} date={d}>
@@ -115,7 +116,7 @@ function ClientBaseCalendar({dates, month, selectMonth}: {dates: Date[], month: 
       </div>
       <div style={{gridTemplateColumns: "1fr 1fr"}} className="gap-2 d-grid d-lg-none">
       {dates.filter(d => d.getMonth() === month).map(d => {
-        const key = d.toLocaleDateString();
+        const key = toLocalDate(d);
         const alist = activityMap[key] || [];
         return (
           <CalendarDay key={d.getTime()} active={true} date={d}>

@@ -6,6 +6,7 @@ import { NavItem, useNav } from "@/contexts";
 import Link from "next/link";
 import React from "react";
 import { useData } from "../contexts";
+import { toLocalTime } from "../utils";
 
 type EntryPoint = {
   id: string;
@@ -44,7 +45,7 @@ export default function Overview() {
     return {
       id: l.id,
       content: l.content,
-      createdAt: l.createdAt.toLocaleString(),
+      createdAt: toLocalTime(l.createdAt),
       createdBy: person.fullName
     }
   });

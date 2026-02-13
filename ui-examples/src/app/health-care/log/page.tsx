@@ -5,6 +5,7 @@ import React from "react";
 import { useData } from "../contexts";
 import { Pagination, usePagination } from "@/components/Pagination";
 import Link from "next/link";
+import { toLocalDate } from "../utils";
 
 type LogTable = {
   id: string;
@@ -21,7 +22,7 @@ export default function Todo() {
       id: l.id,
       content: l.content,
       recipient: <Link href={`/health-care/care-recipients/entry/?entryId=${recipient.username}`}>{recipient.username}</Link>,
-      createdAt: l.createdAt.toISOString(),
+      createdAt: toLocalDate(l.createdAt),
     }
   });
   const logColumns: ColumnSpec<LogTable> = {
