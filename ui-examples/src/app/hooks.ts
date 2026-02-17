@@ -55,3 +55,11 @@ export type SearchableItem = {
     component: React.ReactNode | string;
   }>
 }
+
+export type TypedSearchableItem<OT> = {
+  id: string;
+  properties: Partial<Record<keyof OT, {
+    term: string;
+    component: React.ReactNode | string;
+  }>>
+}

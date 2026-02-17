@@ -3,10 +3,11 @@ import { useState, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
 import { Fragment } from "react";
-import { useItemSelections, useFilter, SearchableItem } from "../hooks";
+import { useItemSelections, useFilter, TypedSearchableItem } from "../../hooks";
 import { useDataSource } from "../contexts";
-import { getOrDefault, toLocalTime } from "../common";
+import { Actor, getOrDefault, toLocalTime } from "../common";
 import { Pagination, usePagination } from "@/components/Pagination";
+import { ColumnSpec, Table } from "@/components/Table";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -15,12 +16,17 @@ const dropdownOpenStyle: CSSProperties = {
   transform: "translate(0px, 40px)",
 }
 
+type SummaryProps = {
+  licenses: string;
+  roles: string;
+}
+
 export default function ListView() {
   const dataSource = useDataSource();
   const [actionIsOpen, setActionIsOpen] = useState(false); 
 
   const actors = getOrDefault(dataSource.getActors(), (a) => a, []).sort((a, b) => a.name.localeCompare(b.name));
-  const items = actors.map<SearchableItem>(item => {
+  const items = actors.map<TypedSearchableItem<Actor & SummaryProps>>(item => {
     const licenses = dataSource.getActorLicenses(item, undefined, "Active");
     const roles = new Set(licenses.map((l) => {
       const info = dataSource.getLicenseInfo(l, item)
@@ -29,19 +35,19 @@ export default function ListView() {
     return {
       id: item.id,
       properties: {
-        "Name": {
+        name: {
           term: item.name,
           component: <Link href={`/bird-ringing/actor-view/?entryId=${item.id}`}>{item.name}</Link>
         },
-        "Type": {
+        type: {
           term: item.type,
           component: item.type,
         },
-        "Roles": {
+        roles: {
           term: Array.from(roles).join(" "),
           component: Array.from(roles).join(", ")
         },
-        "Licenses": {
+        licenses: {
           term: licenses.map((l) => {
             const info = dataSource.getLicenseInfo(l, item);
             const mnr = l.mnr;
@@ -59,15 +65,15 @@ export default function ListView() {
             })}</>
           )
         },
-        "E-mail": {
+        email: {
           term: item.email ? item.email : "-",
           component: item.email ? item.email : "-",
         },
-        "Sex": {
+        sex: {
           term: item.sex,
           component: item.sex
         },
-        "Updated At": {
+        updatedAt: {
           term: toLocalTime(item.updatedAt),
           component: toLocalTime(item.updatedAt)
         },
@@ -81,15 +87,15 @@ export default function ListView() {
     handleItemSelection,
     allSelected
   } = useItemSelections(new Set(filteredItems.map(r => r.id)));
-  const columns = [
-    "Name",
-    "Type",
-    "Roles",
-    "Licenses",
-    "E-mail",
-    "Sex",
-    "Updated At",
-  ]
+  const columns: ColumnSpec<Actor & SummaryProps> = {
+    name: "Name",
+    type: "Type",
+    roles: "Roles",
+    licenses: "Licenses",
+    email: "E-mail",
+    sex: "Sex",
+    updatedAt: "Updated At",
+  }
   const {items: pageItems, currentPage, pages} = usePagination(filteredItems, 50);
   return (
     <div className="container">
@@ -102,7 +108,7 @@ export default function ListView() {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           className="form-control"
-          placeholder={columns.join(", ")}
+          placeholder={Object.values(columns).join(", ")}
           aria-label="Filter for actor table"
           aria-describedby="basic-addon1"
         />
@@ -121,24 +127,7 @@ export default function ListView() {
         </ul>
       </div>
       <Pagination pages={pages} currentPage={currentPage}/>
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col"></th>
-            {columns.map(c => <th key={c} scope="col">{c}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {filteredItems.map(item => {
-            return (
-              <tr key={item.id}>
-                <th><input type="checkbox" onChange={handleItemSelection} checked={selectedItems.has(item.id)} data-actor-id={item.id}/></th>
-                {columns.map(c => <td key={c}>{item.properties[c].component}</td>)}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+      <Table items={pageItems} columns={columns} />
       <Pagination pages={pages} currentPage={currentPage}/>
     </div>
   )
