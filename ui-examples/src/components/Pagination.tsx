@@ -20,7 +20,29 @@ export function usePagination<T>(items: T[], pageSize: number = 10, labels?: Rec
     return {
         items: pageItems,
         currentPage: String(pageNumber + 1),
-        pages
+        pages: [
+          {
+            href: pages.length > 0 ? String(1) : null,
+            onClick: pages.length > 0 ? () => setPageNumber(0) : undefined,
+            rel: labels?.next || "First",
+          },
+          {
+            href: pageNumber - 1 >= 0 ? String(pageNumber) : null,
+            onClick: pageNumber - 1 >= 0 ? () => setPageNumber(pageNumber - 1) : undefined,
+            rel: labels?.last || "Previous",
+          },
+          ...pages,
+          {
+            href: pages.length > pageNumber + 1 ? String(pageNumber + 2) : null,
+            onClick: pages.length > pageNumber + 1 ? () => setPageNumber(pageNumber + 1) : undefined,
+            rel: labels?.next || "Next",
+          },
+          {
+            href: pages.length > 0 ? String(pages.length) : null,
+            onClick: pages.length > 0 ? () => setPageNumber(pages.length - 1) : undefined,
+            rel: labels?.last || "Last",
+          }
+        ]
     }
 }
 
