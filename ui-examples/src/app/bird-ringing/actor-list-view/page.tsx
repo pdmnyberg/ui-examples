@@ -6,6 +6,7 @@ import { Fragment } from "react";
 import { useItemSelections, useFilter, SearchableItem } from "../hooks";
 import { useDataSource } from "../contexts";
 import { getOrDefault, toLocalTime } from "../common";
+import { Pagination, usePagination } from "@/components/Pagination";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -89,6 +90,7 @@ export default function ListView() {
     "Sex",
     "Updated At",
   ]
+  const {items: pageItems, currentPage, pages} = usePagination(filteredItems, 50);
   return (
     <div className="container">
       <Warning><span/></Warning>
@@ -118,6 +120,7 @@ export default function ListView() {
           <li><a className="dropdown-item" href="#">Enable</a></li>
         </ul>
       </div>
+      <Pagination pages={pages} currentPage={currentPage}/>
       <table className="table">
         <thead>
           <tr>
@@ -136,6 +139,7 @@ export default function ListView() {
           })}
         </tbody>
       </table>
+      <Pagination pages={pages} currentPage={currentPage}/>
     </div>
   )
 }

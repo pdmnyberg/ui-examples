@@ -5,6 +5,7 @@ import Warning from "../warning";
 import { useItemSelections, useFilter, SearchableItem } from "../hooks";
 import { useDataSource } from "../contexts";
 import { getOrDefault, toLocalTime } from "../common";
+import { Pagination, usePagination } from "@/components/Pagination";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -66,6 +67,7 @@ export default function ListView() {
     "Updated At",
     "Final Report Status",
   ]
+  const {items: pageItems, currentPage, pages} = usePagination(filteredItems, 50);
   return (
     <div className="container">
       <Warning>
@@ -97,6 +99,7 @@ export default function ListView() {
           <li><a className="dropdown-item" href="#">Enable</a></li>
         </ul>
       </div>
+      <Pagination pages={pages} currentPage={currentPage}/>
       <table className="table">
         <thead>
           <tr>
@@ -105,7 +108,7 @@ export default function ListView() {
           </tr>
         </thead>
         <tbody>
-          {filteredItems.map(item => {
+          {pageItems.map(item => {
             return (
               <tr key={item.id}>
                 <th><input type="checkbox" onChange={handleItemSelection} checked={selectedItems.has(item.id)} data-actor-id={item.id}/></th>
@@ -115,6 +118,7 @@ export default function ListView() {
           })}
         </tbody>
       </table>
+      <Pagination pages={pages} currentPage={currentPage}/>
     </div>
   )
 }
