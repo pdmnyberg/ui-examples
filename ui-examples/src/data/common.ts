@@ -1,3 +1,5 @@
+import { getRandomBase } from "./common-data";
+
 export class RandomContext {
     private _items: number[];
     private _ticker: number = 0;
@@ -57,4 +59,18 @@ export class RandomContext {
 
 export type DataGenerator<T extends object> = {
     createData(): T;
+}
+
+function extendRandomBase(values: number[]): number[] {
+    return [
+        ...values,
+        ...values.map(i => Math.pow(Math.sin(i * 2 * Math.PI), 2)),
+        ...values.map(i => Math.pow(Math.cos(i * 2 * Math.PI + 0.25), 2)),
+        ...values.map(i => Math.pow(Math.sin(i * 2 * Math.PI + 0.5), 2)),
+        ...values.map(i => Math.pow(Math.cos(i * 2 * Math.PI + 0.75), 2))
+    ]
+}
+
+export function getFixedRandom() {
+    return new RandomContext(extendRandomBase(extendRandomBase(getRandomBase())))
 }
