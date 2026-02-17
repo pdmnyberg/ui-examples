@@ -45,7 +45,9 @@ function DataSourceProvider({
     permissionPropertiesUrl,
     speciesUrl,
   ], fetchAppData);
-  console.log(error);
+  if (error) {
+    console.log(error);
+  }
   const dataSource = useMemo(() => new StaticDataSource(
     data ? data[1] : {},
     data ? data[0] : {},

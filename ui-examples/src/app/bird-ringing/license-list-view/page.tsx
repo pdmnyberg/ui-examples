@@ -63,7 +63,6 @@ export default function ListView() {
   const {
     selectedItems,
     toggleItems,
-    handleItemSelection,
     allSelected
   } = useItemSelections(new Set(filteredItems.map(r => r.id)));
   const columns: ColumnSpec<License & SummaryProps> = {
