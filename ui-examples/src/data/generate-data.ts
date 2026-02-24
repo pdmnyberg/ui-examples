@@ -10,7 +10,7 @@ function toCSV(data: {[x: string]: unknown}[]) {
     const sep = ",";
     return [
         headers.join(sep) + sep,
-        data.map(d => headers.map(h => h in d ? d[h] : "NULL").join(sep) + sep).join("\n")
+        data.map(d => headers.map(h => h in d ? `"${d[h]}"` : "NULL").join(sep) + sep).join("\n")
     ].join("\n")
 }
 
