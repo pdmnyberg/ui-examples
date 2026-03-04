@@ -1,5 +1,5 @@
 import { getGenerator as getBirdRinging } from "./bird-ringing";
-import { StaticDataSource, Actor, LicenseStatus, ActorType } from "../app/bird-ringing/common";
+import { StaticDataSource, Actor, LicenseStatus, ActorType, License, DataSource } from "../app/bird-ringing/common";
 import { getFixedRandom } from "./common";
 
 type MNR = string; // Ringer number, identifier for a ringer.
@@ -233,6 +233,22 @@ function parseSex(sex: Actor["sex"]): Maerkare["Sex"] {
     }
 }
 
+function summarizeList(items: string[]) {
+    return items.length > 1 ? (
+        [items.slice(0, -1).join(", "), items[items.length - 1]].join(" and ")
+    ) : (
+        items[0]
+    )
+}
+
+function createSummary(license: License, dataSource: DataSource) {
+    const species = Array.from(new Set(license.permissions.flatMap(p => p.speciesList.map(s => dataSource.getSpecies(s).name))))
+    const permissionTypes = Array.from(new Set(license.permissions.map(p => dataSource.getPermissionType(p.type).name)))
+    const permissionSummary = summarizeList(permissionTypes);
+    const speciesSummary = summarizeList(species);
+    return `Activities of ${license.mnr} may be performed in the region ${license.region}, and it includes permits to perform ${permissionSummary}, for the species ${speciesSummary}.`;
+}
+
 export function contentToLegacyData() {
     const generator = getBirdRinging()
     const content = generator.createData();
@@ -276,7 +292,7 @@ export function contentToLegacyData() {
             Startyr: fixedRandom.randint(1996, 2025),
             Lastredov: parseDateTime(fixedRandom.randdate(new Date("1996-01-01"), new Date("2026-01-01"))),
             Slutredov: parseDateTime(fixedRandom.randdate(new Date("1996-01-01"), new Date("2026-01-01"))),
-            Noteringar: "",
+            Noteringar: createSummary(license, dataSource),
             LicDatum: parseDateTime(fixedRandom.randdate(new Date("1996-01-01"), new Date("2026-01-01"))),
             Mappnamn: fixedRandom.randbool() ? fixedRandom.choice(refNames) : "NULL",
         }
