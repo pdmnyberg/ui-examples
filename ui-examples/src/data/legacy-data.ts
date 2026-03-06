@@ -279,7 +279,7 @@ export function contentToLegacyData() {
             Telarb: `X00-${padZero(fixedRandom.randint(0, 99))}${padZero(fixedRandom.randint(0, 99))}${padZero(fixedRandom.randint(0, 99))}`,
             Email: licenseActor.email || "NULL",
             Spr: fixedRandom.choice(["SV", "EN"]),
-            Greenwich: "",
+            Greenwich: license.region,
             Sex: parseSex(licenseActor.sex),
             Fyr: licenseActor.birthDate ? licenseActor.birthDate.getFullYear() : undefined,
             AdrMnr: adrMnr,
