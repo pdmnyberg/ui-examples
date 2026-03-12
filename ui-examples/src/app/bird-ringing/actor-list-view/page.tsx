@@ -84,9 +84,11 @@ export default function ListView() {
   const {
     selectedItems,
     toggleItems,
-    allSelected
+    allSelected,
+    handleItemSelection
   } = useItemSelections(new Set(filteredItems.map(r => r.id)));
   const columns: ColumnSpec<Actor & SummaryProps> = {
+    id: "",
     name: "Name",
     type: "Type",
     roles: "Roles",
@@ -96,6 +98,15 @@ export default function ListView() {
     updatedAt: "Updated At",
   }
   const {items: pageItems, currentPage, pages} = usePagination(filteredItems, 50);
+  const selectablePageItems = pageItems.map(item => ({
+    ...item,
+    properties: {
+      ...item.properties,
+      id: {
+        component: <input type="checkbox" onChange={handleItemSelection} checked={selectedItems.has(item.id)} data-actor-id={item.id}/>
+      },
+    }
+  }))
   return (
     <div className="container">
       <Warning><span/></Warning>
@@ -107,7 +118,7 @@ export default function ListView() {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           className="form-control"
-          placeholder={Object.values(columns).join(", ")}
+          placeholder={Object.values(columns).filter(c => !!c).join(", ")}
           aria-label="Filter for actor table"
           aria-describedby="basic-addon1"
         />
@@ -126,7 +137,7 @@ export default function ListView() {
         </ul>
       </div>
       <Pagination pages={pages} currentPage={currentPage}/>
-      <Table items={pageItems} columns={columns} />
+      <Table items={selectablePageItems} columns={columns} />
       <Pagination pages={pages} currentPage={currentPage}/>
     </div>
   )

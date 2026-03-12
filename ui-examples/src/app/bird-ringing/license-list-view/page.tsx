@@ -63,9 +63,11 @@ export default function ListView() {
   const {
     selectedItems,
     toggleItems,
-    allSelected
+    allSelected,
+    handleItemSelection,
   } = useItemSelections(new Set(filteredItems.map(r => r.id)));
   const columns: ColumnSpec<License & SummaryProps> = {
+    id: "",
     mnr: "Mnr",
     type: "Type",
     licenseHolder: "License holder",
@@ -74,6 +76,15 @@ export default function ListView() {
     reportStatus: "Final Report Status",
   }
   const {items: pageItems, currentPage, pages} = usePagination(filteredItems, 50);
+  const selectablePageItems = pageItems.map(item => ({
+    ...item,
+    properties: {
+      ...item.properties,
+      id: {
+        component: <input type="checkbox" onChange={handleItemSelection} checked={selectedItems.has(item.id)} data-actor-id={item.id}/>
+      },
+    }
+  }))
   return (
     <div className="container">
       <Warning>
@@ -87,7 +98,7 @@ export default function ListView() {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           className="form-control"
-          placeholder={Object.values(columns).join(", ")}
+          placeholder={Object.values(columns).filter(c => !!c).join(", ")}
           aria-label="Filter for license table"
           aria-describedby="basic-addon1"
         />
@@ -106,7 +117,7 @@ export default function ListView() {
         </ul>
       </div>
       <Pagination pages={pages} currentPage={currentPage}/>
-      <Table columns={columns} items={pageItems} />
+      <Table columns={columns} items={selectablePageItems} />
       <Pagination pages={pages} currentPage={currentPage}/>
     </div>
   )
