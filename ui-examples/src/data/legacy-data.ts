@@ -19,6 +19,8 @@ type BaseMaerkare = {
     Postnr: string; // Postal code
     Ort: string; // City
     Region: "S"; // Obsolete column.
+    Kommunnamn: string;
+    LnNamn: string;
     Telhem: string; // Phone number home -> Rename Telhem to Tel1
     Telarb: string; // Phone number work -> Rename Telarb to Tel2
     Email: string; // Email address
@@ -280,6 +282,8 @@ export function contentToLegacyData() {
             Email: licenseActor.email || "NULL",
             Spr: fixedRandom.choice(["SV", "EN"]),
             Greenwich: license.region,
+            Kommunnamn: license.region,
+            LnNamn: license.subRegion,
             Sex: parseSex(licenseActor.sex),
             Fyr: licenseActor.birthDate ? licenseActor.birthDate.getFullYear() : undefined,
             AdrMnr: adrMnr,

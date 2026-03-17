@@ -33,6 +33,7 @@ export type License = IdentifiableEntity & {
     startsAt: string;
     permissions: Permission[];
     region: string;
+    subRegion: string;
     description: string;
     actors: LicenseRelation[];
     reportStatus: ReportStatus;

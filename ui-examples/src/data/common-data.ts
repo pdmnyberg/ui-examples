@@ -3,7 +3,7 @@ export type CommonDataSource = {
     maleNames: string[];
     femaleNames: string[];
     familyNames: string[];
-    regionNames: string[];
+    regions: {name: string; subRegions: string[]}[];
     regionDescriptors: string[];
 }
 
@@ -292,7 +292,10 @@ export function getCommonData(): CommonDataSource {
         ]
     }
 
-    const regionNames = Object.values(lunarRegions).flat()
+    const regions = Object.entries(lunarRegions).map(([key, value]) => ({
+        name: key,
+        subRegions: value
+    }))
 
     const regionDescriptors = [
         "In",
@@ -342,7 +345,7 @@ export function getCommonData(): CommonDataSource {
         maleNames,
         femaleNames,
         familyNames,
-        regionNames,
+        regions,
         regionDescriptors,
     }
 }

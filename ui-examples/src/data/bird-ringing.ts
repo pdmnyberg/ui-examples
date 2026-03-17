@@ -949,9 +949,10 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const groupNames = this.dataSource.groupNames;
         const maleNames = this.dataSource.maleNames;
         const femaleNames = this.dataSource.femaleNames;
-        const regionNames = this.dataSource.regionNames;
+        const regionNames = this.dataSource.regions.flatMap(r => r.subRegions);
         const familyNames = this.dataSource.familyNames;
         const emailStatus = this.dataSource.emailStatus;
+        const regionName = fixedRandom.choice(regionNames)
         return (Array.from({length: numberOfActors})).map<Actor>((_, index) => {
             const isOrganization = index < numberOfOrganizations;
             fixedRandom.seed(index)
@@ -959,7 +960,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             const declareSex = fixedRandom.randbool();
             const updatedAt = fixedRandom.randdate(...period);
             const givenNames = isMale ? maleNames : femaleNames;
-            const name = isOrganization ? `${fixedRandom.choice(groupNames)} ${fixedRandom.choice(regionNames)}` : `${fixedRandom.choice(givenNames)} ${fixedRandom.choice(familyNames)}`;
+            const name = isOrganization ? `${fixedRandom.choice(groupNames)} ${regionName}` : `${fixedRandom.choice(givenNames)} ${fixedRandom.choice(familyNames)}`;
             const email = isOrganization ? `contact@${name.toLowerCase().replaceAll(" ", "-")}.example.edu` : `${name.toLowerCase().replaceAll(/(\s+|')/g, ".")}@example.edu`;
             const sex: Sex = isOrganization ? "N/A" : (
                 declareSex ? (isMale ? "Male" : "Female") : "Undisclosed"
@@ -974,7 +975,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 emailStatus: fixedRandom.choice(emailStatus),
                 emailSentAt: updatedAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),
-                city: fixedRandom.choice(this.dataSource.regionNames),
+                city: regionName,
                 birthDate: fixedRandom.randdate(...period)
             }
         }).reduce<Record<string, Actor>>((acc, actor) => {
@@ -988,7 +989,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const period = this.period;
         const maxLicenseLength = this.maxLicenseLength;
         const {
-            regionNames,
+            regions,
             regionDescriptors,
             emailStatus,
             descriptions,
@@ -1037,7 +1038,9 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 status: "Active",
             }
             const id: string = `license-${index}`;
-            const regionName = fixedRandom.choice(regionNames);
+            const region = fixedRandom.choice(regions);
+            const regionName = region.name;
+            const subRegionName = fixedRandom.choice(region.subRegions);
             return {
                 id,
                 mnr,
@@ -1046,10 +1049,11 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 updatedAt: updatedAt.toISOString(),
                 expiresAt: expiresAt.toISOString(),
                 startsAt: startsAt.toISOString(),
-                permissions: this.createPermissions(regionName, [startsAt, expiresAt], species, fixedRandom.randint(3, 5)),
+                permissions: this.createPermissions(regionName, subRegionName, [startsAt, expiresAt], species, fixedRandom.randint(3, 5)),
                 description: "Within this license the actors will perform:\n" + fixedRandom.choices(descriptions, fixedRandom.randint(1, 3)).map(d => `- ${d}`).join("\n"),
                 status: fixedRandom.choice(licenseStatuses),
-                region: `${fixedRandom.choice(regionDescriptors)} ${regionName}`,
+                region: regionName,
+                subRegion: `${fixedRandom.choice(regionDescriptors)} ${subRegionName}`,
                 actors: [
                     ringer,
                     ...helpers
@@ -1062,7 +1066,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         }, {});
     }
 
-    createPermissions(regionName: string, period: [Date, Date], species: Record<string, Species>, count: number): License["permissions"] {
+    createPermissions(regionName: string, subRegionName: string, period: [Date, Date], species: Record<string, Species>, count: number): License["permissions"] {
         const {permissionTypes, permissionProperties, regionDescriptors} = this.dataSource;
         const fixedRandom = this.randomContext;
         const speciesList = Object.keys(species).map(key => species[key])
@@ -1081,7 +1085,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                     id: pp.id,
                 })),
                 speciesList: fixedRandom.choices(speciesList, fixedRandom.randint(3, 5)).map(s => ({type: "species", id: s.id})),
-                location: `${fixedRandom.choice(regionDescriptors)} ${regionName}`,
+                location: `${regionName}: ${fixedRandom.choice(regionDescriptors)} ${subRegionName}`,
                 period: [permissionPeriod[0].toISOString(), permissionPeriod[1].toISOString()]
             };
             return permission;
