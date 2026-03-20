@@ -1143,9 +1143,9 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     }
 
     createData() {
-        const actors = this.createActors(200, 30);
+        const actors = this.createActors(900, 270);
         const species = this.createSpecies(50);
-        const licenses = this.createLicenses(actors, species, 100);
+        const licenses = this.createLicenses(actors, species, 500);
         const documents = this.createDocuments(licenses);
         const permissionTypes = this.createPermissionTypes();
         const permissionProperties = this.createPermissionProperties();
