@@ -1023,7 +1023,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 const isActive = index > 0.5 * list.length
                 return {
                     role: fixedRandom.choice(helperVariants),
-                    mednr: `${String(index).padStart(4, '0')}`,
+                    mednr: `${String(index + 1).padStart(4, '0')}`,
                     actor: {id: actorId, type: "actor"},
                     licenseSentAt: createdAt.toISOString(),
                     licenseSentStatus: fixedRandom.choice(emailStatus),
