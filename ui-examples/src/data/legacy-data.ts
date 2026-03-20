@@ -262,7 +262,7 @@ export function contentToLegacyData() {
     const fixedRandom = getFixedRandom();
 
     const licenseList = Object.values(dataSource.licenses);
-    const licenses: Maerkare[] = licenseList.map<Maerkare>((license) => {
+    const licenses: Maerkare[] = licenseList.map<Maerkare>((license, index) => {
         const licenseActor = dataSource.getLicenseActors(license, "Ringer")[0];
         const [fnamn, enamn] = parseNames(licenseActor);
         const assistantList = licenseList.filter(l => l.mnr !== license.mnr);
@@ -289,7 +289,13 @@ export function contentToLegacyData() {
             Kommunnamn: license.region,
             LnNamn: license.subRegion,
             Sex: parseSex(licenseActor.sex),
-            Fyr: licenseActor.birthDate ? licenseActor.birthDate.getFullYear() : undefined,
+            Fyr: licenseActor.birthDate ? (
+                index % 5 == 0 ? (
+                    licenseActor.birthDate.getFullYear()
+                ) : (
+                    licenseActor.birthDate.toISOString().split('T')[0]
+                )
+            ) : undefined,
             AdrMnr: adrMnr,
             AssMnr1: assMnrs[0] || "NULL",
             AssMnr2: assMnrs[1] || "NULL",
@@ -307,7 +313,7 @@ export function contentToLegacyData() {
     });
 
     const actorList = Object.values(dataSource.actors);
-    const helpers = fixedRandom.choices(actorList, Math.floor(actorList.length * 0.7)).flatMap<Medhj>(actor => {
+    const helpers = fixedRandom.choices(actorList, Math.floor(actorList.length * 0.7)).flatMap<Medhj>((actor, index) => {
         const helperLicenses = dataSource.getActorLicenses(actor, undefined, undefined, (r) => r.role === "Associate" || r.role === "Communication" || r.role == "Helper")
         const [fnamn, enamn] = parseNames(actor)
         return helperLicenses.map<Medhj>((license) => {
@@ -318,7 +324,13 @@ export function contentToLegacyData() {
                 "FNamn": fnamn,
                 "ENamn": enamn,
                 "Fritext": "",
-                "Fyr": actor.birthDate ? actor.birthDate.getFullYear() : undefined,
+                "Fyr": actor.birthDate ? (
+                    index % 5 == 0 ? (
+                        actor.birthDate.getFullYear()
+                    ) : (
+                        actor.birthDate.toISOString().split('T')[0]
+                    )
+                ) : undefined,
                 "Sex": parseSex(actor.sex),
                 "E-post": actor.email || "",
             }
