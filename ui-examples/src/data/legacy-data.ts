@@ -120,6 +120,10 @@ type BaseMarkAss = {
 
 export type MarkAss = Omit<BaseMarkAss, "UDat">
 
+export type Medhj = MarkAss & {
+    "E-post": string;
+}
+
 type BaseMarkAssYr = {
     Mnr: MNR; // Reference to the main ringer to which this helper is associated
     Mednr: MNR; // Enumeration local to a specific MNR
@@ -303,10 +307,10 @@ export function contentToLegacyData() {
     });
 
     const actorList = Object.values(dataSource.actors);
-    const helpers = fixedRandom.choices(actorList, Math.floor(actorList.length * 0.7)).flatMap<MarkAss>(actor => {
+    const helpers = fixedRandom.choices(actorList, Math.floor(actorList.length * 0.7)).flatMap<Medhj>(actor => {
         const helperLicenses = dataSource.getActorLicenses(actor, undefined, undefined, (r) => r.role === "Associate" || r.role === "Communication" || r.role == "Helper")
         const [fnamn, enamn] = parseNames(actor)
-        return helperLicenses.map<MarkAss>((license) => {
+        return helperLicenses.map<Medhj>((license) => {
             const relation = license.actors.filter(r => r.actor.id === actor.id)[0]
             return {
                 "Mnr": license.mnr,
@@ -316,6 +320,7 @@ export function contentToLegacyData() {
                 "Fritext": "",
                 "Fyr": actor.birthDate ? actor.birthDate.getFullYear() : undefined,
                 "Sex": parseSex(actor.sex),
+                "E-post": actor.email || "",
             }
         })
     })
@@ -367,6 +372,7 @@ export function contentToLegacyData() {
     return {
         "br-ex-Maerkare": licenses,
         "br-ex-MarkAss": helpers,
+        "br-ex-Medhj": helpers,
         "br-ex-MarkAssYr": helperYears,
         "br-ex-Artlista": species,
         "br-ex-Tillstand": permissions,
