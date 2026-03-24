@@ -121,7 +121,7 @@ export default function Home() {
       {view === "metrics" && questionData && (
         <div className="row my-3">
           {questionData.values.map(question => (
-            <div className="col-2" key={question.id}>
+            <div className="col-12 col-md-4 col-lg-2" key={question.id}>
               <div className="form-check">
                 <input className="form-check-input" type="checkbox" id={question.id} data-entry-id={question.id} onChange={handleQuestionChoice} checked={questions.has(question.id)}/>
                 <label className="form-check-label" htmlFor={question.id}>{question.label}</label>
