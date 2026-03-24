@@ -25,8 +25,9 @@ type Result<T> = {
   values: T[]
 }
 
-async function fetchMetrics([apiRoot, questions]: [string, string[]]): Promise<Result<MetricsData>> {
-  return await (await fetch(`${apiRoot}/metrics?questions=${Array.from(questions).join(",")}`)).json()
+async function fetchMetrics([apiRoot, questions, dataset]: [string, string[], string]): Promise<Result<MetricsData>> {
+  const datasetOpts = !dataset ? "" : `&dataset=${dataset}`
+  return await (await fetch(`${apiRoot}/metrics?questions=${Array.from(questions).join(",")}${datasetOpts}`)).json()
 }
 
 async function fetchQuestions([apiRoot, questionset]: [string, string[]]): Promise<Result<QuestionData>> {
@@ -44,20 +45,31 @@ const questionsets: Entry[] = [
   {label: "Demographic", id: "demographic"},
 ]
 
+function UserActuatedField({name, defaultValue, label, onUpdate}: {name: string, defaultValue: string, label: string, onUpdate: (v: string) => void}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const updateRoot = useCallback(() => {
+    const input = inputRef.current;
+    if (input) {
+      onUpdate(input.value)
+    }
+  }, [inputRef, onUpdate])
+
+  return (
+    <div className="input-group">
+      <input className="form-control" type="text" ref={inputRef} name={name} defaultValue={defaultValue} />
+      <button className="btn btn-primary" type="button" onClick={updateRoot}>{label}</button>
+    </div>
+  )
+}
+
 export default function Home() {
   const [apiRoot, setAPIRoot] = useState("http://localhost:8000")
+  const [dataset, setDataset] = useState("")
   const [view, setView] = useState("questions")
   const [questionset, setQuestionset] = useState(questionsets[0].id);
   const [questions, setQuestions] = useState<Set<string>>(new Set());
   const {data: questionData, error: questionError, isLoading: questionLoading} = useSWR([apiRoot, questionset], fetchQuestions);
-  const {data, error: dataError, isLoading: dataLoading} = useSWR([apiRoot, questions], fetchMetrics);
-  const apiRootInputRef = useRef<HTMLInputElement>(null);
-  const updateRoot = useCallback(() => {
-    const input = apiRootInputRef.current;
-    if (input) {
-      setAPIRoot(input.value)
-    }
-  }, [apiRootInputRef, setAPIRoot])
+  const {data, error: dataError, isLoading: dataLoading} = useSWR([apiRoot, questions, dataset], fetchMetrics);
   const handleQuestionChoice = useCallback<ChangeEventHandler<HTMLInputElement>>((event) => {
     const entryId = event.target.getAttribute("data-entry-id");
     const checked = event.target.checked;
@@ -82,12 +94,14 @@ export default function Home() {
       <h2>TMD API Example</h2>
       <div className="row my-3">
         <div className="col">
-          <div className="input-group">
-            <input className="form-control" type="text" ref={apiRootInputRef} name="api-root" defaultValue={apiRoot} />
-            <button className="btn btn-primary" type="button" onClick={updateRoot}>Change Root</button>
-          </div>
+          <UserActuatedField label="Change Root" name="api-root" defaultValue={apiRoot} onUpdate={setAPIRoot}/>
         </div>
       </div>
+      {view === "metrics" && <div className="row my-3">
+        <div className="col">
+          <UserActuatedField label="Set dataset" name="dataset" defaultValue={dataset} onUpdate={setDataset}/>
+        </div>
+      </div>}
       <div className="row my-3">
         <div className="col">
           <div className="btn-group btn-group-toggle" data-toggle="buttons">
