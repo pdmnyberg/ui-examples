@@ -97,11 +97,6 @@ export default function Home() {
           <UserActuatedField label="Change Root" name="api-root" defaultValue={apiRoot} onUpdate={setAPIRoot}/>
         </div>
       </div>
-      {view === "metrics" && <div className="row my-3">
-        <div className="col">
-          <UserActuatedField label="Set dataset" name="dataset" defaultValue={dataset} onUpdate={setDataset}/>
-        </div>
-      </div>}
       <div className="row my-3">
         <div className="col">
           <div className="btn-group btn-group-toggle" data-toggle="buttons">
@@ -118,6 +113,11 @@ export default function Home() {
           </select>
         </div>
       </div>
+      {view === "metrics" && <div className="row my-3">
+        <div className="col">
+          <UserActuatedField label="Set dataset" name="dataset" defaultValue={dataset} onUpdate={setDataset}/>
+        </div>
+      </div>}
       {view === "metrics" && questionData && (
         <div className="row my-3">
           {questionData.values.map(question => (
@@ -170,7 +170,7 @@ export default function Home() {
                     <tr>
                       <th scope="col">ID</th>
                       <th scope="col">Label</th>
-                      <th scope="col">Count</th>
+                      <th scope="col">Distribution</th>
                     </tr>
                   </thead>
                   <tbody>
