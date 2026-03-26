@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import { getGenerator as getBirdRinging } from "./bird-ringing";
-import { getGenerator as getLegacyBirdRinging } from "./legacy-data";
+import {
+    getGenerator as getLegacyBirdRinging,
+    getNextGenerator as getNextBirdRinging
+} from "./legacy-data";
 import { DataGenerator } from "./common";
 
 
@@ -36,6 +39,7 @@ function main(rootPath: string = "public/data") {
 
     const csvGenerators: Record<string, DataGenerator<object>> = {
         "bird-ringing/legacy": getLegacyBirdRinging(),
+        "bird-ringing/next": getNextBirdRinging(),
     }
 
     for (const key in csvGenerators) {

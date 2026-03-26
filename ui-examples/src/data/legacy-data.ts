@@ -230,6 +230,11 @@ function parseDate(date: Date) {
     return `${date.getFullYear()}-${padZero(date.getMonth() + 1)}-${padZero(date.getDate())}`
 }
 
+function parseMonthDay(date: Date) {
+    // 03-15
+    return `${padZero(date.getMonth() + 1)}-${padZero(date.getDate())}`
+}
+
 function parseSex(sex: Actor["sex"]): Maerkare["Sex"] {
     switch (sex) {
         case "Female": return "F";
@@ -393,8 +398,30 @@ export function contentToLegacyData() {
     }
 }
 
+
+function contentToNextData() {
+    const data = contentToLegacyData()
+
+    const permissions = data["br-ex-Tillstand"].map(p => ({
+        ...p,
+        starts_at: parseMonthDay(new Date(p.starts_at)),
+        ends_at: parseMonthDay(new Date(p.ends_at))
+    }));
+    return {
+        ...data,
+        "br-ex-Tillstand": permissions,
+    }
+}
+
+
 export function getGenerator() {
     return {
         createData: contentToLegacyData,
+    }
+}
+
+export function getNextGenerator() {
+    return {
+        createData: contentToNextData,
     }
 }
