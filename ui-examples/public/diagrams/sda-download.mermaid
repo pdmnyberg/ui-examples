@@ -2,7 +2,7 @@
 title: SDA Download User Workflow
 ---
 
-flowchart TD
+flowchart LR
     user@{ shape: circle, label: "User" }
     intent@{ shape: diamond, label: "Intent" }
 
@@ -31,11 +31,12 @@ flowchart TD
 
     subgraph system_operations["System operations"]
         subgraph encrypted_operations["Encrypted operations"]
-            encrypted_operations_description@{ shape: brace-r, label: "All operations within this scope requires the public encryption key to be set in order to be performed." }
+            encrypted_operations_description@{ shape: braces, label: "All operations within this scope requires the public encryption key to be set in order to be performed." }
             ds_file_download@{ shape: stadium, label: "Download file(s) from dataset"}
             ds_partial_file_download@{ shape: stadium, label: "Download partial file"}
             ds_download@{ shape: stadium, label: "Download dataset"}
         end
+        download_checksum_file@{ shape: stadium, label: "Download checksum file"}
         user_set_public_key@{ shape: stadium, label: "Set public encryption key"}
     end
 
@@ -49,15 +50,21 @@ flowchart TD
     ds_search -- "Change search params" --> ds_list
     ds_list -- "Select dataset" --> ds_file_search
     ds_file_search -- "Change search params" --> ds_file_list
+
     ds_file_list -- "Select file(s)" --> ds_file_selection
     ds_file_list -- "With file" --> ds_file_actions
     ds_file_list -- "With dataset" --> ds_actions
 
     ds_file_actions -. "Download file" .-> ds_file_download
-    ds_file_selection -. "Download files" .-> ds_file_download
     ds_file_actions -- "View file details" --> file_view
+    ds_file_actions -. "Download checkums" .-> download_checksum_file
+
+    ds_file_selection -. "Download files" .-> ds_file_download
+    ds_file_selection -. "Download checkums" .-> download_checksum_file
+
     file_range_selection -. "Download partial file" .-> ds_partial_file_download
 
     ds_actions -. "Download dataset" .-> ds_download
+    ds_actions -. "Download checkums" .-> download_checksum_file
 
     user_public_key -. "Set public encryption key" .-> user_set_public_key
