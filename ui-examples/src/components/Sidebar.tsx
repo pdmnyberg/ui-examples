@@ -22,7 +22,7 @@ export function Sidebar({
 
   return (
     <>
-      <aside className="d-flex flex-shrink-0 sidebar" data-is-open={navIsOpen}>
+      <aside className="d-flex flex-shrink-0 sidebar d-print-none" data-is-open={navIsOpen}>
         <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary sidebar-content">
           <Link href={rootHref} className="d-flex align-items-center p-3 pe-5 bg-primary text-white text-decoration-none">
             {iconRef ? <i className={`bi fs-4 lh-1 pe-2 ${iconRef}`} /> : <></>}
@@ -58,7 +58,7 @@ export function Sidebar({
         </div>
       </aside>
       <main className="p-1 sm-p-3 flex-grow-1 overflow-auto position-relative">
-        <button className="btn btn-primary position-fixed z-3" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
+        <button className="btn btn-primary position-fixed z-3 d-print-none" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
           <i className="bi fs-2 bi-list" />
         </button>
         <div className="py-5" />

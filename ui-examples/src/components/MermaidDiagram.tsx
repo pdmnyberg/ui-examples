@@ -31,9 +31,9 @@ export function MermaidDiagram(props: {id?: string} & ({src: string} | {data: st
     <>
       <div dangerouslySetInnerHTML={{__html: svg || ""}}/>
       <hr />
-      <button className="btn btn-primary" onClick={handleDownload}>Download diagram</button>
-      <hr />
-      <pre>{svg}</pre>
+      <button className="btn btn-primary d-print-none" onClick={handleDownload}>Download diagram</button>
+      <hr  className="d-print-none" />
+      <pre className="d-print-none">{svg}</pre>
     </>
   )
 }
