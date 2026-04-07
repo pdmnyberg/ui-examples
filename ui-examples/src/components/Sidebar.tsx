@@ -1,3 +1,4 @@
+"use client"
 import { useNavInfo, useNav} from "@/contexts";
 import Link from "next/link";
 import { useState } from "react";

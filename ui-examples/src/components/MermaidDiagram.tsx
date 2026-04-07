@@ -2,7 +2,7 @@
 import useSWR from "swr";
 import mermaid from "mermaid";
 import { useId, useCallback } from "react";
-import { downloadData } from "../utils";
+import { downloadData } from "../app/utils";
 
 mermaid.initialize({ startOnLoad: false })
 

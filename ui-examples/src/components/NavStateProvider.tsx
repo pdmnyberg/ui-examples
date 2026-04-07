@@ -1,3 +1,4 @@
+"use client"
 import { NavInfoContext, toPath } from "@/contexts";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
