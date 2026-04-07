@@ -1,0 +1,63 @@
+---
+title: SDA Download User Workflow
+---
+
+flowchart TD
+    user@{ shape: circle, label: "User" }
+    intent@{ shape: diamond, label: "Intent" }
+
+    subgraph ds_search_view["Data search"]
+        ds_list@{ shape: docs, label: "Dataset list"}
+        ds_search[Dataset search]
+    end
+
+    subgraph ds_view["Dataset view"]
+        ds_file_search[File search]
+        ds_file_list@{ shape: docs, label: "Dataset file list"}
+        ds_file_selection@{ shape: docs, label: "Dataset file selection"}
+        ds_file_actions[Dataset file actions]
+        ds_actions[Dataset actions]
+    end
+
+    subgraph user_settings_view["User settings view"]
+        user_auth_info["Authentication information"]
+        user_public_key["Public encryption key input"]
+    end
+
+    subgraph file_view["File view"]
+        file_range_selection[File range selection]
+        file_checksum[Checksum]
+    end
+
+    subgraph system_operations["System operations"]
+        subgraph encrypted_operations["Encrypted operations"]
+            encrypted_operations_description@{ shape: brace-r, label: "All operations within this scope requires the public encryption key to be set in order to be performed." }
+            ds_file_download@{ shape: stadium, label: "Download file(s) from dataset"}
+            ds_partial_file_download@{ shape: stadium, label: "Download partial file"}
+            ds_download@{ shape: stadium, label: "Download dataset"}
+        end
+        user_set_public_key@{ shape: stadium, label: "Set public encryption key"}
+    end
+
+    lsaai_auth["External auth<br>(LSAAI)"]
+
+    user -- "Authentication needed" --> lsaai_auth
+    lsaai_auth -- "Authentication given" --> intent
+    intent -- "Find dataset" --> ds_search
+    intent -- "Set or update public encryption key" --> user_public_key
+    intent -- "View authentication information" --> user_auth_info
+    ds_search -- "Change search params" --> ds_list
+    ds_list -- "Select dataset" --> ds_file_search
+    ds_file_search -- "Change search params" --> ds_file_list
+    ds_file_list -- "Select file(s)" --> ds_file_selection
+    ds_file_list -- "With file" --> ds_file_actions
+    ds_file_list -- "With dataset" --> ds_actions
+
+    ds_file_actions -. "Download file" .-> ds_file_download
+    ds_file_selection -. "Download files" .-> ds_file_download
+    ds_file_actions -- "View file details" --> file_view
+    file_range_selection -. "Download partial file" .-> ds_partial_file_download
+
+    ds_actions -. "Download dataset" .-> ds_download
+
+    user_public_key -. "Set public encryption key" .-> user_set_public_key
