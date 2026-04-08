@@ -1,12 +1,31 @@
 ---
 title: SDA Download User Workflow
+descriptions:
+- title: Dataset search
+  content: Search using parameters related to finding datasets amoung the user's accessible datasets. *Relevant paramters are to be decided later.*
+- title: Dataset list
+  content: Lists all datasets matching the current search query (or all if no query exists). Includes links to `Dataset view`.
+- title: File search
+  content: Search using parameters related to finding files within a specific dataset. *Relevant parameters are to be decided later.*
+- title: Dataset file list
+  content: A list of files matching the current search query (or all if no query exists). Includes links to `File view`. May make individual file actions available.
+- title: Download file(s) from dataset (Encrypted)
+  content: Downloads a selection of files from a dataset.
+- title: Download partial file (Encrypted)
+  content: Downloads a range of data from a file.
+- title: Download dataset (Encrypted)
+  content: Downloads all the files from a dataset.
+- title: Download checksum file
+  content: Downloads a checksum file containing all the checksums and relations to files of from a selection of files or a dataset.
+- title: Set public encryption key
+  content: Sets the public encryption key to be used for encrypting all sensitive data downloads.
 ---
 
 flowchart TD
     user@{ shape: circle, label: "User" }
     intent@{ shape: diamond, label: "Intent" }
 
-    subgraph ds_search_view["Data search"]
+    subgraph ds_search_view["Dataset search view"]
         ds_list@{ shape: docs, label: "Dataset list"}
         ds_search[Dataset search]
     end
