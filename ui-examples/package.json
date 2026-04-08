@@ -12,10 +12,12 @@
   "dependencies": {
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
+    "front-matter": "^4.0.2",
     "mermaid": "^11.12.1",
-    "next": "15.5.5",
+    "next": "^15.5.14",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-markdown": "^10.1.0",
     "swr": "^2.3.6",
     "tsx": "^4.20.6"
   },

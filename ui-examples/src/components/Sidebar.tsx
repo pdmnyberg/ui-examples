@@ -61,7 +61,7 @@ export function Sidebar({
         <button className="btn btn-primary position-fixed z-3 d-print-none" type="button" aria-label="Toggle navigation" onClick={() => setNavIsOpen(!navIsOpen)}>
           <i className="bi fs-2 bi-list" />
         </button>
-        <div className="py-5" />
+        <div className="py-5 d-print-none" />
         {children}
       </main>
     </>
