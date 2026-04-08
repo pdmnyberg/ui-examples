@@ -1,19 +1,22 @@
 ---
 title: User Workflow
+descriptions: 
+- title: Actor
+  content: An actor is either a 'Ringer', a 'Helper' or an 'Associate'
+- title: Admin
+  content: Admin is the ringer license administrator working with managing commincation regarding active licenses
+- title: Actor selection
+  content: Selections are assumed to involve some filtering or search for items but the details on which filters are necessary are left out to simplify the workflow
+- title: System operations
+  content: |
+   System operations are operations performed by the system which generally generate some output
+
+   When operations are performed on licenses it is generally assumed that they are performed on all actors assigned to the selected licenses, that are relevant for the selected operation
 ---
 
-flowchart LR
+flowchart TD
     admin@{ shape: circle, label: "Admin" }
     intent@{ shape: diamond, label: "Intent" }
-
-    subgraph descriptions["Descriptions"]
-        direction TB
-        actor_desc@{ shape: brace-r, label: "An actor is either a 'Ringer', a 'Helper' or an 'Associate'"}
-        admin_desc@{ shape: brace-r, label: "Admin is the ringer license administrator working with managing commincation regarding active licenses"}
-        list_filtering@{ shape: brace-r, label: "Selections are assumed to involve some filtering or search for items but the details on which filters are necessary are left out to simplify the workflow"}
-        sysops_desc@{ shape: brace-r, label: "System operations are operations performed by the system which generally generate some output"}
-        sysops_detail@{ shape: brace-r, label: "When operations are performed on licenses it is generally assumed that they are performed on all actors assigned to the selected licenses, that are relevant for the selected operation"}
-    end
 
     subgraph license_list_view["License list view"]
         llist[License list]
@@ -46,13 +49,6 @@ flowchart LR
         lplist[License permission list]
         ldetails[License Details]
     end
-
-    actor_desc -.- actor
-    admin_desc -.- admin
-    sysops_desc -.- system_operations
-    sysops_detail -.- system_operations
-    list_filtering -.- lselection
-    list_filtering -.- aselection
 
     admin --> intent
     intent -- "License has changed" --> llist

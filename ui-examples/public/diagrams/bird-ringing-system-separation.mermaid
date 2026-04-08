@@ -1,35 +1,31 @@
 ---
 title: System separation
+descriptions:
+- title: Admin
+  content: Admin is the ringer license administrator working with managing licenses
+- title: NRM Entrypoint
+  content: The NRM Bird Ringing Entrypoint is the old system and allows all of the current operations
+- title: NBIS Data
+  content: NBIS Database primarily focuses on holding the data pushed from the old system while allowing updates to generated documents and communication status
+- title: NBIS Entrypoint
+  content: The NBIS Bird Ringing Entrypoint is the new system and focuses primarily on communcation around licenses and generation of license documents
 ---
 
-flowchart LR
+flowchart TD
     admin@{ shape: circle, label: "Admin" }
     intent@{ shape: diamond, label: "Intent" }
 
-    subgraph descriptions["Descriptions"]
-        direction TB
-        admin_desc@{ shape: brace-r, label: "Admin is the ringer license administrator working with managing licenses"}
-        nrm_entrypoint_desc@{ shape: brace-r, label: "The NRM Bird Ringing Entrypoint is the old system and allows all of the current operations"}
-        nbis_data_desc@{ shape: brace-r, label: "NBIS Database primarily focuses on holding the data pushed from the old system while allowing updates to generated documents and communication status"}
-        nbis_entrypoint_desc@{ shape: brace-r, label: "The NBIS Bird Ringing Entrypoint is the new system and focuses primarily on communcation around licenses and generation of license documents"}
-    end
-
     subgraph nrm_bird_ringing["NRM Bird Ringing (Legacy)"]
-        nrm_entrypoint["Entrypoint"]
+        nrm_entrypoint["NRM Entrypoint"]
         nrm_data@{ shape: lin-cyl, label: "NRM Database" }
     end
 
     subgraph nbis_bird_ringing["NBIS Bird Ringing (New system)"]
-        nbis_entrypoint["Entrypoint"]
+        nbis_entrypoint["NBIS Entrypoint"]
         nbis_data@{ shape: lin-cyl, label: "NBIS Database" }
     end
 
     one_way_push@{ shape: lin-rect, label: "One way push of data" }
-
-    admin_desc -.- admin
-    nbis_data_desc -.- nbis_data
-    nbis_entrypoint_desc -.- nbis_entrypoint
-    nrm_entrypoint_desc -.- nrm_entrypoint
 
     admin --> intent
 
