@@ -2,7 +2,7 @@
 title: SDA Download User Workflow
 ---
 
-flowchart LR
+flowchart TD
     user@{ shape: circle, label: "User" }
     intent@{ shape: diamond, label: "Intent" }
 
@@ -44,9 +44,11 @@ flowchart LR
 
     user -- "Authentication needed" --> lsaai_auth
     lsaai_auth -- "Authentication given" --> intent
-    intent -- "Find dataset" --> ds_search
+
+    intent == "Find dataset<br><i>(Default)</i>" ==> ds_search
     intent -- "Set or update public encryption key" --> user_public_key
     intent -- "View authentication information" --> user_auth_info
+
     ds_search -- "Change search params" --> ds_list
     ds_list -- "Select dataset" --> ds_file_search
     ds_file_search -- "Change search params" --> ds_file_list
