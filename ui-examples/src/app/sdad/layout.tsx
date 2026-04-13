@@ -1,41 +1,65 @@
 "use client"
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import { NavContext, NavItems } from "@/contexts";
 import { Sidebar } from "@/components/Sidebar";
 import { NavStateProvider } from "@/components/NavStateProvider";
 import { DataContext, SDADData } from "./contexts";
 import { Dataset, DatasetFile, User } from "./types";
-import { StaticDataSource } from "../common";
+import { StaticDataSource, toList } from "../common";
 import "./layout.css";
+import { fetchData } from "../utils";
+import useSWR from "swr";
+
+function fetchAppData([datasetUrl, filesUrl]: [string, string]) {
+  return Promise.all([
+    fetchData<Record<string, Dataset>>(datasetUrl),
+    fetchData<Record<string, DatasetFile>>(filesUrl),
+  ]);
+}
+
+function DataProvider({
+  datasetUrl,
+  filesUrl,
+  children,
+}: Readonly<{
+  datasetUrl: string,
+  filesUrl: string,
+  children: React.ReactNode;
+}>) {
+  const {data, error, isLoading} = useSWR([
+    datasetUrl,
+    filesUrl,
+  ], fetchAppData);
+  if (error) {
+    console.log(error);
+  }
+  const dataSource = useMemo<SDADData>(() => ({
+    datasets: new StaticDataSource<Dataset>(toList(data && data[0] || {})),
+    files: new StaticDataSource<DatasetFile>(toList(data && data[1] || {}), (f, properties) => {
+      const dataset = properties?.dataset || [];
+      const datasets = Array.isArray(dataset) ? dataset : [dataset];
+      return properties === undefined ? (
+        true
+      ) : (
+        datasets.map(ds => ds.id).includes(f.dataset.id) ? true : false
+      )
+    }),
+    user: {
+        username: "Mock User"
+    }
+  }), [data, isLoading])
+  return (
+    isLoading ? <></> : <DataContext.Provider value={dataSource}>{children}</DataContext.Provider>
+  )
+}
+
 
 export default function PageLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const datasets = Array.from({length: 100}).map<Dataset>((_, index) => ({
-    id: `dataset-${index}`,
-    type: "dataset",
-    files: 3 + (index % 5),
-    size: 3 + (index % 5),
-    date: new Date().toUTCString(),
-  }));
-  const datasetFiles = datasets.flatMap<DatasetFile>((ds, di) => Array.from({length: di}).map<DatasetFile>((_, fi) => ({
-    id: `file-${di}-${fi}`,
-    type: "dataset-file",
-    dataset: {id: ds.id, type: "dataset"},
-    checksums: ["checksum-1", "checksum-2"],
-    decryptedSize: 2000,
-    downloadUrl: "",
-    filePath: `file-${fi}`,
-  })))
-  const data: SDADData = {
-    datasets: new StaticDataSource<Dataset>(datasets),
-    files: new StaticDataSource<DatasetFile>(datasetFiles),
-    user: {
-        username: "Mock User"
-    }
-  }
+  const basePath = process.env.NEXT_PUBLIC_API_URL || "";
   const navItems: NavItems =  [
     {type: "heading", label: "Data"},
     {type: "item", label: "Datasets", href: "/sdad/datasets", id: "datasets"},
@@ -49,17 +73,20 @@ export default function PageLayout({
   };
   return (
     <NavContext.Provider value={navItems}>
-      <DataContext.Provider value={data}>
-        <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
-          <NavStateProvider>
-            <Sidebar {...sidebarProps}>
+      <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
+        <NavStateProvider>
+          <Sidebar {...sidebarProps}>
+            <DataProvider
+              datasetUrl={`${basePath}/data/sdad/datasets.json`}
+              filesUrl={`${basePath}/data/sdad/files.json`}
+            >
               <div className="container-xxl p-0 md-p3">
                 {children}
               </div>
-            </Sidebar>
-          </NavStateProvider>
-        </Suspense>
-      </DataContext.Provider>
+            </DataProvider>
+          </Sidebar>
+        </NavStateProvider>
+      </Suspense>
     </NavContext.Provider>
   )
 }
