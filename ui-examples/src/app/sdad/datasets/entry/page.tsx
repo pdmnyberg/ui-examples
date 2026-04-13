@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams, notFound } from "next/navigation";
-import { CSSProperties, Suspense, useState } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { useData } from "../../contexts";
 import { EntityRef, toLocalDate } from "@/app/common";
@@ -9,13 +9,7 @@ import { Pagination, usePagination } from "@/components/Pagination";
 import { ColumnSpec, DataSpec, Table, VerticalTable } from "@/components/Table";
 import { Dataset, DatasetFile } from "../../types";
 import { TypedSearchableItem, useFilter, useItemSelections } from "@/app/hooks";
-
-const dropdownOpenStyle: CSSProperties = {
-  position: "absolute",
-  inset: "0px 0px auto auto",
-  margin: "0px",
-  transform: "translate(0px, 40px)",
-}
+import { ActionDropDown } from "@/components/ActionDropDown";
 
 type DatasetTable = DataSpec<Dataset & {datasetId: string}>;
 
@@ -26,7 +20,6 @@ function EntryViewBase() {
   if (!datasetId) {
     notFound();
   }
-  const [actionIsOpen, setActionIsOpen] = useState(false); 
   const datasetRef: EntityRef<"dataset"> = {id: datasetId, type: "dataset"};
   const dataset = datasets.get(datasetRef);
   const datasetFiles = files.find({properties: {dataset: datasetRef}}).map<TypedSearchableItem<DatasetFile>>((f) => ({
@@ -101,6 +94,10 @@ function EntryViewBase() {
     <div className="container">
       <h2>Dataset {dataset.id}</h2>
       <h3>Properties</h3>
+      <div className="input-group mb-3">
+        <span className="input-group-text flex-grow-1" >Get dataset {dataset.id}</span>
+        <ActionDropDown label="Dataset actions" items={[{label: "Download dataset", action: () => {}}, {label: "Download dataset checksums", action: () => {}}]}/>
+      </div>
       <VerticalTable items={[datasetEntry]} columns={datasetColumns} param="Param"/>
       <h3>Files</h3>
       <div className="input-group mb-3">
@@ -118,11 +115,7 @@ function EntryViewBase() {
       <div className="input-group mb-3">
         <button className="btn btn-outline-secondary" type="button" onClick={toggleItems}>{allSelected ? "Select None" : "Select All"}</button>
         <span className="input-group-text flex-grow-1" >{selectedItems.size} of {datasetFiles.length} selected</span>
-        <button className="btn btn-outline-secondary dropdown-toggle" onClick={() => setActionIsOpen(!actionIsOpen)} type="button" aria-expanded={actionIsOpen}>File actions</button>
-        <ul className={`dropdown-menu ${actionIsOpen ? "show" : ""}`} style={actionIsOpen ? dropdownOpenStyle : {}} onClick={() => setActionIsOpen(false)}>
-          <li><a className="dropdown-item" href="#">Download files</a></li>
-          <li><a className="dropdown-item" href="#">Download checksums</a></li>
-        </ul>
+        <ActionDropDown label="File actions" items={[{label: "Download files", action: () => {}}, {label: "Download file checksums", action: () => {}}]}/>
       </div>
       <Pagination pages={filesPagination.pages} currentPage={filesPagination.currentPage}/>
       <Table items={selectablePageItems} columns={datasetFileColumns} />
