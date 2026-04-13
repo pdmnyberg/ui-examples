@@ -67,7 +67,7 @@ export default function PageLayout({
     {type: "item", label: "Userinfo", href: "/sdad/user-info", id: "user-info"},
  ]
   const sidebarProps = {
-    title: "SDA Dowload",
+    title: "SDA Download",
     rootHref: "/sdad",
     iconRef: "bi-database",
   };
