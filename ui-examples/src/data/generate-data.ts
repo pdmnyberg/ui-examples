@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { getGenerator as getBirdRinging } from "./bird-ringing";
+import { getGenerator as getSDADGenerator } from "./sdad";
 import {
     getGenerator as getLegacyBirdRinging,
     getNextGenerator as getNextBirdRinging
@@ -21,6 +22,7 @@ function toCSV(data: {[x: string]: unknown}[]) {
 function main(rootPath: string = "public/data") {
     const generators: Record<string, DataGenerator<object>> = {
         "bird-ringing": getBirdRinging(),
+        "sdad": getSDADGenerator(),
     }
 
     for (const key in generators) {
