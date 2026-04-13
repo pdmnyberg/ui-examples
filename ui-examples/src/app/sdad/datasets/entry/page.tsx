@@ -27,7 +27,7 @@ function EntryViewBase() {
     properties: {
       id: {
         term: f.id,
-        component: <Link href={`/datasets/entry/file/?entryId=${f.id}`}>{f.id}</Link>,
+        component: <Link href={`/sdad/datasets/file/?entryId=${f.id}`}>{f.id}</Link>,
       },
       filePath: {
         term: f.filePath,
