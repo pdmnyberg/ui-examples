@@ -1,0 +1,7 @@
+body {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  --bs-primary-rgb: 200, 150, 54;
+  --bs-link-color-rgb: 36, 125, 163;
+}
