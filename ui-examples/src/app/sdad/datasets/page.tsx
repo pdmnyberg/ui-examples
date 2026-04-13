@@ -1,7 +1,7 @@
 "use client"
 
-import { ColumnSpec, DataSpec, Table } from "@/components/Table";
-import React, { CSSProperties, useState } from "react";
+import { ColumnSpec, Table } from "@/components/Table";
+import React from "react";
 import { useData } from "../contexts";
 import { Pagination, usePagination } from "@/components/Pagination";
 import Link from "next/link";
@@ -9,15 +9,8 @@ import { toLocalDate } from "@/app/common";
 import { Dataset } from "../types";
 import { TypedSearchableItem, useFilter } from "@/app/hooks";
 
-const dropdownOpenStyle: CSSProperties = {
-  position: "absolute",
-  inset: "0px 0px auto auto",
-  margin: "0px",
-  transform: "translate(0px, 40px)",
-}
 
 export default function Datasets() {
-  const [actionIsOpen, setActionIsOpen] = useState(false); 
   const {datasets} = useData();
   const datasetItems = datasets.all().map<TypedSearchableItem<Dataset & {datasetId: string}>>(dataset => ({
     id: dataset.id,

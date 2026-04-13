@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { DataSource } from "../common";
+import { DataSource, StaticDataSource } from "../common";
 import { Dataset, DatasetFile, User } from "./types";
 
 
@@ -15,7 +15,13 @@ export function useData(): SDADData {
     const data = useContext(DataContext);
 
     if (!data) {
-        throw new Error("No data context available.")
+        return {
+            datasets: new StaticDataSource<Dataset>([]),
+            files: new StaticDataSource<DatasetFile>([]),
+            user: {
+                username: "",
+            }
+        }
     }
 
     return data;

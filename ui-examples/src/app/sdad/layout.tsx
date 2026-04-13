@@ -4,7 +4,7 @@ import { NavContext, NavItems } from "@/contexts";
 import { Sidebar } from "@/components/Sidebar";
 import { NavStateProvider } from "@/components/NavStateProvider";
 import { DataContext, SDADData } from "./contexts";
-import { Dataset, DatasetFile, User } from "./types";
+import { Dataset, DatasetFile } from "./types";
 import { StaticDataSource, toList } from "../common";
 import "./layout.css";
 import { fetchData } from "../utils";
@@ -47,7 +47,7 @@ function DataProvider({
     user: {
         username: "Mock User"
     }
-  }), [data, isLoading])
+  }), [data])
   return (
     isLoading ? <></> : <DataContext.Provider value={dataSource}>{children}</DataContext.Provider>
   )

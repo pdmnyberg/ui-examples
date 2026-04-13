@@ -16,7 +16,6 @@ function EntryViewBase() {
   const searchParams = useSearchParams();
   const {files} = useData();
   const fileId = searchParams.get("entryId")
-  console.log(fileId)
   if (!fileId) {
     notFound();
   }
