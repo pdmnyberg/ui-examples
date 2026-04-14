@@ -11,12 +11,21 @@ export class SDADGenerator implements DataGenerator<{
     private fileCountRange: [number, number]
     private dateRange: [Date, Date]
     private namespace: string
+    private groupNames: string[]
 
-    constructor(randomContext: RandomContext, datasetCount: number, fileCountRange: [number, number], dateRange: [Date, Date], namespace: string) {
+    constructor(
+        randomContext: RandomContext,
+        datasetCount: number,
+        fileCountRange: [number, number],
+        dateRange: [Date, Date],
+        groupNames: string[],
+        namespace: string,
+    ) {
         this.randomContext = randomContext;
         this.datasetCount = datasetCount;
         this.fileCountRange = fileCountRange;
         this.dateRange = dateRange;
+        this.groupNames = groupNames;
         this.namespace = namespace
     }
 
@@ -31,14 +40,25 @@ export class SDADGenerator implements DataGenerator<{
     }
 
     createFiles(datasets: Dataset[]): DatasetFile[] {
-        return datasets.flatMap<DatasetFile>((ds, di) => Array.from({length: ds.files}).map<DatasetFile>((_, fi) => ({
-            id: uuidv5(`file-${di}-${fi}`, this.namespace),
-            type: "dataset-file",
-            dataset: {id: ds.id, type: "dataset"},
-            checksums: Array.from({length: this.randomContext.randint(1, 10)}).map(() => this._getChecksum()),
-            decryptedSize: Math.floor(ds.size / ds.files),
-            downloadUrl: "",
-            filePath: `file-${fi}`,
+        return datasets.flatMap<DatasetFile>((ds, di) => {
+            const groups = this._getGroups(this.randomContext.randint(2, Math.max(4, ds.files / 10)), this.randomContext.randint(1, 4))
+            return Array.from({length: ds.files}).map<DatasetFile>((_, fi) => ({
+                id: uuidv5(`file-${di}-${fi}`, this.namespace),
+                type: "dataset-file",
+                dataset: {id: ds.id, type: "dataset"},
+                checksums: Array.from({length: this.randomContext.randint(1, 10)}).map(() => this._getChecksum()),
+                decryptedSize: Math.floor(ds.size / ds.files),
+                downloadUrl: "",
+                filePath: `${this.randomContext.choice(groups)}/file-${fi}`,
+            }))
+        })
+    }
+
+    _getGroups(count: number, maxDepth: number = 3): string[] {
+        maxDepth = Math.max(1, maxDepth)
+        return Array.from(new Set(Array.from({length: count}).map(() => {
+            const depth = this.randomContext.randint(1, maxDepth);
+            return this.randomContext.choices(this.groupNames, depth).join("/")
         })))
     }
 
@@ -71,6 +91,15 @@ export function getGenerator() {
         100,
         [10, 100],
         [new Date("2020-01-01T00:00:00.000Z"), new Date("2025-01-01T00:00:00.000Z")],
+        [
+            "group",
+            "region",
+            "dna",
+            "rna",
+            "sequence",
+            "meta",
+            "collection",
+        ],
         uuidv5("sdad", "00000000-0000-0000-0000-000000000000"),
     )
 }
