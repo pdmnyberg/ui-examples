@@ -20,6 +20,9 @@ export default function PageLayout({
     {type: "separator"},
     {type: "heading", label: "Settings"},
     {type: "item", label: "Userinfo", href: "/sdad/userinfo", id: "user-info"},
+    {type: "separator"},
+    {type: "heading", label: "Diagrams"},
+    {type: "item", label: "User flow diagram", href: "/diagrams/sda-download", id: "diagram"},
  ]
   const sidebarProps = {
     title: "SDA Download",
