@@ -31,11 +31,18 @@ export function createMockToken(rootUrl: string): Token {
     }
 }
 
+export function getHost(): string {
+    if (typeof window !== "undefined") {
+        return window.location.protocol + "//" + window.location.host;
+    }
+    return "";
+}
+
 export function useData(): SDADData {
     const data = useContext(DataContext);
 
     if (!data) {
-        const basePath = process.env.NEXT_PUBLIC_API_URL || "";
+        const basePath = getHost();
         return {
             datasets: new StaticDataSource<Dataset>([]),
             files: new StaticDataSource<DatasetFile>([]),
