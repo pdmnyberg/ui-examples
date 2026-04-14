@@ -18,6 +18,7 @@ export default function PageLayout({
     {type: "heading", label: "Data"},
     {type: "item", label: "Datasets", href: "/sdad/datasets", id: "datasets"},
     {type: "separator"},
+    {type: "heading", label: "Settings"},
     {type: "item", label: "Userinfo", href: "/sdad/userinfo", id: "user-info"},
  ]
   const sidebarProps = {

@@ -1,14 +1,13 @@
 "use client"
 
 import { useSearchParams, notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useId } from "react";
 import Link from "next/link";
 import { useData } from "../../contexts";
 import { EntityRef } from "@/app/common";
 import { ColumnSpec, DataSpec, VerticalTable } from "@/components/Table";
 import { DatasetFile } from "../../types";
 import { ActionDropDown } from "@/components/ActionDropDown";
-import Alert from "@/components/Alert";
 
 type DatasetFileTable = DataSpec<DatasetFile & {datasetId: string}>;
 
@@ -38,6 +37,8 @@ function EntryViewBase() {
     checksums: "Checksums",
     datasetId: "Dataset",
   };
+  const startId = useId();
+  const endId = useId()
 
   return (
     <div className="container">
@@ -49,7 +50,16 @@ function EntryViewBase() {
       </div>
       <VerticalTable items={[fileEntry]} columns={datasetFileColumns} param="Param"/>
       <h3>Partial download</h3>
-      <Alert type="warning">TODO: Allow selecting a subset of a file.</Alert>
+      <form>
+        <label htmlFor={startId}>Select a range for a partial download:</label>
+        <div className="input-group mb-3">
+          <label className="input-group-text" htmlFor={startId}>Start position</label>
+          <input type="number" className="form-control" id={startId} placeholder="0" aria-label="Start" />
+          <label className="input-group-text" htmlFor={endId}>End position</label>
+          <input type="number" className="form-control" id={endId} placeholder={String(file.decryptedSize)} aria-label="End" />
+        </div>
+        <button type="submit" className="btn btn-primary">Download</button>
+      </form>
     </div>
   )
 }
