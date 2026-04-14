@@ -19,7 +19,7 @@ export default function PageLayout({
     {type: "item", label: "Datasets", href: "/sdad/datasets", id: "datasets"},
     {type: "separator"},
     {type: "heading", label: "Settings"},
-    {type: "item", label: "Userinfo", href: "/sdad/userinfo", id: "user-info"},
+    {type: "item", label: "Userinfo", href: "/sdad/userinfo", id: "userinfo"},
     {type: "separator"},
     {type: "heading", label: "Diagrams"},
     {type: "item", label: "User flow diagram", href: "/diagrams/sda-download", id: "diagram"},
