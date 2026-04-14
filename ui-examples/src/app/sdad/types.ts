@@ -14,6 +14,19 @@ export type DatasetFile = EntityRef<"dataset-file"> & {
     dataset: EntityRef<"dataset">;
 }
 
-export type User = {
-    username: string;
+export type Token = {
+    payload: {
+        iss: string;
+        sub: string;
+        aud: string;
+        iat: number;
+        exp: number;
+        jti: string
+    }
+    header: {
+        alg: string;
+        typ: string;
+        kid: string;
+    }
 }
+

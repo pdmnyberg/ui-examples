@@ -2,7 +2,7 @@
 import { PropsWithChildren, useMemo } from "react";
 import { NavContext, NavItems } from "@/contexts";
 import { NavStateProvider } from "@/components/NavStateProvider";
-import { DataContext, SDADData } from "./contexts";
+import { createMockToken, DataContext, SDADData } from "./contexts";
 import { Dataset, DatasetFile } from "./types";
 import { StaticDataSource, toList } from "../common";
 import "./layout.css";
@@ -18,10 +18,12 @@ function fetchAppData([datasetUrl, filesUrl]: [string, string]) {
 }
 
 function DataProvider({
+  baseUrl,
   datasetUrl,
   filesUrl,
   children,
 }: Readonly<{
+  baseUrl: string,
   datasetUrl: string,
   filesUrl: string,
   children: React.ReactNode;
@@ -44,10 +46,8 @@ function DataProvider({
         datasets.map(ds => ds.id).includes(f.dataset.id) ? true : false
       )
     }),
-    user: {
-        username: "Mock User"
-    }
-  }), [data])
+    token: createMockToken(baseUrl)
+  }), [data, baseUrl])
   return (
     isLoading ? <></> : <DataContext.Provider value={dataSource}>{children}</DataContext.Provider>
   )
@@ -65,6 +65,7 @@ export default function ContentProvider({
     <NavContext.Provider value={navItems}>
       <NavStateProvider>
         <DataProvider
+          baseUrl={basePath}
           datasetUrl={`${basePath}/data/sdad/datasets.json`}
           filesUrl={`${basePath}/data/sdad/files.json`}
         >

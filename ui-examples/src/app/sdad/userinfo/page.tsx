@@ -2,28 +2,56 @@
 
 import { useData } from "../contexts";
 import { ColumnSpec, VerticalTable } from "@/components/Table";
-import Alert from "@/components/Alert";
-import { User } from "../types";
+import { Token } from "../types";
+import { useId } from "react";
+import { toLocalTime } from "@/app/common";
 
 
 export default function EntryView() {
-  const {user} = useData();
-  const userEntry = {
-    id: user.username,
-    ...user,
+  const {token} = useData();
+  const uploadId = useId();
+  const payloadEntry = {
+    id: token.payload.sub,
+    ...token.payload,
+    iat: toLocalTime(new Date(token.payload.iat)),
+    exp: toLocalTime(new Date(token.payload.exp)),
+  }
+  const headerEntry = {
+    id: token.payload.sub,
+    ...token.header,
   }
 
-  const userColumns: ColumnSpec<User & {id: string}> = {
-    username: "Username",
+  const payloadColumns: ColumnSpec<Token["payload"] & {id: string}> = {
+    iss: "Issuer",
+    sub: "Subject",
+    aud: "Audience",
+    iat: "Issued at",
+    exp: "Expires at",
+    jti: "Token ID",
   };
+
+  const headerColumns: ColumnSpec<Token["header"] & {id: string}> = {
+    alg: "Algorithm",
+    typ: "Type",
+    kid: "Key ID",
+  }
 
   return (
     <div className="container">
-      <h2>User {user.username}</h2>
-      <h3>Properties</h3>
-      <VerticalTable items={[userEntry]} columns={userColumns} param="Param"/>
+      <h2>User {token.payload.sub}</h2>
+      <h3>Token</h3>
+      <h4>Payload</h4>
+      <VerticalTable items={[payloadEntry]} columns={payloadColumns} param="Param"/>
+      <h4>Header</h4>
+      <VerticalTable items={[headerEntry]} columns={headerColumns} param="Param"/>
       <h3>Set public encryption key</h3>
-      <Alert type="warning">TODO: Allow selecting a subset of a file.</Alert>
+      <form>
+        <div className="mb-3">
+          <label htmlFor={uploadId}>Select a public key to upload:</label>
+          <input className="form-control" id={uploadId} type="file" />
+        </div>
+        <button type="submit" className="btn btn-primary">Upload key</button>
+      </form>
     </div>
   )
 }

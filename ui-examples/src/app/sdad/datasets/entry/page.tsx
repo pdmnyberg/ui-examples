@@ -31,7 +31,7 @@ function EntryViewBase() {
       },
       filePath: {
         term: f.filePath,
-        component: f.filePath,
+        component: <span className="text-nowrap">{f.filePath}</span>,
       },
       decryptedSize: {
         term: `${f.decryptedSize} bytes`,
