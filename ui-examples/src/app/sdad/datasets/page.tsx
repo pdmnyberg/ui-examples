@@ -1,23 +1,41 @@
 "use client"
 
 import { ColumnSpec, Table } from "@/components/Table";
-import React from "react";
+import React, { useState } from "react";
 import { useData } from "../contexts";
 import { Pagination, usePagination } from "@/components/Pagination";
 import Link from "next/link";
 import { toLocalDate } from "@/app/common";
 import { Dataset } from "../types";
 import { TypedSearchableItem, useFilter } from "@/app/hooks";
+import { CardList } from "@/components/CardList";
 
+function getDatasetHref(id: string) {
+  return `/sdad/datasets/entry/?entryId=${id}`;
+}
+
+type ViewMode = "grid" | "list";
 
 export default function Datasets() {
   const {datasets} = useData();
-  const datasetItems = datasets.all().map<TypedSearchableItem<Dataset & {datasetId: string}>>(dataset => ({
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const viewModes: {mode: ViewMode, icon: string}[]  = [
+    {
+      mode: "grid",
+      icon: "grid",
+    },
+    {
+      mode: "list",
+      icon: "list-ul"
+    }
+  ]
+  const datasetItems = datasets.all().map<TypedSearchableItem<Dataset & {datasetId: string}> & {href: string}>(dataset => ({
     id: dataset.id,
+    href: getDatasetHref(dataset.id),
     properties: {
       datasetId: {
         term: dataset.id,
-        component: <Link href={`/sdad/datasets/entry/?entryId=${dataset.id}`}>{dataset.id}</Link>,
+        component: <Link href={getDatasetHref(dataset.id)}>{dataset.id}</Link>,
       },
       date: {
         term: toLocalDate(new Date(dataset.date)),
@@ -60,8 +78,13 @@ export default function Datasets() {
       <div className="input-group mb-3">
         <span className="input-group-text flex-grow-1" >Viewing {filteredItems.length} of {datasetItems.length}</span>
       </div>
+      <div className="btn-group mb-3">
+        {viewModes.map(vm => (
+          <a key={vm.mode} onClick={() => setViewMode(vm.mode)} className={`btn btn-primary ${vm.mode === viewMode ? "active" : ""}`} aria-current="page"><i className={`bi bi-${vm.icon}`}></i></a>
+        ))}
+      </div>
       <Pagination pages={datasetPagination.pages} currentPage={datasetPagination.currentPage}/>
-      <Table items={datasetPagination.items} columns={datasetColumns} />
+      {viewMode === "grid" ? <CardList items={datasetPagination.items} rows={datasetColumns} labelKey="id" /> : <Table items={datasetPagination.items} columns={datasetColumns} />}
       <Pagination pages={datasetPagination.pages} currentPage={datasetPagination.currentPage}/>
     </>
   )
