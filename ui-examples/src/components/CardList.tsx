@@ -26,7 +26,7 @@ export function CardList<TData extends {id: string}>(
         const subLabel = subLabelKey ? getProperty(item, subLabelKey) : undefined;
         const content = contentKey ? getProperty(item, contentKey) : undefined;
         const hasRows = Object.keys(rows).length > 0;
-        const nav = item.href ? <Link href={item.href} className="btn btn-primary">View {label}</Link> : <></>
+        const nav = item.href ? <Link href={item.href} className="btn btn-primary text-break">View {label}</Link> : <></>
         return (
           <div className="col-sm-4 p-2" key={item.id}>
             <div className="card">
