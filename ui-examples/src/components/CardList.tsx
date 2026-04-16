@@ -30,12 +30,12 @@ export function CardList<TData extends {id: string}>(
         return (
           <div className="col-sm-4 p-2" key={item.id}>
             <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">{label}</h5>
+              <h5 className="card-header">{label}</h5>
+              {content || subLabel || !hasRows ? <div className="card-body">
                 {subLabel ? <h6 className="card-subtitle mb-2 text-body-secondary">{subLabel}</h6> : <></>}
-                <p className="card-text">{content}</p>
+                {content ? <p className="card-text">{content}</p> : <></>}
                 {hasRows ? <></> : nav}
-              </div>
+              </div> : <></>}
               {hasRows ? <ul className="list-group list-group-flush">
                 {Object.keys(rows).map((row) => {
                   return (
