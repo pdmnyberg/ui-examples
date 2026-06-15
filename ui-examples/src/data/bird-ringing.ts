@@ -90,7 +90,7 @@ export function getMoonData(): BirdRingingDataSource {
         { "id": "extended-or-repeated-contact-authorization", "name": "Extended or Repeated Contact Authorization", "description": "Permits sustained or repeated interaction with the same individuals beyond standard contact thresholds." }
     ]
 
-const permissionProperties: PermissionProperty[] = [
+    const permissionProperties: PermissionProperty[] = [
         {
             "id": "manual-handling-required",
             "name": "manual handling required",
@@ -119,7 +119,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "repeat-capture-allowed",
             "name": "repeat capture allowed",
             "description": "The same individual may be captured multiple times for study or monitoring purposes.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
         },
         {
             "id": "juveniles-included",
@@ -180,7 +180,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "group-displacement-permitted",
             "name": "group displacement permitted",
             "description": "Multiple birds may be moved together as a cohort rather than individually.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
         },
         {
             "id": "juveniles-subject-to-relocation",
@@ -229,7 +229,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "access-during-feeding-phase",
             "name": "access during feeding phase",
             "description": "Nests may be accessed while adults are feeding chicks, potentially disturbing feeding behavior.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
             "id": "direct-egg-contact-permitted",
@@ -271,7 +271,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "clutch-size-modification-allowed",
             "name": "clutch size modification allowed",
             "description": "Adding or removing eggs from a nest is permitted under controlled study or management conditions.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
         },
 
         {
@@ -296,7 +296,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "interruption-during-molt",
             "name": "interruption during molt",
             "description": "Activities may disrupt the natural feather replacement process, affecting flight, insulation, or display.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
         },
         {
             "id": "interruption-during-migration-behavior",
@@ -350,7 +350,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "tag-removal-not-required",
             "name": "tag removal not required",
             "description": "Markers may remain permanently on the bird without removal after study completion.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
         },
         
         {
@@ -381,7 +381,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "repeat-sampling-allowed",
             "name": "repeat sampling allowed",
             "description": "The same individual may be sampled multiple times across the study period.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
         },
         {
             "id": "sampling-during-active-illness",
@@ -418,7 +418,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "aversive-stimulus-permitted",
             "name": "aversive stimulus permitted",
             "description": "Unpleasant or mildly stressful stimuli may be applied to modify behavior under controlled conditions.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
             "id": "reward-based-stimulus-permitted",
@@ -461,7 +461,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "repeated-movement-trials-required",
             "name": "repeated movement trials required",
             "description": "Birds may be subjected to multiple trials to observe or test locomotion and flight behavior.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
             "id": "movement-suppression-permitted",
@@ -503,7 +503,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "disturbance-during-breeding-season",
             "name": "disturbance during breeding season",
             "description": "Alterations may occur even during the breeding season, potentially affecting nesting success.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
         },
 
         {
@@ -540,7 +540,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "long-term-alteration-permitted",
             "name": "long-term alteration permitted",
             "description": "Sustained changes to environmental conditions may be maintained for extended study or management.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
         },
         {
             "id": "light-intensity-altered",
@@ -576,7 +576,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "circadian-shift-exceeds-one-cycle",
             "name": "circadian shift exceeds one cycle",
             "description": "The alteration in daily or lunar cycles may exceed one full circadian rhythm period.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
         },
 
         {
@@ -613,7 +613,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "cross-species-signal-exposure-allowed",
             "name": "cross-species signal exposure allowed",
             "description": "Signals may be broadcast in ways that affect other species present in the habitat.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
         },
         {
             "id": "sex-ratio-intentionally-altered",
@@ -643,7 +643,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "intervention-affects-multiple-generations",
             "name": "intervention affects multiple generations",
             "description": "Actions may have consequences that influence the population over more than one breeding cycle or generation.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "population-structure-intervention"}
         },
 
         {
@@ -680,7 +680,7 @@ const permissionProperties: PermissionProperty[] = [
             "id": "intervention-persists-beyond-one-generation",
             "name": "intervention persists beyond one generation",
             "description": "Effects of the intervention may influence multiple successive generations.",
-            "permissionType": null
+            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
         },
         {
             "id": "transfer-between-biospheres",
@@ -851,7 +851,97 @@ const permissionProperties: PermissionProperty[] = [
             "name": "contact frequency exceeds baseline limits",
             "description": "The number of interactions may surpass standard guidelines for normal handling or monitoring.",
             "permissionType": {"type": "permission-type", "id": "extended-or-repeated-contact-authorization"}
-        }
+        },
+        {
+            "id": "observer-must-remain-stationary",
+            "name": "observer must remain stationary",
+            "description": "The researcher or handler must not move during the observation period to avoid influencing bird behavior.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-requires-two-person-team",
+            "name": "activity requires two-person team",
+            "description": "A minimum of two qualified personnel must be present during any interaction with the bird.",
+            "permissionType": null
+        },
+        {
+            "id": "written-field-log-required",
+            "name": "written field log required",
+            "description": "A handwritten or digital field log must be completed for every interaction, including time, location, and outcome.",
+            "permissionType": null
+        },
+        {
+            "id": "photographic-documentation-required",
+            "name": "photographic documentation required",
+            "description": "Photographic evidence of the bird and activity must be captured and retained for each permitted interaction.",
+            "permissionType": null
+        },
+        {
+            "id": "veterinary-clearance-required",
+            "name": "veterinary clearance required",
+            "description": "A qualified veterinarian must approve the bird's health status before any permitted activity may proceed.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-restricted-to-daylight-hours",
+            "name": "activity restricted to daylight hours",
+            "description": "All permitted activities must be conducted exclusively during the artificial daylight phase of the habitat cycle.",
+            "permissionType": null
+        },
+        {
+            "id": "habitat-entry-requires-decontamination",
+            "name": "habitat entry requires decontamination",
+            "description": "Personnel must undergo decontamination procedures before entering the habitat to prevent pathogen introduction.",
+            "permissionType": null
+        },
+        {
+            "id": "maximum-noise-threshold-applies",
+            "name": "maximum noise threshold applies",
+            "description": "All activities must be conducted below a defined ambient noise limit to avoid undue stress to birds.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-suspended-during-system-maintenance",
+            "name": "activity suspended during system maintenance",
+            "description": "No permitted activities may take place while the biosphere undergoes scheduled technical maintenance.",
+            "permissionType": null
+        },
+        {
+            "id": "incident-report-mandatory-on-injury",
+            "name": "incident report mandatory on injury",
+            "description": "Any injury to a bird during a permitted activity must be immediately documented in a formal incident report.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-subject-to-third-party-audit",
+            "name": "activity subject to third-party audit",
+            "description": "An independent auditor may observe or review any permitted activity at any time without prior notice.",
+            "permissionType": null
+        },
+        {
+            "id": "permit-copy-must-be-on-site",
+            "name": "permit copy must be on-site",
+            "description": "A copy of the relevant permit must be physically or digitally accessible at the location of any activity.",
+            "permissionType": null
+        },
+        {
+            "id": "cooling-off-period-between-interactions",
+            "name": "cooling-off period between interactions",
+            "description": "A mandatory rest interval must be observed between consecutive interactions with the same individual bird.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-void-in-adverse-habitat-conditions",
+            "name": "activity void in adverse habitat conditions",
+            "description": "Permitted activities are automatically suspended if habitat conditions fall outside defined safe parameters.",
+            "permissionType": null
+        },
+        {
+            "id": "non-native-equipment-must-be-sterilized",
+            "name": "non-native equipment must be sterilized",
+            "description": "Any equipment brought into the habitat must be sterilized in advance to prevent contamination of the biosphere.",
+            "permissionType": null
+        },
     ]
 
     const speciesSignifiers = [
@@ -1073,14 +1163,19 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         return Array.from({length: count}).map(() => {
             const permissionType = fixedRandom.choice(permissionTypes);
             const permissionPeriod = fixedRandom.randdaterange(...period);
-            const currentPermissionProperties = permissionProperties.filter(pp => pp.permissionType?.id === permissionType.id)
+            const nullPermissionProperties = permissionProperties.filter(pp => pp.permissionType === null);
+            const currentPermissionProperties = permissionProperties.filter(pp => pp.permissionType?.id === permissionType.id);
+            const combinedProperties = [
+                ...currentPermissionProperties,
+                ...fixedRandom.choices(nullPermissionProperties, Math.floor(nullPermissionProperties.length * 0.2)),
+            ];
             const permission: License["permissions"][number] = {
                 description: "",
                 type: {
                     type: "permission-type",
                     id: permissionType.id,
                 },
-                properties: fixedRandom.choices(currentPermissionProperties, Math.floor(currentPermissionProperties.length * 0.5)).map(pp => ({
+                properties: fixedRandom.choices(combinedProperties, Math.floor(combinedProperties.length * 0.5)).map(pp => ({
                     type: "permission-property",
                     id: pp.id,
                 })),
