@@ -370,7 +370,7 @@ export function contentToLegacyData() {
         property_code: pp.id,
         name: pp.name,
         description: pp.description,
-        related_type_code: pp.permissionType.id,
+        related_type_code: pp.permissionType?.id ?? "",
     }))
 
     const permissions = Object.keys(content.licenses).map(key => content.licenses[key]).flatMap(license => license.permissions.map<Tillstand>(lp => {

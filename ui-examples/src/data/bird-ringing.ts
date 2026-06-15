@@ -198,7 +198,7 @@ export function getMoonData(): BirdRingingDataSource {
         {
             "id": "structural-alteration-permitted",
             "name": "structural alteration permitted",
-            "description": "Modifications to the nest’s physical structure are allowed, including reinforcement or minor reshaping.",
+            "description": "Modifications to the nest's physical structure are allowed, including reinforcement or minor reshaping.",
             "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
@@ -399,7 +399,7 @@ export function getMoonData(): BirdRingingDataSource {
         {
             "id": "behavior-induced-intentionally",
             "name": "behavior induced intentionally",
-            "description": "The bird’s behavior is deliberately provoked for observation or experimentation.",
+            "description": "The bird's behavior is deliberately provoked for observation or experimentation.",
             "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
@@ -436,7 +436,7 @@ export function getMoonData(): BirdRingingDataSource {
         {
             "id": "flight-restriction-applied",
             "name": "flight restriction applied",
-            "description": "Birds’ ability to fly may be temporarily limited or constrained for study, safety, or management purposes.",
+            "description": "Birds' ability to fly may be temporarily limited or constrained for study, safety, or management purposes.",
             "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
@@ -851,7 +851,97 @@ export function getMoonData(): BirdRingingDataSource {
             "name": "contact frequency exceeds baseline limits",
             "description": "The number of interactions may surpass standard guidelines for normal handling or monitoring.",
             "permissionType": {"type": "permission-type", "id": "extended-or-repeated-contact-authorization"}
-        }
+        },
+        {
+            "id": "observer-must-remain-stationary",
+            "name": "observer must remain stationary",
+            "description": "The researcher or handler must not move during the observation period to avoid influencing bird behavior.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-requires-two-person-team",
+            "name": "activity requires two-person team",
+            "description": "A minimum of two qualified personnel must be present during any interaction with the bird.",
+            "permissionType": null
+        },
+        {
+            "id": "written-field-log-required",
+            "name": "written field log required",
+            "description": "A handwritten or digital field log must be completed for every interaction, including time, location, and outcome.",
+            "permissionType": null
+        },
+        {
+            "id": "photographic-documentation-required",
+            "name": "photographic documentation required",
+            "description": "Photographic evidence of the bird and activity must be captured and retained for each permitted interaction.",
+            "permissionType": null
+        },
+        {
+            "id": "veterinary-clearance-required",
+            "name": "veterinary clearance required",
+            "description": "A qualified veterinarian must approve the bird's health status before any permitted activity may proceed.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-restricted-to-daylight-hours",
+            "name": "activity restricted to daylight hours",
+            "description": "All permitted activities must be conducted exclusively during the artificial daylight phase of the habitat cycle.",
+            "permissionType": null
+        },
+        {
+            "id": "habitat-entry-requires-decontamination",
+            "name": "habitat entry requires decontamination",
+            "description": "Personnel must undergo decontamination procedures before entering the habitat to prevent pathogen introduction.",
+            "permissionType": null
+        },
+        {
+            "id": "maximum-noise-threshold-applies",
+            "name": "maximum noise threshold applies",
+            "description": "All activities must be conducted below a defined ambient noise limit to avoid undue stress to birds.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-suspended-during-system-maintenance",
+            "name": "activity suspended during system maintenance",
+            "description": "No permitted activities may take place while the biosphere undergoes scheduled technical maintenance.",
+            "permissionType": null
+        },
+        {
+            "id": "incident-report-mandatory-on-injury",
+            "name": "incident report mandatory on injury",
+            "description": "Any injury to a bird during a permitted activity must be immediately documented in a formal incident report.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-subject-to-third-party-audit",
+            "name": "activity subject to third-party audit",
+            "description": "An independent auditor may observe or review any permitted activity at any time without prior notice.",
+            "permissionType": null
+        },
+        {
+            "id": "permit-copy-must-be-on-site",
+            "name": "permit copy must be on-site",
+            "description": "A copy of the relevant permit must be physically or digitally accessible at the location of any activity.",
+            "permissionType": null
+        },
+        {
+            "id": "cooling-off-period-between-interactions",
+            "name": "cooling-off period between interactions",
+            "description": "A mandatory rest interval must be observed between consecutive interactions with the same individual bird.",
+            "permissionType": null
+        },
+        {
+            "id": "activity-void-in-adverse-habitat-conditions",
+            "name": "activity void in adverse habitat conditions",
+            "description": "Permitted activities are automatically suspended if habitat conditions fall outside defined safe parameters.",
+            "permissionType": null
+        },
+        {
+            "id": "non-native-equipment-must-be-sterilized",
+            "name": "non-native equipment must be sterilized",
+            "description": "Any equipment brought into the habitat must be sterilized in advance to prevent contamination of the biosphere.",
+            "permissionType": null
+        },
     ]
 
     const speciesSignifiers = [
@@ -1073,14 +1163,19 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         return Array.from({length: count}).map(() => {
             const permissionType = fixedRandom.choice(permissionTypes);
             const permissionPeriod = fixedRandom.randdaterange(...period);
-            const currentPermissionProperties = permissionProperties.filter(pp => pp.permissionType.id === permissionType.id)
+            const nullPermissionProperties = permissionProperties.filter(pp => pp.permissionType === null);
+            const currentPermissionProperties = permissionProperties.filter(pp => pp.permissionType?.id === permissionType.id);
+            const combinedProperties = [
+                ...currentPermissionProperties,
+                ...fixedRandom.choices(nullPermissionProperties, Math.floor(nullPermissionProperties.length * 0.2)),
+            ];
             const permission: License["permissions"][number] = {
                 description: "",
                 type: {
                     type: "permission-type",
                     id: permissionType.id,
                 },
-                properties: fixedRandom.choices(currentPermissionProperties, Math.floor(currentPermissionProperties.length * 0.5)).map(pp => ({
+                properties: fixedRandom.choices(combinedProperties, Math.floor(combinedProperties.length * 0.5)).map(pp => ({
                     type: "permission-property",
                     id: pp.id,
                 })),
