@@ -68,7 +68,7 @@ export type PermissionType = IdentifiableEntity & {
 }
 
 export type PermissionProperty = IdentifiableEntity & {
-    permissionType: PermissionTypeRef;
+    permissionType: PermissionTypeRef | null;
     name: string;
     description: string;
 }

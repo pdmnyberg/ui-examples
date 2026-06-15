@@ -90,7 +90,7 @@ export function getMoonData(): BirdRingingDataSource {
         { "id": "extended-or-repeated-contact-authorization", "name": "Extended or Repeated Contact Authorization", "description": "Permits sustained or repeated interaction with the same individuals beyond standard contact thresholds." }
     ]
 
-    const permissionProperties: PermissionProperty[] = [
+const permissionProperties: PermissionProperty[] = [
         {
             "id": "manual-handling-required",
             "name": "manual handling required",
@@ -119,7 +119,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "repeat-capture-allowed",
             "name": "repeat capture allowed",
             "description": "The same individual may be captured multiple times for study or monitoring purposes.",
-            "permissionType": {"type": "permission-type", "id": "capture-and-physical-restraint"}
+            "permissionType": null
         },
         {
             "id": "juveniles-included",
@@ -180,7 +180,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "group-displacement-permitted",
             "name": "group displacement permitted",
             "description": "Multiple birds may be moved together as a cohort rather than individually.",
-            "permissionType": {"type": "permission-type", "id": "temporary-displacement-or-relocation"}
+            "permissionType": null
         },
         {
             "id": "juveniles-subject-to-relocation",
@@ -198,7 +198,7 @@ export function getMoonData(): BirdRingingDataSource {
         {
             "id": "structural-alteration-permitted",
             "name": "structural alteration permitted",
-            "description": "Modifications to the nest’s physical structure are allowed, including reinforcement or minor reshaping.",
+            "description": "Modifications to the nest's physical structure are allowed, including reinforcement or minor reshaping.",
             "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
         },
         {
@@ -229,7 +229,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "access-during-feeding-phase",
             "name": "access during feeding phase",
             "description": "Nests may be accessed while adults are feeding chicks, potentially disturbing feeding behavior.",
-            "permissionType": {"type": "permission-type", "id": "nest-access-and-modification"}
+            "permissionType": null
         },
         {
             "id": "direct-egg-contact-permitted",
@@ -271,7 +271,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "clutch-size-modification-allowed",
             "name": "clutch size modification allowed",
             "description": "Adding or removing eggs from a nest is permitted under controlled study or management conditions.",
-            "permissionType": {"type": "permission-type", "id": "egg-and-hatchling-handling"}
+            "permissionType": null
         },
 
         {
@@ -296,7 +296,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "interruption-during-molt",
             "name": "interruption during molt",
             "description": "Activities may disrupt the natural feather replacement process, affecting flight, insulation, or display.",
-            "permissionType": {"type": "permission-type", "id": "lifecycle-stage-interruption"}
+            "permissionType": null
         },
         {
             "id": "interruption-during-migration-behavior",
@@ -350,7 +350,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "tag-removal-not-required",
             "name": "tag removal not required",
             "description": "Markers may remain permanently on the bird without removal after study completion.",
-            "permissionType": {"type": "permission-type", "id": "artificial-marking-or-tagging"}
+            "permissionType": null
         },
         
         {
@@ -381,7 +381,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "repeat-sampling-allowed",
             "name": "repeat sampling allowed",
             "description": "The same individual may be sampled multiple times across the study period.",
-            "permissionType": {"type": "permission-type", "id": "biological-sample-extraction"}
+            "permissionType": null
         },
         {
             "id": "sampling-during-active-illness",
@@ -399,7 +399,7 @@ export function getMoonData(): BirdRingingDataSource {
         {
             "id": "behavior-induced-intentionally",
             "name": "behavior induced intentionally",
-            "description": "The bird’s behavior is deliberately provoked for observation or experimentation.",
+            "description": "The bird's behavior is deliberately provoked for observation or experimentation.",
             "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
         },
         {
@@ -418,7 +418,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "aversive-stimulus-permitted",
             "name": "aversive stimulus permitted",
             "description": "Unpleasant or mildly stressful stimuli may be applied to modify behavior under controlled conditions.",
-            "permissionType": {"type": "permission-type", "id": "induced-behavioral-response"}
+            "permissionType": null
         },
         {
             "id": "reward-based-stimulus-permitted",
@@ -436,7 +436,7 @@ export function getMoonData(): BirdRingingDataSource {
         {
             "id": "flight-restriction-applied",
             "name": "flight restriction applied",
-            "description": "Birds’ ability to fly may be temporarily limited or constrained for study, safety, or management purposes.",
+            "description": "Birds' ability to fly may be temporarily limited or constrained for study, safety, or management purposes.",
             "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
         },
         {
@@ -461,7 +461,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "repeated-movement-trials-required",
             "name": "repeated movement trials required",
             "description": "Birds may be subjected to multiple trials to observe or test locomotion and flight behavior.",
-            "permissionType": {"type": "permission-type", "id": "alteration-of-flight-or-movement"}
+            "permissionType": null
         },
         {
             "id": "movement-suppression-permitted",
@@ -503,7 +503,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "disturbance-during-breeding-season",
             "name": "disturbance during breeding season",
             "description": "Alterations may occur even during the breeding season, potentially affecting nesting success.",
-            "permissionType": {"type": "permission-type", "id": "habitat-structure-disturbance"}
+            "permissionType": null
         },
 
         {
@@ -540,7 +540,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "long-term-alteration-permitted",
             "name": "long-term alteration permitted",
             "description": "Sustained changes to environmental conditions may be maintained for extended study or management.",
-            "permissionType": {"type": "permission-type", "id": "environmental-condition-manipulation"}
+            "permissionType": null
         },
         {
             "id": "light-intensity-altered",
@@ -576,7 +576,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "circadian-shift-exceeds-one-cycle",
             "name": "circadian shift exceeds one cycle",
             "description": "The alteration in daily or lunar cycles may exceed one full circadian rhythm period.",
-            "permissionType": {"type": "permission-type", "id": "light-and-circadian-cycle-interference"}
+            "permissionType": null
         },
 
         {
@@ -613,7 +613,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "cross-species-signal-exposure-allowed",
             "name": "cross-species signal exposure allowed",
             "description": "Signals may be broadcast in ways that affect other species present in the habitat.",
-            "permissionType": {"type": "permission-type", "id": "acoustic-or-signal-emission"}
+            "permissionType": null
         },
         {
             "id": "sex-ratio-intentionally-altered",
@@ -643,7 +643,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "intervention-affects-multiple-generations",
             "name": "intervention affects multiple generations",
             "description": "Actions may have consequences that influence the population over more than one breeding cycle or generation.",
-            "permissionType": {"type": "permission-type", "id": "population-structure-intervention"}
+            "permissionType": null
         },
 
         {
@@ -680,7 +680,7 @@ export function getMoonData(): BirdRingingDataSource {
             "id": "intervention-persists-beyond-one-generation",
             "name": "intervention persists beyond one generation",
             "description": "Effects of the intervention may influence multiple successive generations.",
-            "permissionType": {"type": "permission-type", "id": "genetic-lineage-influence"}
+            "permissionType": null
         },
         {
             "id": "transfer-between-biospheres",
@@ -1073,7 +1073,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         return Array.from({length: count}).map(() => {
             const permissionType = fixedRandom.choice(permissionTypes);
             const permissionPeriod = fixedRandom.randdaterange(...period);
-            const currentPermissionProperties = permissionProperties.filter(pp => pp.permissionType.id === permissionType.id)
+            const currentPermissionProperties = permissionProperties.filter(pp => pp.permissionType?.id === permissionType.id)
             const permission: License["permissions"][number] = {
                 description: "",
                 type: {
