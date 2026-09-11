@@ -22,7 +22,7 @@ export default function PageLayout({
     {type: "item", label: "Userinfo", href: "/sdad/userinfo", id: "userinfo"},
     {type: "separator"},
     {type: "heading", label: "Diagrams"},
-    {type: "item", label: "User flow diagram", href: "/diagrams/sda-download", id: "diagram"},
+    {type: "item", label: "User flow diagram", href: "/sdad/diagrams/sda-download", id: "diagrams/sda-download/"},
  ]
   const sidebarProps = {
     title: "SDA Download",

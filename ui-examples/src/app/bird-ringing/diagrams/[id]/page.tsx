@@ -15,5 +15,5 @@ export default async function Page(args: {params: Promise<{ id: string }>}) {
 }
 
 export function generateStaticParams() {
-  return baseGenerateStaticParams();
+  return baseGenerateStaticParams((name) => name.startsWith("bird-ringing-"));
 }
