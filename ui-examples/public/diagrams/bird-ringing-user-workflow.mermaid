@@ -28,6 +28,7 @@ flowchart TD
         lsend@{ shape: lin-rect , label: "Send license(s)"}
         ldownload@{ shape: lin-rect , label: "Downoad license(s)"}
         listemails@{ shape: lin-rect , label: "Get list of email addresses"}
+        permissionupdate@{ shape: lin-rect , label: "Update permissions"}
     end
 
     subgraph actor_list_view["Actor list view"]
@@ -38,7 +39,7 @@ flowchart TD
     subgraph actor_view["Actor view"]
         actor[Actor]
         allist[Actor license list]
-        adetails[Actor Details]
+        adetails[Actor details]
         acomstatus[Actor communication status]
         adlist[Actor document list]
     end
@@ -47,12 +48,19 @@ flowchart TD
         license[License]
         lalist[License actor list]
         lplist[License permission list]
-        ldetails[License Details]
+        ldetails[License details]
+        lhistory[License history]
+    end
+
+    subgraph permission_edit["Permission edit"]
+      permissionlist[Permission list]
+      permissionpropertylist[Permission property list]
     end
 
     admin --> intent
     intent -- "License has changed" --> llist
     intent -- "License summary needed" --> llist
+    intent -- "Add or update permissions" --> permissionlist
     llist -- "Select licenses" --> lselection
     llist -- "View license" --> license
 
@@ -65,11 +73,14 @@ flowchart TD
     lalist -- "View actor" --> actor
     license -- "View permissions" --> lplist
     license -- "View details" --> ldetails
+    license -- "View history" --> lhistory
 
-    license -. "Generate license" .-> lgenerate
-    license -. "Send license" .-> lsend
-    license -. "Download license" .-> ldownload
-    
+    lalist -. "Send license" .-> lsend
+    lalist -. "Download license" .-> ldownload
+
+    permissionlist -- "Select permission" --> permissionpropertylist
+    permissionlist -- "Create new permission" --> permissionupdate
+    permissionpropertylist -- "Create new property" --> permissionupdate
 
     lselection -. "Generate licenses" .-> lgenerate
     lselection -. "Send licenses" .-> lsend
