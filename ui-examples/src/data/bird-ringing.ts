@@ -1026,11 +1026,20 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     period: [Date, Date];
     maxLicenseLength: number;
     dataSource: BirdRingingDataSource;
-    constructor(randomContext: RandomContext, dataSource: BirdRingingDataSource, period: [Date, Date], maxLicenseLength: number) {
+    numberOfLicenses: number;
+
+    constructor(
+        randomContext: RandomContext,
+        dataSource: BirdRingingDataSource,
+        period: [Date, Date],
+        maxLicenseLength: number,
+        numberOfLicenses: number = 100,
+    ) {
         this.randomContext = randomContext;
         this.dataSource = dataSource;
         this.period = period;
         this.maxLicenseLength = maxLicenseLength;
+        this.numberOfLicenses = numberOfLicenses;
     }
 
     createActors(numberOfActors: number, numberOfOrganizations: number): Record<string, Actor> {
@@ -1043,17 +1052,35 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const familyNames = this.dataSource.familyNames;
         const emailStatus = this.dataSource.emailStatus;
         const regionName = fixedRandom.choice(regionNames)
-        return (Array.from({length: numberOfActors})).map<Actor>((_, index) => {
-            const isOrganization = index < numberOfOrganizations;
-            fixedRandom.seed(index)
-            const isMale = fixedRandom.randbool();
+        const allPeople = [
+            ...familyNames.flatMap(fn => femaleNames.map(gn => `${gn} ${fn}`)).map<Pick<Actor, "sex" | "name" | "type">>(fn => ({
+                sex: "Female",
+                name: fn,
+                type: "Person"
+            })),
+            ...familyNames.flatMap(fn => maleNames.map(gn => `${gn} ${fn}`).map<Pick<Actor, "sex" | "name" | "type">>(fn => ({
+                sex: "Male",
+                name: fn,
+                type: "Person"
+            })))
+        ];
+        const allOrganizations = groupNames.flatMap(gn => regionNames.map(rn => `${gn} ${rn}`)).map<Pick<Actor, "sex" | "name" | "type">>(on => ({
+            sex: "N/A",
+            name: on,
+            type: "Organization"
+        }))
+        fixedRandom.seed(0)
+        const usedActors = [
+            ...fixedRandom.choices(allPeople, numberOfActors - numberOfOrganizations),
+            ...fixedRandom.choices(allOrganizations, numberOfOrganizations)
+        ]
+        return usedActors.map<Actor>(({sex: actualSex, name, type}, index) => {
+            const isOrganization = type === "Organization";
             const declareSex = fixedRandom.randbool();
             const updatedAt = fixedRandom.randdate(...period);
-            const givenNames = isMale ? maleNames : femaleNames;
-            const name = isOrganization ? `${fixedRandom.choice(groupNames)} ${regionName}` : `${fixedRandom.choice(givenNames)} ${fixedRandom.choice(familyNames)}`;
             const email = isOrganization ? `contact@${name.toLowerCase().replaceAll(" ", "-")}.example.edu` : `${name.toLowerCase().replaceAll(/(\s+|')/g, ".")}@example.edu`;
             const sex: Sex = isOrganization ? "N/A" : (
-                declareSex ? (isMale ? "Male" : "Female") : "Undisclosed"
+                declareSex ? actualSex : "Undisclosed"
             )
             const id: string = `actor-${index}`;
             return {
@@ -1238,9 +1265,9 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     }
 
     createData() {
-        const actors = this.createActors(900, 270);
+        const actors = this.createActors(this.numberOfLicenses * 2, Math.floor(this.numberOfLicenses * 0.3));
         const species = this.createSpecies(50);
-        const licenses = this.createLicenses(actors, species, 500);
+        const licenses = this.createLicenses(actors, species, this.numberOfLicenses);
         const documents = this.createDocuments(licenses);
         const permissionTypes = this.createPermissionTypes();
         const permissionProperties = this.createPermissionProperties();
@@ -1255,11 +1282,12 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     }
 }
 
-export function getGenerator() {
+export function getGenerator(numberOfLicenses: number = 100) {
     return new BirdRingingDataGenerator(
         getFixedRandom(),
         getMoonData(),
         [new Date("2020-01-01T00:00:00.000Z"), new Date("2025-01-01T00:00:00.000Z")],
         new Date("2020-06-01T00:00:00.000Z").getTime() - new Date("2020-01-01T00:00:00.000Z").getTime(),
+        numberOfLicenses
     )
 }

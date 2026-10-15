@@ -260,10 +260,13 @@ function createSummary(license: License, dataSource: DataSource) {
     return `Activities of ${license.mnr} may be performed in the region ${license.region}, and it includes permits to perform ${permissionSummary}, for the species ${speciesSummary}.`;
 }
 
-export function contentToLegacyData() {
-    const generator = getBirdRinging()
+function getDataSource(numberOfLicenses: number = 100) {
+    const generator = getBirdRinging(numberOfLicenses)
     const content = generator.createData();
-    const dataSource = new StaticDataSource(content.actors, content.licenses, content.documents, content.permissionTypes, content.permissionProperties, content.species, false);
+    return new StaticDataSource(content.actors, content.licenses, content.documents, content.permissionTypes, content.permissionProperties, content.species, false);
+}
+
+export function contentToLegacyData(dataSource: StaticDataSource) {
     const fixedRandom = getFixedRandom();
 
     const licenseList = Object.values(dataSource.licenses);
@@ -352,7 +355,7 @@ export function contentToLegacyData() {
         }))
     })
 
-    const species = Object.values(content.species).map<Artilista>(s => {
+    const species = Object.values(dataSource.species).map<Artilista>(s => {
         return {
             "VetKod": s.scientificCode,
             "VetNamn": s.scientificName,
@@ -360,20 +363,20 @@ export function contentToLegacyData() {
         }
     })
 
-    const permissionTypes = Object.keys(content.permissionTypes).map(key => content.permissionTypes[key]).map<TillstTyp>(pt => ({
+    const permissionTypes = Object.keys(dataSource.permissionTypes).map(key => dataSource.permissionTypes[key]).map<TillstTyp>(pt => ({
         type_code: pt.id,
         name: pt.name,
         description: pt.description,
     }))
 
-    const properties = Object.keys(content.permissionProperties).map(key => content.permissionProperties[key]).map<TillstProp>(pp => ({
+    const properties = Object.keys(dataSource.permissionProperties).map(key => dataSource.permissionProperties[key]).map<TillstProp>(pp => ({
         property_code: pp.id,
         name: pp.name,
         description: pp.description,
         related_type_code: pp.permissionType?.id ?? "",
     }))
 
-    const permissions = Object.keys(content.licenses).map(key => content.licenses[key]).flatMap(license => license.permissions.map<Tillstand>(lp => {
+    const permissions = Object.keys(dataSource.licenses).map(key => dataSource.licenses[key]).flatMap(license => license.permissions.map<Tillstand>(lp => {
         return {
             license_mnr: license.mnr,
             type_code: lp.type.id,
@@ -399,8 +402,8 @@ export function contentToLegacyData() {
 }
 
 
-function contentToNextData() {
-    const data = contentToLegacyData()
+function contentToNextData(dataSource: StaticDataSource) {
+    const data = contentToLegacyData(dataSource)
 
     const permissions = data["br-ex-Tillstand"].map(p => ({
         ...p,
@@ -416,12 +419,24 @@ function contentToNextData() {
 
 export function getGenerator() {
     return {
-        createData: contentToLegacyData,
+        createData: () => contentToLegacyData(getDataSource()),
+    }
+}
+
+export function getLargeGenerator() {
+    return {
+        createData: () => contentToLegacyData(getDataSource(500)),
     }
 }
 
 export function getNextGenerator() {
     return {
-        createData: contentToNextData,
+        createData: () => contentToNextData(getDataSource()),
+    }
+}
+
+export function getLargeNextGenerator() {
+    return {
+        createData: () => contentToNextData(getDataSource(500)),
     }
 }
