@@ -17,8 +17,8 @@ export class RandomContext {
     }
 
     randint(min: number, max: number) {
-        const delta = max - min;
-        return Math.floor(min + delta * this.random());
+        const delta = Math.floor(max - min) + 1;
+        return Math.floor(min) + Math.floor(delta * 100 * this.random()) % delta;
     }
 
     randbool(): boolean {
