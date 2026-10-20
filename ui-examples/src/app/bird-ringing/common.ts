@@ -99,6 +99,7 @@ export type RingSeries = IdentifiableEntity & {
 export type RingEvent = {
     ring: RingRef;
     status: RingStatus;
+    timestamp: string;
 }
 
 export type RelationStatus = "Active" | "Inactive";

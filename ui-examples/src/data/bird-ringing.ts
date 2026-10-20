@@ -12,6 +12,8 @@ import {
     PermissionProperty,
     Ring,
     RingSeries,
+    RingEvent,
+    RingStatus,
 } from "../app/bird-ringing/common";
 import { RandomContext, DataGenerator, getFixedRandom } from "./common";
 import { CommonDataSource, getCommonData } from "./common-data";
@@ -1025,6 +1027,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     permissionTypes: Record<string, PermissionType>,
     permissionProperties: Record<string, PermissionProperty>,
     rings: Record<string, Ring>,
+    ringSeries: Record<string, RingSeries>;
+    ringEvents: RingEvent[],
 }> {
     randomContext: RandomContext;
     period: [Date, Date];
@@ -1309,6 +1313,35 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         }, {});
     }
 
+    createRingEvents(rings: Ring[]): RingEvent[] {
+        const fixedRandom = this.randomContext;
+        const eventOrderAndCount: [RingStatus, number][] = [
+            ["Ordered", 1],
+            ["In stock", 1],
+            ["Distributed", 1],
+            ["Assigned", 1],
+            ["Observed", 10],
+            ["Decommissioned", 1]
+        ];
+        return rings.flatMap<RingEvent>(ring => {
+            const selectedEvents = eventOrderAndCount.slice(0, fixedRandom.randint(1, eventOrderAndCount.length ));
+            const neededDateCount = selectedEvents.reduce((acc, v) => acc + v[1], 0);
+            const eventDates = Array.from({length: neededDateCount}).map(() => fixedRandom.randdate(...this.period)).sort((a, b) => a.getTime() - b.getTime());
+            let eventIndex = 0;
+            return selectedEvents.flatMap<RingEvent>(([status, count]) => {
+                const selectedCount = fixedRandom.randint(1, count);
+                return Array.from({length: selectedCount}).map<RingEvent>(() => {
+                    const eventDate = eventDates[eventIndex++];
+                    return {
+                        ring: {id: ring.id, type: "ring"},
+                        status: status,
+                        timestamp: eventDate.toISOString(),
+                    }
+                })
+            })
+        });
+    }
+
     createData() {
         const actors = this.createActors(this.numberOfLicenses * 2, Math.floor(this.numberOfLicenses * 0.3));
         const species = this.createSpecies(50);
@@ -1318,6 +1351,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const permissionProperties = this.createPermissionProperties();
         const ringSeries = this.createRingSeries();
         const rings = this.createRings(Object.values(ringSeries));
+        const ringEvents = this.createRingEvents(Object.values(rings));
         return {
             actors,
             licenses,
@@ -1327,6 +1361,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             permissionProperties,
             rings,
             ringSeries,
+            ringEvents,
         }
     }
 }
