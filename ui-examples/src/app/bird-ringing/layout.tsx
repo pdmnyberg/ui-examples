@@ -9,7 +9,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { NavStateProvider } from "@/components/NavStateProvider";
 
 
-function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl, permissionPropertiesUrl, speciesUrl, ringsUrl, ringSeriesUrl]: [string, string, string, string, string, string, string, string]) {
+function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl, permissionPropertiesUrl, speciesUrl, ringsUrl, ringSeriesUrl, ringEventsUrl]: [string, string, string, string, string, string, string, string, string]) {
   return Promise.all([
     fetchData<StaticDataSource["licenses"]>(licensesUrl),
     fetchData<StaticDataSource["actors"]>(actorsUrl),
@@ -19,6 +19,7 @@ function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl,
     fetchData<StaticDataSource["species"]>(speciesUrl),
     fetchData<StaticDataSource["rings"]>(ringsUrl),
     fetchData<StaticDataSource["ringSeries"]>(ringSeriesUrl),
+    fetchData<StaticDataSource["ringEvents"]>(ringEventsUrl),
   ]);
 }
 
@@ -31,6 +32,7 @@ function DataSourceProvider({
   speciesUrl,
   ringsUrl,
   ringSeriesUrl,
+  ringEventsUrl,
   children,
 }: Readonly<{
   licensesUrl: string,
@@ -41,6 +43,7 @@ function DataSourceProvider({
   speciesUrl: string,
   ringsUrl: string,
   ringSeriesUrl: string,
+  ringEventsUrl: string,
   children: React.ReactNode;
 }>) {
   const {data, error, isLoading} = useSWR([
@@ -52,8 +55,10 @@ function DataSourceProvider({
     speciesUrl,
     ringsUrl,
     ringSeriesUrl,
+    ringEventsUrl,
   ], fetchAppData);
   if (error) {
+    console.warn("PANIC!")
     console.log(error);
   }
   const dataSource = useMemo(() => new StaticDataSource(
@@ -61,6 +66,7 @@ function DataSourceProvider({
     data ? data[0] : {},
     data ? data[6] : {},
     data ? data[7] : {},
+    data ? data[8] : [],
     data ? data[2] : {},
     data ? data[3] : {},
     data ? data[4] : {},
@@ -112,6 +118,7 @@ export default function PageLayout({
               speciesUrl={`${basePath}/data/bird-ringing/species.json`}
               ringsUrl={`${basePath}/data/bird-ringing/rings.json`}
               ringSeriesUrl={`${basePath}/data/bird-ringing/ringSeries.json`}
+              ringEventsUrl={`${basePath}/data/bird-ringing/ringEvents.json`}
             >
               {children}
             </DataSourceProvider>

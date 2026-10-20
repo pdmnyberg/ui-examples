@@ -263,7 +263,7 @@ function createSummary(license: License, dataSource: DataSource) {
 function getDataSource(numberOfLicenses: number = 100) {
     const generator = getBirdRinging(numberOfLicenses)
     const content = generator.createData();
-    return new StaticDataSource(content.actors, content.licenses, {}, {}, content.documents, content.permissionTypes, content.permissionProperties, content.species, false);
+    return new StaticDataSource(content.actors, content.licenses, {}, {}, [], content.documents, content.permissionTypes, content.permissionProperties, content.species, false);
 }
 
 export function contentToLegacyData(dataSource: StaticDataSource) {

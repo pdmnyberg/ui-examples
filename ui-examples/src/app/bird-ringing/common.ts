@@ -127,8 +127,9 @@ export type DataSource = {
     getPermissionType(permission: IdentifiableEntity): PermissionType;
     getPermissionProperty(property: IdentifiableEntity): PermissionProperty;
     getSpecies(species: IdentifiableEntity): Species;
-    getRing(ring: IdentifiableEntity): Ring;
+    getRing(ring: IdentifiableEntity): DataLoading<Ring & IdentifiableEntity>;
     getRingSeries(series: IdentifiableEntity): RingSeries;
+    getRingEvents(ring: IdentifiableEntity): RingEvent[];
 }
 
 export class StaticDataSource implements DataSource {
@@ -136,6 +137,7 @@ export class StaticDataSource implements DataSource {
     licenses: Record<string, License>;
     rings: Record<string, Ring>;
     ringSeries: Record<string, RingSeries>;
+    ringEvents: RingEvent[];
     documents: Record<string, LicenseDocument>;
     permissionTypes: Record<string, PermissionType>;
     permissionProperties: Record<string, PermissionProperty>;
@@ -147,6 +149,7 @@ export class StaticDataSource implements DataSource {
         licenses: Record<string, License>,
         rings: Record<string, Ring>,
         ringSeries: Record<string, RingSeries>,
+        ringEvents: RingEvent[],
         documents: Record<string, LicenseDocument>,
         permissionTypes: Record<string, PermissionType>,
         permissionProperties: Record<string, PermissionProperty>,
@@ -157,6 +160,7 @@ export class StaticDataSource implements DataSource {
         this.licenses = licenses;
         this.rings = rings;
         this.ringSeries = ringSeries;
+        this.ringEvents = ringEvents;
         this.documents = documents;
         this.permissionTypes = permissionTypes;
         this.permissionProperties = permissionProperties;
@@ -228,15 +232,6 @@ export class StaticDataSource implements DataSource {
             return this._getResult(undefined, false, e);
         }
     }
-    getDocuments(license: IdentifiableEntity, actor: IdentifiableEntity) {
-        return Object.values(this.documents).filter(d => d.actor.id === actor.id && d.license.id === license.id)
-    }
-    getRing(ring: IdentifiableEntity) {
-        return this.rings[ring.id];
-    }
-    getRingSeries(series: IdentifiableEntity) {
-        return this.ringSeries[series.id];
-    }
     _getLicense(identifier: IdentifiableEntity): License {
         const license = this.licenses[identifier.id];
         if (license) {
@@ -246,6 +241,32 @@ export class StaticDataSource implements DataSource {
             }
         }
         throw new Error(`Missing license id ${identifier.id}`);
+    }
+    getDocuments(license: IdentifiableEntity, actor: IdentifiableEntity) {
+        return Object.values(this.documents).filter(d => d.actor.id === actor.id && d.license.id === license.id)
+    }
+    getRing(identifier: IdentifiableEntity) {
+        try {
+            return this.isLoading ? this._getResult(undefined, true) : this._getResult(this._getRing(identifier), false);
+        } catch (e) {
+            return this._getResult(undefined, false, e);
+        }
+    }
+    _getRing(identifier: IdentifiableEntity) {
+        const ring = this.rings[identifier.id];
+        if (ring) {
+            return {
+                ...identifier,
+                ...ring,
+            }
+        }
+        throw new Error(`Missing ring id ${identifier.id}`);
+    }
+    getRingSeries(series: IdentifiableEntity) {
+        return this.ringSeries[series.id];
+    }
+    getRingEvents(ring: IdentifiableEntity) {
+        return this.ringEvents.filter(e => e.ring.id === ring.id);
     }
     _getResult<T>(data: T, isLoading: boolean, error?: unknown | undefined) {
         return {data, error, isLoading}
