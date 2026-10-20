@@ -5,6 +5,8 @@ export type CommonDataSource = {
     familyNames: string[];
     regions: {name: string; subRegions: string[]}[];
     regionDescriptors: string[];
+    companyNameDescriptors: string[];
+    companyNameEndings: string[];
 }
 
 export function getCommonData(): CommonDataSource {
@@ -292,6 +294,50 @@ export function getCommonData(): CommonDataSource {
         ]
     }
 
+    const companyNameDescriptors = [
+        "Precision",
+        "Advanced",
+        "Alloy",
+        "Apex",
+        "Catalyst",
+        "Carbon",
+        "Ceramic",
+        "Composite",
+        "Element",
+        "Endeavor",
+        "Engineering",
+        "Innovative",
+        "Molecular",
+        "Modular",
+        "Nexus",
+        "Pioneer",
+        "Robotic",
+        "Silicon",
+        "Titanium",
+        "Vertex",
+        "Automation",
+        "Materials",
+        "Systems"
+    ]
+    
+    const companyNameEndings = [
+        "Manufacturing",
+        "Industries",
+        "Works",
+        "Foundry",
+        "Forge",
+        "Fabrication",
+        "Engineering",
+        "Technologies",
+        "Systems",
+        "Materials",
+        "Machinery",
+        "Robotics",
+        "Components",
+        "Dynamics",
+        "Assembly"
+    ]
+
     const regions = Object.entries(lunarRegions).map(([key, value]) => ({
         name: key,
         subRegions: value
@@ -347,6 +393,8 @@ export function getCommonData(): CommonDataSource {
         familyNames,
         regions,
         regionDescriptors,
+        companyNameDescriptors,
+        companyNameEndings,
     }
 }
 

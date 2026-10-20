@@ -9,7 +9,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { NavStateProvider } from "@/components/NavStateProvider";
 
 
-function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl, permissionPropertiesUrl, speciesUrl]: [string, string, string, string, string, string]) {
+function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl, permissionPropertiesUrl, speciesUrl, ringsUrl, ringSeriesUrl]: [string, string, string, string, string, string, string, string]) {
   return Promise.all([
     fetchData<StaticDataSource["licenses"]>(licensesUrl),
     fetchData<StaticDataSource["actors"]>(actorsUrl),
@@ -17,6 +17,8 @@ function fetchAppData([licensesUrl, actorsUrl, documentsUrl, permissionTypesUrl,
     fetchData<StaticDataSource["permissionTypes"]>(permissionTypesUrl),
     fetchData<StaticDataSource["permissionProperties"]>(permissionPropertiesUrl),
     fetchData<StaticDataSource["species"]>(speciesUrl),
+    fetchData<StaticDataSource["rings"]>(ringsUrl),
+    fetchData<StaticDataSource["ringSeries"]>(ringSeriesUrl),
   ]);
 }
 
@@ -27,6 +29,8 @@ function DataSourceProvider({
   permissionTypesUrl,
   permissionPropertiesUrl,
   speciesUrl,
+  ringsUrl,
+  ringSeriesUrl,
   children,
 }: Readonly<{
   licensesUrl: string,
@@ -35,6 +39,8 @@ function DataSourceProvider({
   permissionTypesUrl: string,
   permissionPropertiesUrl: string,
   speciesUrl: string,
+  ringsUrl: string,
+  ringSeriesUrl: string,
   children: React.ReactNode;
 }>) {
   const {data, error, isLoading} = useSWR([
@@ -44,6 +50,8 @@ function DataSourceProvider({
     permissionTypesUrl,
     permissionPropertiesUrl,
     speciesUrl,
+    ringsUrl,
+    ringSeriesUrl,
   ], fetchAppData);
   if (error) {
     console.log(error);
@@ -51,6 +59,8 @@ function DataSourceProvider({
   const dataSource = useMemo(() => new StaticDataSource(
     data ? data[1] : {},
     data ? data[0] : {},
+    data ? data[6] : {},
+    data ? data[7] : {},
     data ? data[2] : {},
     data ? data[3] : {},
     data ? data[4] : {},
@@ -74,6 +84,7 @@ export default function PageLayout({
     {type: "item", label: "License list", href: "/bird-ringing/license-list-view", id: "license-list-view"},
     {type: "separator"},
     {type: "heading", label: "Manage details"},
+    {type: "item", label: "Ring list", href: "/bird-ringing/ring-list-view", id: "ring-list-view"},
     {type: "item", label: "Species list", href: "/bird-ringing/species-list-view", id: "species-list-view"},
     {type: "item", label: "Permissions list", href: "/bird-ringing/permissions-list-view", id: "permissions-list-view"},
     {type: "separator"},
@@ -99,6 +110,8 @@ export default function PageLayout({
               permissionTypesUrl={`${basePath}/data/bird-ringing/permissionTypes.json`}
               permissionPropertiesUrl={`${basePath}/data/bird-ringing/permissionProperties.json`}
               speciesUrl={`${basePath}/data/bird-ringing/species.json`}
+              ringsUrl={`${basePath}/data/bird-ringing/rings.json`}
+              ringSeriesUrl={`${basePath}/data/bird-ringing/ringSeries.json`}
             >
               {children}
             </DataSourceProvider>

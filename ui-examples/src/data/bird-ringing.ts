@@ -10,6 +10,8 @@ import {
     LicenseRole,
     PermissionType,
     PermissionProperty,
+    Ring,
+    RingSeries,
 } from "../app/bird-ringing/common";
 import { RandomContext, DataGenerator, getFixedRandom } from "./common";
 import { CommonDataSource, getCommonData } from "./common-data";
@@ -1020,7 +1022,9 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     actors: Record<string, Actor>,
     licenses: Record<string, License>,
     documents: Record<string, LicenseDocument>,
-    species: Record<string, Species>,
+    permissionTypes: Record<string, PermissionType>,
+    permissionProperties: Record<string, PermissionProperty>,
+    rings: Record<string, Ring>,
 }> {
     randomContext: RandomContext;
     period: [Date, Date];
@@ -1264,6 +1268,47 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         }, {});
     }
 
+    createManufacturers(count: number): string[] {
+        const fixedRandom = this.randomContext;
+        const {companyNameDescriptors, companyNameEndings, familyNames, regions} = this.dataSource;
+        return Array.from({length: count}).map(() => {
+            const descriptors = fixedRandom.choices(companyNameDescriptors, fixedRandom.randint(1, 2));
+            const prefix = fixedRandom.randbool() ? fixedRandom.choice(familyNames) : fixedRandom.choice(regions.map(r => r.name));
+            const ending = fixedRandom.choice(companyNameEndings);
+            const components = [
+                prefix,
+                ...descriptors,
+                ending
+            ];
+            return components.join(" ")
+        })
+    }
+
+    createRingSeries(): Record<string, RingSeries> {
+        const fixedRandom = this.randomContext;
+        const numberOfRingSeries = Math.max(1, Math.floor(this.numberOfLicenses * 2));
+        const manufacturers = this.createManufacturers(10);
+        return Array.from({length: numberOfRingSeries}).map<RingSeries>((_, index) => ({
+            id: `ring-series-${index}`,
+            manufacturer: fixedRandom.choice(manufacturers),
+            identifier: `S${String(index).padStart(10, '0')}`,
+        })).reduce<Record<string, RingSeries>>((acc, s) => {
+            acc[s.id] = s;
+            return acc;
+        }, {});;
+    }
+
+    createRings(ringSeries: RingSeries[]): Record<string, Ring> {
+        return ringSeries.flatMap<Ring>((rs, rsi) => (Array.from({length: 25}).map<Ring>((_, ri) => ({
+            id: `ring-${rsi * 25 + ri}`,
+            identifier: `R${String(rsi * 25 + ri).padStart(10, '0')}`,
+            ringSeries: {id: rs.id, type: "ring-series"},
+        })))).reduce<Record<string, Ring>>((acc, s) => {
+            acc[s.id] = s;
+            return acc;
+        }, {});
+    }
+
     createData() {
         const actors = this.createActors(this.numberOfLicenses * 2, Math.floor(this.numberOfLicenses * 0.3));
         const species = this.createSpecies(50);
@@ -1271,13 +1316,17 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const documents = this.createDocuments(licenses);
         const permissionTypes = this.createPermissionTypes();
         const permissionProperties = this.createPermissionProperties();
+        const ringSeries = this.createRingSeries();
+        const rings = this.createRings(Object.values(ringSeries));
         return {
             actors,
             licenses,
             documents,
             species,
             permissionTypes,
-            permissionProperties
+            permissionProperties,
+            rings,
+            ringSeries,
         }
     }
 }

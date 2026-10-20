@@ -18,11 +18,15 @@ export type LicenseStatus = "Active" | "Not active" | "Discontinued";
 
 export type LicenseRole = "Ringer" | "Helper" | "Associate" | "Communication";
 
+export type RingStatus = "Ordered" | "In stock" | "Distributed" | "Assigned" | "Observed" | "Decommissioned"
+
 export type ActorRef = IdentifiableEntity & {type: "actor"};
 export type LicenseRef = IdentifiableEntity & {type: "license"};
 export type SpeciesRef = IdentifiableEntity & {type: "species"};
 export type PermissionTypeRef = IdentifiableEntity & {type: "permission-type"};
 export type PermissionPropertyRef = IdentifiableEntity & {type: "permission-property"};
+export type RingSeriesRef = IdentifiableEntity & {type: "ring-series"};
+export type RingRef = IdentifiableEntity & {type: "ring"};
 
 export type License = IdentifiableEntity & {
     mnr: string;
@@ -82,6 +86,21 @@ export type Permission = {
     period: [string, string];
 }
 
+export type Ring = IdentifiableEntity & {
+    identifier: string;
+    ringSeries: RingSeriesRef;
+}
+
+export type RingSeries = IdentifiableEntity & {
+    identifier: string;
+    manufacturer: string;
+}
+
+export type RingEvent = {
+    ring: RingRef;
+    status: RingStatus;
+}
+
 export type RelationStatus = "Active" | "Inactive";
 
 export type IdentifiableEntity = {
@@ -97,6 +116,7 @@ export type DataLoading<T> = {
 export type DataSource = {
     getActors(): DataLoading<(Actor & IdentifiableEntity)[]>;
     getLicenses(): DataLoading<(License & IdentifiableEntity)[]>;
+    getRings(): DataLoading<(Ring & IdentifiableEntity)[]>;
     getActorLicenses(actor: IdentifiableEntity, role?: LicenseRole, status?: RelationStatus): (License & IdentifiableEntity)[];
     getLicenseInfo(license: License, actor: IdentifiableEntity): LicenseRelation;
     getLicenseActors(license: IdentifiableEntity, role: LicenseRole): (Actor & IdentifiableEntity)[];
@@ -106,11 +126,15 @@ export type DataSource = {
     getPermissionType(permission: IdentifiableEntity): PermissionType;
     getPermissionProperty(property: IdentifiableEntity): PermissionProperty;
     getSpecies(species: IdentifiableEntity): Species;
+    getRing(ring: IdentifiableEntity): Ring;
+    getRingSeries(series: IdentifiableEntity): RingSeries;
 }
 
 export class StaticDataSource implements DataSource {
     actors: Record<string, Actor>;
     licenses: Record<string, License>;
+    rings: Record<string, Ring>;
+    ringSeries: Record<string, RingSeries>;
     documents: Record<string, LicenseDocument>;
     permissionTypes: Record<string, PermissionType>;
     permissionProperties: Record<string, PermissionProperty>;
@@ -120,6 +144,8 @@ export class StaticDataSource implements DataSource {
     constructor(
         actors: Record<string, Actor>,
         licenses: Record<string, License>,
+        rings: Record<string, Ring>,
+        ringSeries: Record<string, RingSeries>,
         documents: Record<string, LicenseDocument>,
         permissionTypes: Record<string, PermissionType>,
         permissionProperties: Record<string, PermissionProperty>,
@@ -128,6 +154,8 @@ export class StaticDataSource implements DataSource {
     ) {
         this.actors = actors;
         this.licenses = licenses;
+        this.rings = rings;
+        this.ringSeries = ringSeries;
         this.documents = documents;
         this.permissionTypes = permissionTypes;
         this.permissionProperties = permissionProperties;
@@ -145,6 +173,12 @@ export class StaticDataSource implements DataSource {
     }
     _getLicenses(): (License & IdentifiableEntity)[] {
         return Object.values(this.licenses);
+    }
+    getRings() {
+        return this.isLoading ? this._getResult([], true) : this._getResult(this._getRings(), false)
+    }
+    _getRings() {
+        return Object.values(this.rings);
     }
     getActorLicenses(actor: IdentifiableEntity, role?: LicenseRole, status?: RelationStatus, filter: (r: LicenseRelation) => boolean = () => true): (License & IdentifiableEntity)[] {
         return this._getLicenses().filter(l => l.actors.some(a => (
@@ -195,6 +229,12 @@ export class StaticDataSource implements DataSource {
     }
     getDocuments(license: IdentifiableEntity, actor: IdentifiableEntity) {
         return Object.values(this.documents).filter(d => d.actor.id === actor.id && d.license.id === license.id)
+    }
+    getRing(ring: IdentifiableEntity) {
+        return this.rings[ring.id];
+    }
+    getRingSeries(series: IdentifiableEntity) {
+        return this.ringSeries[series.id];
     }
     _getLicense(identifier: IdentifiableEntity): License {
         const license = this.licenses[identifier.id];
