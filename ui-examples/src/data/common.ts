@@ -52,6 +52,10 @@ export class RandomContext {
         return new Date(start.getTime() + this.randint(0, delta));
     }
 
+    randdatesequence(start: Date, end: Date, count: number): Date[] {
+        return Array.from({length: count}).map(() => this.randdate(start, end)).sort((a, b) => a.getTime() - b.getTime());
+    }
+
     reset() {
         this._ticker = 0;
     }
