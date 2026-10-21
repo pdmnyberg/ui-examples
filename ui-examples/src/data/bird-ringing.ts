@@ -14,6 +14,7 @@ import {
     RingSeries,
     RingEvent,
     RingStatus,
+    LicenseRef,
 } from "../app/bird-ringing/common";
 import { RandomContext, DataGenerator, getFixedRandom } from "./common";
 import { CommonDataSource, getCommonData } from "./common-data";
@@ -1035,6 +1036,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     maxLicenseLength: number;
     dataSource: BirdRingingDataSource;
     numberOfLicenses: number;
+    maxRingOrderTime: number;
 
     constructor(
         randomContext: RandomContext,
@@ -1048,6 +1050,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         this.period = period;
         this.maxLicenseLength = maxLicenseLength;
         this.numberOfLicenses = numberOfLicenses;
+        this.maxRingOrderTime = new Date("2020-02-01T00:00:00.000Z").getTime() - new Date("2020-01-01T00:00:00.000Z").getTime();
     }
 
     createActors(numberOfActors: number, numberOfOrganizations: number): Record<string, Actor> {
@@ -1299,14 +1302,17 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         })).reduce<Record<string, RingSeries>>((acc, s) => {
             acc[s.id] = s;
             return acc;
-        }, {});;
+        }, {});
     }
 
-    createRings(ringSeries: RingSeries[]): Record<string, Ring> {
+    createRings(ringSeries: RingSeries[], licenses: License[]): Record<string, Ring> {
+        const fixedRandom = this.randomContext;
+        const owners = licenses.map<LicenseRef>(l => ({id: l.id, type: "license"}));
         return ringSeries.flatMap<Ring>((rs, rsi) => (Array.from({length: 25}).map<Ring>((_, ri) => ({
             id: `ring-${rsi * 25 + ri}`,
             identifier: `R${String(rsi * 25 + ri).padStart(10, '0')}`,
             ringSeries: {id: rs.id, type: "ring-series"},
+            license: fixedRandom.randbool() ? fixedRandom.choice(owners) : undefined,
         })))).reduce<Record<string, Ring>>((acc, s) => {
             acc[s.id] = s;
             return acc;
@@ -1323,10 +1329,28 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             ["Observed", 10],
             ["Decommissioned", 1]
         ];
+        const distributionMap = rings.reduce<Record<string, boolean>>((acc, ring) => {
+            if (ring.license) acc[String(ring.ringSeries.id)] = true;
+            return acc;
+        }, {})
+        const initialDates = rings.reduce<Partial<Record<string, Date[]>>>((acc, ring) => {
+            const id = String(ring.ringSeries.id);
+            if (id in acc || !distributionMap[id]) return acc;
+
+            acc[id] = fixedRandom.randdaterange(...this.period, this.maxRingOrderTime);
+            return acc;
+        }, {});
         return rings.flatMap<RingEvent>(ring => {
-            const selectedEvents = eventOrderAndCount.slice(0, fixedRandom.randint(1, eventOrderAndCount.length ));
+            const distributionDates = initialDates[String(ring.ringSeries.id)];
+            const selectedEvents = eventOrderAndCount.slice(
+                0,
+                distributionDates ? fixedRandom.randint(3, eventOrderAndCount.length) : fixedRandom.randint(1, 2)
+            );
             const neededDateCount = selectedEvents.reduce((acc, v) => acc + v[1], 0);
-            const eventDates = Array.from({length: neededDateCount}).map(() => fixedRandom.randdate(...this.period)).sort((a, b) => a.getTime() - b.getTime());
+            const eventDates = distributionDates ? [
+                ...distributionDates,
+                ...fixedRandom.randdatesequence(distributionDates[1], this.period[1], Math.max(0, neededDateCount - distributionDates.length))
+            ] : fixedRandom.randdatesequence(...this.period, neededDateCount);
             let eventIndex = 0;
             return selectedEvents.flatMap<RingEvent>(([status, count]) => {
                 const selectedCount = fixedRandom.randint(1, count);
@@ -1350,7 +1374,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const permissionTypes = this.createPermissionTypes();
         const permissionProperties = this.createPermissionProperties();
         const ringSeries = this.createRingSeries();
-        const rings = this.createRings(Object.values(ringSeries));
+        const rings = this.createRings(Object.values(ringSeries), Object.values(licenses));
         const ringEvents = this.createRingEvents(Object.values(rings));
         return {
             actors,

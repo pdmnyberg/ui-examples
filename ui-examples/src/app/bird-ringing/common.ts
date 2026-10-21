@@ -89,6 +89,7 @@ export type Permission = {
 export type Ring = IdentifiableEntity & {
     identifier: string;
     ringSeries: RingSeriesRef;
+    license?: LicenseRef;
 }
 
 export type RingSeries = IdentifiableEntity & {
