@@ -97,6 +97,7 @@ export default function PageLayout({
     {type: "heading", label: "Diagrams"},
     {type: "item", label: "User workflow", href: "/bird-ringing/diagrams/bird-ringing-user-workflow", id: "diagrams/bird-ringing-user-workflow/"},
     {type: "item", label: "System separation", href: "/bird-ringing/diagrams/bird-ringing-system-separation", id: "diagrams/bird-ringing-system-separation/"},
+    {type: "item", label: "Ring life cycle", href: "/bird-ringing/diagrams/bird-ringing-ring-lifecycle", id: "diagrams/bird-ringing-ring-lifecycle/"},
   ]
 
   const sidebarProps = {

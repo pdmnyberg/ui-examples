@@ -1,0 +1,19 @@
+---
+title: Ring lifecycle
+---
+
+flowchart TD
+    ordered["Ordered"]
+    in_stock["In stock"]
+    assigned["Assigned"]
+    in_use["In use"]
+    decommissioned["Decommissioned"]
+
+    ordered -- "Ring delivered" --> in_stock
+    in_stock -- "Assign ring to ringer" --> assigned
+    assigned -- "Trapped bird gets ringed" --> in_use
+    in_use -- "Ringed bird is found dead" --> decommissioned
+    in_use -- "Ring is found without bird" --> decommissioned
+
+    assigned -- "Ringer returns rings to NRM" --> in_stock
+
