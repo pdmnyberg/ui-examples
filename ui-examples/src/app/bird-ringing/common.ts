@@ -18,7 +18,7 @@ export type LicenseStatus = "Active" | "Not active" | "Discontinued";
 
 export type LicenseRole = "Ringer" | "Helper" | "Associate" | "Communication";
 
-export type RingStatus = "Ordered" | "In stock" | "Distributed" | "Assigned" | "Observed" | "Decommissioned"
+export type RingStatus = "Ordered" | "In stock" | "Assigned" | "In use" | "Observed" | "Decommissioned"
 
 export type ActorRef = IdentifiableEntity & {type: "actor"};
 export type LicenseRef = IdentifiableEntity & {type: "license"};

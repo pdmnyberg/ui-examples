@@ -1324,8 +1324,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const eventOrderAndCount: [RingStatus, number][] = [
             ["Ordered", 1],
             ["In stock", 1],
-            ["Distributed", 1],
             ["Assigned", 1],
+            ["In use", 1],
             ["Observed", 10],
             ["Decommissioned", 1]
         ];
