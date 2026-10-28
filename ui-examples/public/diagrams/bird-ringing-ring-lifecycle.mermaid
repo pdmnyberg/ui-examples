@@ -3,17 +3,22 @@ title: Ring lifecycle
 ---
 
 flowchart TD
+    order_prepared@{ shape: circle, label: "Order perpared" }
     ordered["Ordered"]
+    delivered["Delivered"]
     in_stock["In stock"]
     assigned["Assigned"]
     in_use["In use"]
     decommissioned["Decommissioned"]
 
-    ordered -- "Ring delivered" --> in_stock
+    order_prepared -- "Interval of ring series is defined" --> ordered
+    ordered -- "Ring delivered" --> delivered
+    delivered -- "Ring checked by NRM" --> in_stock
     in_stock -- "Assign ring to ringer" --> assigned
     assigned -- "Trapped bird gets ringed" --> in_use
     in_use -- "Ringed bird is found dead" --> decommissioned
     in_use -- "Ring is found without bird" --> decommissioned
-
+    in_use -- "Ring is replaced due to wear" --> decommissioned
     assigned -- "Ringer returns rings to NRM" --> in_stock
+    assigned -- "Ring is assigned to different ringer" --> assigned
 
