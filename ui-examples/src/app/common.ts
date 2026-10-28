@@ -8,11 +8,27 @@ export type SearchParams<T> = {
 
 export type SearchFunction<T, SP> = (value: T, props: SearchParams<T & SP>["properties"]) => boolean;
 
-export interface DataSource<T extends EntityRef<V>, V extends string = T["type"]> {
-    get(ref: EntityRef<V>): T;
-    find(params: SearchParams<T>): T[];
-    all(): T[]
+export interface ListSource<T> {
+    list(params?: SearchParams<T>): T[];
 }
+
+export interface EntrySource<T extends EntityRef<V>, V extends string = T["type"]> {
+    get(ref: EntityRef<V>): T;
+}
+
+export interface DataSource<T extends EntityRef<V>, LT extends EntityRef<V> = T, V extends string = T["type"]> extends EntrySource<T>, ListSource<LT> {};
+
+
+export interface AsyncListSource<T> {
+    list(params?: SearchParams<T>): Promise<T[]>;
+}
+
+export interface AsyncEntrySource<T extends EntityRef<V>, V extends string = T["type"]> {
+    get(ref: EntityRef<V>): Promise<T>;
+}
+
+export interface AsyncDataSource<T extends EntityRef<V>, LT extends EntityRef<V> = T, V extends string = T["type"]> extends AsyncEntrySource<T>, AsyncListSource<LT> {};
+
 
 export type EntityRef<T> = {
     id: string;
@@ -36,7 +52,7 @@ export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type
         return this._record[ref.id];
     }
 
-    find({orderBy, limit, start, properties}: SearchParams<T & SP>) {
+    list({orderBy, limit, start, properties}: SearchParams<T & SP> = {}) {
         const filter = this._customSearch === undefined ? () => true : this._customSearch;
         const data = this._data.filter(item => filter(item, properties))
         const sorted = Array.isArray(orderBy) ? data : data.sort((a, b) => {
@@ -58,8 +74,23 @@ export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type
         return limit === undefined ? sorted : sorted.slice(selectedStart, selectedStart + limit);
     }
 
-    all() {
-        return this._data;
+    toAsyncSource() {
+        return new AsyncStaticDataSource(this);
+    }
+}
+
+export class AsyncStaticDataSource<T extends EntityRef<V>, V extends string = T["type"], SP extends object = object> implements AsyncDataSource<T> {
+    private _source: DataSource<T>;
+    constructor(source: DataSource<T>) {
+        this._source = source;
+    }
+
+    get(ref: EntityRef<V>) {
+        return Promise.resolve(this._source.get(ref))
+    }
+
+    list(params: SearchParams<T & SP> = {}) {
+        return Promise.resolve(this._source.list(params))
     }
 }
 

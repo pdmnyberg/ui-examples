@@ -1,5 +1,5 @@
 import { getGenerator as getBirdRinging } from "./bird-ringing";
-import { StaticDataSource, Actor, LicenseStatus, ActorType, License, DataSource } from "../app/bird-ringing/common";
+import { StaticDataSource, Actor, LicenseStatus, ActorType, License, DataSourceLegacy } from "../app/bird-ringing/common";
 import { getFixedRandom } from "./common";
 
 type MNR = string; // Ringer number, identifier for a ringer.
@@ -252,7 +252,7 @@ function summarizeList(items: string[]) {
     )
 }
 
-function createSummary(license: License, dataSource: DataSource) {
+function createSummary(license: License, dataSource: DataSourceLegacy) {
     const species = Array.from(new Set(license.permissions.flatMap(p => p.speciesList.map(s => dataSource.getSpecies(s).name))))
     const permissionTypes = Array.from(new Set(license.permissions.map(p => dataSource.getPermissionType(p.type).name)))
     const permissionSummary = summarizeList(permissionTypes);

@@ -22,7 +22,7 @@ function EntryViewBase() {
   }
   const datasetRef: EntityRef<"dataset"> = {id: datasetId, type: "dataset"};
   const dataset = datasets.get(datasetRef);
-  const datasetFiles = files.find({properties: {dataset: datasetRef}}).map<TypedSearchableItem<DatasetFile>>((f) => ({
+  const datasetFiles = files.list({properties: {dataset: datasetRef}}).map<TypedSearchableItem<DatasetFile>>((f) => ({
     id: f.id,
     properties: {
       id: {

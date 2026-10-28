@@ -40,8 +40,8 @@ export default function ListView() {
           component: <Link href={`/bird-ringing/actor-view/?entryId=${item.id}`}>{item.name}</Link>
         },
         type: {
-          term: item.type,
-          component: item.type,
+          term: item.actorType,
+          component: item.actorType,
         },
         roles: {
           term: Array.from(roles).join(" "),
@@ -90,7 +90,7 @@ export default function ListView() {
   const columns: ColumnSpec<Actor & SummaryProps> = {
     id: "",
     name: "Name",
-    type: "Type",
+    actorType: "Type",
     roles: "Roles",
     licenses: "Licenses",
     email: "E-mail",

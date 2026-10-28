@@ -9,7 +9,7 @@ import { useDataSource } from "../contexts";
 function entryToTable(entry: Actor): Record<string, React.ReactNode> {
   return {
     "Name": entry.name,
-    "Type": entry.type,
+    "Type": entry.actorType,
     "E-mail": entry.email,
     "Sex": entry.sex,
     "Updated At": toLocalTime(entry.updatedAt),

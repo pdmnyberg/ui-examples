@@ -1,8 +1,10 @@
+import { AsyncDataSource, EntityRef } from "../common";
+
 export type Actor = IdentifiableEntity & {
     name: string;
     email?: string;
     updatedAt: string;
-    type: ActorType;
+    actorType: ActorType;
     sex: Sex,
     city: string;
     birthDate?: Date;
@@ -55,7 +57,7 @@ export type LicenseRelation = {
 export type LicenseDocument = IdentifiableEntity & {
     actor: ActorRef;
     license: LicenseRef;
-    type: string;
+    documentType: string;
     createdAt: string;
     href: string;
 }
@@ -78,7 +80,7 @@ export type PermissionProperty = IdentifiableEntity & {
 }
 
 export type Permission = {
-    type: PermissionTypeRef;
+    permissionType: PermissionTypeRef;
     speciesList: SpeciesRef[];
     properties: PermissionPropertyRef[];
     location: string;
@@ -132,6 +134,30 @@ export type DataSource = {
     getRingSeries(series: IdentifiableEntity): RingSeries;
     getRingEvents(ring: IdentifiableEntity): RingEvent[];
 }
+
+export interface DataAPI {
+    actors: AsyncDataSource<EntityRef<"actor"> & Actor>;
+    licenses: AsyncDataSource<EntityRef<"license"> & License>;
+    documents: AsyncDataSource<EntityRef<"document"> & LicenseDocument>;
+    permissionTypes: AsyncDataSource<EntityRef<"permission-type"> & PermissionType>;
+    permissionProperties: AsyncDataSource<EntityRef<"permission-property"> & PermissionProperty>;
+    species: AsyncDataSource<EntityRef<"species"> & Species>;
+    rings: AsyncDataSource<EntityRef<"ring"> & Ring>;
+    ringSeries: AsyncDataSource<EntityRef<"ring-series"> & RingSeries>;
+}
+
+async function fetchItemList<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T): Promise<ReturnType<DataAPI[T]["list"]>> {
+    const source = api[type];
+    const data = await source.list() as ReturnType<DataAPI[T]["list"]>;
+    return data;
+}
+
+async function fetchItem<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, ref: EntityRef<NoInfer<T>>): Promise<ReturnType<DataAPI[T]["get"]>> {
+    const getter = api[type].get as (ref: EntityRef<T>) => ReturnType<DataAPI[T]["get"]>;
+    const data = await getter(ref);
+    return data;
+}
+
 
 export class StaticDataSource implements DataSource {
     actors: Record<string, Actor>;
