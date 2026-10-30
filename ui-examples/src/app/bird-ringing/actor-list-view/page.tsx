@@ -4,10 +4,11 @@ import Link from "next/link";
 import Warning from "../warning";
 import { Fragment } from "react";
 import { useItemSelections, useFilter, TypedSearchableItem } from "../../hooks";
-import { useDataSource } from "../contexts";
-import { Actor, getOrDefault, toLocalTime } from "../common";
+import { useDataAPI } from "../contexts";
+import { Actor, DataAPI, getActorLicenses, getLicenseInfo, toLocalTime } from "../common";
 import { Pagination, usePagination } from "@/components/Pagination";
 import { ColumnSpec, Table } from "@/components/Table";
+import useSWR from "swr";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -22,14 +23,24 @@ type SummaryProps = {
 }
 
 export default function ListView() {
-  const dataSource = useDataSource();
+  const api = useDataAPI();
   const [actionIsOpen, setActionIsOpen] = useState(false); 
 
-  const actors = getOrDefault(dataSource.getActors(), (a) => a, []).sort((a, b) => a.name.localeCompare(b.name));
+  const { data: actors } = useSWR(
+    [api, "actors"],
+    ([api, type]: [DataAPI, "actors"]) => api[type].list(),
+    {fallbackData: []}
+  )
+  const {data: licenses} = useSWR(
+    [api, "licenses", {}],
+    async ([api, type]: [DataAPI, "licenses"]) => await api[type].list(),
+    {fallbackData: []}
+  );
+
   const items = actors.map<TypedSearchableItem<Actor & SummaryProps>>(item => {
-    const licenses = dataSource.getActorLicenses(item, undefined, "Active");
-    const roles = new Set(licenses.map((l) => {
-      const info = dataSource.getLicenseInfo(l, item)
+    const actorLicenses = getActorLicenses(licenses, item, undefined, "Active");
+    const roles = new Set(actorLicenses.map((l) => {
+      const info = getLicenseInfo(l, item)
       return info.role;
     }));
     return {
@@ -44,20 +55,20 @@ export default function ListView() {
           component: item.actorType,
         },
         roles: {
-          term: Array.from(roles).join(" "),
-          component: Array.from(roles).join(", ")
+          term: roles.size === 0 ? "" : Array.from(roles).join(" "),
+          component: roles.size === 0 ? "-" : Array.from(roles).join(", ")
         },
         licenses: {
-          term: licenses.map((l) => {
-            const info = dataSource.getLicenseInfo(l, item);
+          term: actorLicenses.map((l) => {
+            const info = getLicenseInfo(l, item);
             const mnr = l.mnr;
             return (
               info.mednr ? `${mnr}:${info.mednr}` : mnr
             );
           }).join(" "),
           component: (
-            <>{licenses.map((l, index, list) => {
-              const info = dataSource.getLicenseInfo(l, item);
+            <>{actorLicenses.map((l, index, list) => {
+              const info = getLicenseInfo(l, item);
               const mnr = l.mnr;
               return (
                 <Fragment key={index}><Link href={`/bird-ringing/license-view/?entryId=${l.id}`}>{info.mednr ? `${mnr}:${info.mednr}` : mnr}</Link>{index < list.length - 1 ? ", " : <></>}</Fragment>

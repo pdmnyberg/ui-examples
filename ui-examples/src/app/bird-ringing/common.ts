@@ -137,8 +137,8 @@ export type DataSource = {
 
 export interface DataAPI {
     actors: AsyncDataSource<EntityRef<"actor"> & Actor>;
-    licenses: AsyncDataSource<EntityRef<"license"> & License>;
-    documents: AsyncDataSource<EntityRef<"document"> & LicenseDocument>;
+    licenses: AsyncDataSource<EntityRef<"license"> & License, EntityRef<"license"> & License, "license", {actorRef: EntityRef<"actor">, role: LicenseRole}>;
+    documents: AsyncDataSource<EntityRef<"document"> & LicenseDocument, EntityRef<"document"> & LicenseDocument, "document", {actorRef: EntityRef<"actor">, licenseRef: EntityRef<"license">}>;
     permissionTypes: AsyncDataSource<EntityRef<"permission-type"> & PermissionType>;
     permissionProperties: AsyncDataSource<EntityRef<"permission-property"> & PermissionProperty>;
     species: AsyncDataSource<EntityRef<"species"> & Species>;
@@ -146,16 +146,14 @@ export interface DataAPI {
     ringSeries: AsyncDataSource<EntityRef<"ring-series"> & RingSeries>;
 }
 
-async function fetchItemList<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T): Promise<ReturnType<DataAPI[T]["list"]>> {
+export function fetchItemList<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, params: Parameters<DataAPI[T]["list"]>[0]): ReturnType<DataAPI[T]["list"]> {
     const source = api[type];
-    const data = await source.list() as ReturnType<DataAPI[T]["list"]>;
-    return data;
+    return source.list(params as any) as ReturnType<DataAPI[T]["list"]>;
 }
 
-async function fetchItem<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, ref: EntityRef<NoInfer<T>>): Promise<ReturnType<DataAPI[T]["get"]>> {
+export function fetchItem<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, ref: EntityRef<NoInfer<T>>): ReturnType<DataAPI[T]["get"]> {
     const getter = api[type].get as (ref: EntityRef<T>) => ReturnType<DataAPI[T]["get"]>;
-    const data = await getter(ref);
-    return data;
+    return getter(ref);
 }
 
 
@@ -310,4 +308,16 @@ export function toLocalDate(d: string) {
 
 export function toLocalTime(d: string) {
     return new Date(d).toLocaleString()
+}
+
+export function getActorLicenses(licenses: (EntityRef<"license"> & License)[], actor: EntityRef<"actor">, role?: LicenseRole, status?: RelationStatus): (License & EntityRef<"license">)[] {
+    return licenses.filter(l => l.actors.some(a => (
+        a.actor.id === actor.id &&
+        (!role || a.role === role) &&
+        (status === undefined || a.status === status)
+    )))
+}
+
+export function getLicenseInfo(license: License, actor: EntityRef<"actor">): LicenseRelation {
+    return license.actors.filter(a => a.actor.id === actor.id)[0]
 }

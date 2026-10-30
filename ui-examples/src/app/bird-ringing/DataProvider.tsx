@@ -1,7 +1,7 @@
 "use client"
 import { PropsWithChildren, useMemo } from "react";
-import { Actor, DataAPI, License, LicenseDocument, PermissionProperty, PermissionType, Ring, RingSeries, Species } from "./common";
-import { EntityRef, StaticDataSource, toList } from "../common";
+import { Actor, DataAPI, License, LicenseDocument, LicenseRole, PermissionProperty, PermissionType, Ring, RingSeries, Species } from "./common";
+import { EntityRef, SearchFunction, StaticDataSource, toList } from "../common";
 import { fetchData } from "../utils";
 import useSWR from "swr";
 import { DataContext } from "./contexts";
@@ -36,6 +36,26 @@ function toEntity<T, TT extends string>(value: T, type: TT): T & {type: TT} {
     type: type,
     ...value
   };
+}
+
+const licenseFilter: SearchFunction<EntityRef<"license"> & License, {actorRef: EntityRef<"actor">, role: LicenseRole}> = (license, props) => {
+  const actors = refsToSet(props?.actorRef)
+  const roles = new Set(toArray(props?.role))
+  return license.actors.some(a => (roles.size === 0 || roles.has(a.role)) && (actors.size === 0 || actors.has(a.actor.id)))
+}
+
+const documentFilter: SearchFunction<EntityRef<"document"> & LicenseDocument, {actorRef: EntityRef<"actor">, licenseRef: EntityRef<"license">}> = (document, props) => {
+  const actors = refsToSet(props?.actorRef)
+  const licenses = refsToSet(props?.licenseRef)
+  return (actors.size === 0 || actors.has(document.actor.id)) && (licenses.size === 0 || licenses.has(document.license.id))
+}
+
+function refsToSet(refs?: (EntityRef<string>[] | EntityRef<string>)): Set<string> {
+  return new Set<string>(toArray(refs).map(a => a.id))
+}
+
+function toArray<T>(item?: T[] | T): T[] {
+  return Array.isArray(item) ? item : (item ? [item] : [])
 }
 
 export function DataProvider({
@@ -83,8 +103,14 @@ export function DataProvider({
   ] = (data || []);
   const dataSource = useMemo<DataAPI>(() => ({
     actors: new StaticDataSource<EntityRef<"actor"> & Actor>(toList(actors || {}).map(v => toEntity(v, "actor"))).toAsyncSource(),
-    licenses: new StaticDataSource<EntityRef<"license"> & License>(toList(licenses || {}).map(v => toEntity(v, "license"))).toAsyncSource(),
-    documents: new StaticDataSource<EntityRef<"document"> & LicenseDocument>(toList(documents || {}).map(v => toEntity(v, "document"))).toAsyncSource(),
+    licenses: new StaticDataSource<EntityRef<"license"> & License>(
+      toList(licenses || {}).map(v => toEntity(v, "license")),
+      licenseFilter
+    ).toAsyncSource(),
+    documents: new StaticDataSource<EntityRef<"document"> & LicenseDocument>(
+      toList(documents || {}).map(v => toEntity(v, "document")),
+      documentFilter
+    ).toAsyncSource(),
     permissionTypes: new StaticDataSource<EntityRef<"permission-type"> & PermissionType>(toList(permissionTypes || {}).map(v => toEntity(v, "permission-type"))).toAsyncSource(),
     permissionProperties: new StaticDataSource<EntityRef<"permission-property"> & PermissionProperty>(toList(permissionProperties || {}).map(v => toEntity(v, "permission-property"))).toAsyncSource(),
     species: new StaticDataSource<EntityRef<"species"> & Species>(toList(species || {}).map(v => toEntity(v, "species"))).toAsyncSource(),

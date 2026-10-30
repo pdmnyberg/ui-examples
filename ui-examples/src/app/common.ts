@@ -8,26 +8,31 @@ export type SearchParams<T> = {
 
 export type SearchFunction<T, SP> = (value: T, props: SearchParams<T & SP>["properties"]) => boolean;
 
-export interface ListSource<T> {
-    list(params?: SearchParams<T>): T[];
+export interface ListSource<T, SP extends object = {}> {
+    list(params?: SearchParams<T & SP>): T[];
 }
 
 export interface EntrySource<T extends EntityRef<V>, V extends string = T["type"]> {
     get(ref: EntityRef<V>): T;
 }
 
-export interface DataSource<T extends EntityRef<V>, LT extends EntityRef<V> = T, V extends string = T["type"]> extends EntrySource<T>, ListSource<LT> {};
+export interface DataSource<T extends EntityRef<V>, LT extends EntityRef<V> = T, V extends string = T["type"], SP extends object = {}> extends EntrySource<T>, ListSource<LT, SP> {};
 
 
-export interface AsyncListSource<T> {
-    list(params?: SearchParams<T>): Promise<T[]>;
+export interface AsyncListSource<T, SP extends object = {}> {
+    list(params?: SearchParams<T & SP>): Promise<T[]>;
 }
 
 export interface AsyncEntrySource<T extends EntityRef<V>, V extends string = T["type"]> {
     get(ref: EntityRef<V>): Promise<T>;
 }
 
-export interface AsyncDataSource<T extends EntityRef<V>, LT extends EntityRef<V> = T, V extends string = T["type"]> extends AsyncEntrySource<T>, AsyncListSource<LT> {};
+export interface AsyncDataSource<
+    T extends EntityRef<V>,
+    LT extends EntityRef<V> = T,
+    V extends string = T["type"],
+    SP extends object = {}
+> extends AsyncEntrySource<T>, AsyncListSource<LT, SP> {};
 
 
 export type EntityRef<T> = {
@@ -35,7 +40,7 @@ export type EntityRef<T> = {
     type: T;
 }
 
-export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type"], SP extends object = object> implements DataSource<T> {
+export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type"], SP extends object = object> implements DataSource<T, T, V, SP> {
     private _data: T[];
     private _record: Record<string, T>;
     private _customSearch?: SearchFunction<T, SP>;
@@ -71,7 +76,8 @@ export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type
             return 0;
         });
         const selectedStart = start || 0;
-        return limit === undefined ? sorted : sorted.slice(selectedStart, selectedStart + limit);
+        const result = limit === undefined ? sorted : sorted.slice(selectedStart, selectedStart + limit);
+        return result
     }
 
     toAsyncSource() {
@@ -79,7 +85,7 @@ export class StaticDataSource<T extends EntityRef<V>, V extends string = T["type
     }
 }
 
-export class AsyncStaticDataSource<T extends EntityRef<V>, V extends string = T["type"], SP extends object = object> implements AsyncDataSource<T> {
+export class AsyncStaticDataSource<T extends EntityRef<V>, V extends string = T["type"], SP extends object = object> implements AsyncDataSource<T, T, V, SP> {
     private _source: DataSource<T>;
     constructor(source: DataSource<T>) {
         this._source = source;
