@@ -321,3 +321,10 @@ export function getActorLicenses(licenses: (EntityRef<"license"> & License)[], a
 export function getLicenseInfo(license: License, actor: EntityRef<"actor">): LicenseRelation {
     return license.actors.filter(a => a.actor.id === actor.id)[0]
 }
+
+export function toRecord<T extends {id: string}>(items: T[]): Record<string, T> {
+  return items.reduce<Record<string, T> >((acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  }, {})
+}

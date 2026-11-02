@@ -1,11 +1,11 @@
 "use client"
-import { License, toLocalDate, toLocalTime } from "../common";
+import { DataAPI, License, toLocalDate, toLocalTime, toRecord } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Fragment, Suspense } from "react";
 import Link from "next/link";
-import { useDataSource } from "../contexts";
-import { getOrDefault } from "../common";
+import { useDataAPI } from "../contexts";
+import useSWR from "swr";
 
 function entryToTable(entry: License): Record<string, React.ReactNode> {
   const mnr = entry.mnr;
@@ -20,14 +20,46 @@ function entryToTable(entry: License): Record<string, React.ReactNode> {
   }
 }
 
+const getLicense = ([api, type, licenseId]: [DataAPI, "licenses", string]) => api[type].get({id: licenseId, type: "license"})
+
+const getActors = async ([api, type, _licenseId, actorIds]: [DataAPI, "actors", string, string[]]) => {
+  const actors = Promise.all(
+    actorIds.map(aid => api[type].get({id: aid, type: "actor"}))
+  );
+  return actors;
+}
+
 function EntryViewBase() {
-  const dataSource = useDataSource();
+  const api = useDataAPI();
   const searchParams = useSearchParams();
   const entryId = searchParams.get("entryId")
   if (!entryId) {
     notFound();
   }
-  const {data: entry, isLoading} = dataSource.getLicense({id: entryId})
+  const {data: entry, isLoading} = useSWR(
+    [api, "licenses", entryId],
+    getLicense
+  )
+  const {data: actors} = useSWR(
+    [api, "actors", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    getActors,
+    {fallbackData: []}
+  )
+  const {data: permissionTypeMap, isLoading: isLoadingPermissionTypeMap} = useSWR(
+    [api, "permissionTypes", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    async ([api, type]: [DataAPI, "permissionTypes"]) => toRecord(await api[type].list()),
+    {fallbackData: {}}
+  )
+  const {data: permissionPropertyMap, isLoading: isLoadingPermissionPropertyMap} = useSWR(
+    [api, "permissionProperties", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    async ([api, type]: [DataAPI, "permissionProperties"]) => toRecord(await api[type].list()),
+    {fallbackData: {}}
+  )
+  const {data: speciesMap, isLoading: isLoadingSpecies} = useSWR(
+    [api, "species", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    async ([api, type]: [DataAPI, "species"]) => toRecord(await api[type].list()),
+    {fallbackData: {}}
+  )
   if (isLoading) return (
     <div className="container">
       <h2>License view</h2>
@@ -77,11 +109,11 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {entry.permissions.map((p, index) => {
-            const type = dataSource.getPermissionType(p.type);
-            const species = p.speciesList.map(s => dataSource.getSpecies(s));
-            const properties = p.properties.map(pp => dataSource.getPermissionProperty(pp));
+            const type = permissionTypeMap[p.permissionType.id];
+            const species = p.speciesList.map(s => speciesMap[s.id]);
+            const properties = p.properties.map(pp => permissionPropertyMap[pp.id]);
 
-            return (
+            return !isLoadingPermissionTypeMap && !isLoadingPermissionPropertyMap && !isLoadingSpecies ? (
               <tr key={index}>
                 <td>{p.description || "-"}</td>
                 <td>{type.name}</td>
@@ -94,7 +126,7 @@ function EntryViewBase() {
                 <td>{p.location}</td>
                 <td>{toLocalDate(p.period[0])} to {toLocalDate(p.period[1])}</td>
               </tr>
-            );
+            ) : <Fragment key={index}></Fragment>;
           })}
         </tbody>
       </table>
@@ -111,10 +143,10 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {entry.actors.map((r, index) => {
-            const actor = getOrDefault(dataSource.getActor({id: r.actor.id}), (a) => a, {type: "-", id: "-", name: "-"})
+            const actor = actors.filter(a => a.id === r.actor.id)[0] ?? {type: "-", id: "-", name: "-"}
             return (
               <tr key={index}>
-                <td>{actor.type}</td>
+                <td>{actor.actorType}</td>
                 <td>{r.status}</td>
                 <td>{r.role}</td>
                 <td>{r.mednr}</td>

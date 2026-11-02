@@ -35,7 +35,7 @@ export default function PageLayout({
   };
   return (
     <NavContext.Provider value={navItems}>
-      <Suspense fallback={<Sidebar {...sidebarProps}>{children}</Sidebar>}>
+      <Suspense fallback={<Sidebar {...sidebarProps}><></></Sidebar>}>
         <NavStateProvider>
           <Sidebar {...sidebarProps}>
             <DataProvider

@@ -44,6 +44,11 @@ const licenseFilter: SearchFunction<EntityRef<"license"> & License, {actorRef: E
   return license.actors.some(a => (roles.size === 0 || roles.has(a.role)) && (actors.size === 0 || actors.has(a.actor.id)))
 }
 
+const actorFilter: SearchFunction<EntityRef<"actor"> & Actor, {}> = (actor, props) => {
+  const ids = new Set(toArray(props?.id));
+  return ids.size === 0 || ids.has(actor.id);
+}
+
 const documentFilter: SearchFunction<EntityRef<"document"> & LicenseDocument, {actorRef: EntityRef<"actor">, licenseRef: EntityRef<"license">}> = (document, props) => {
   const actors = refsToSet(props?.actorRef)
   const licenses = refsToSet(props?.licenseRef)
@@ -102,7 +107,10 @@ export function DataProvider({
     ringSeries,
   ] = (data || []);
   const dataSource = useMemo<DataAPI>(() => ({
-    actors: new StaticDataSource<EntityRef<"actor"> & Actor>(toList(actors || {}).map(v => toEntity(v, "actor"))).toAsyncSource(),
+    actors: new StaticDataSource<EntityRef<"actor"> & Actor>(
+      toList(actors || {}).map(v => toEntity(v, "actor")),
+      actorFilter
+    ).toAsyncSource(),
     licenses: new StaticDataSource<EntityRef<"license"> & License>(
       toList(licenses || {}).map(v => toEntity(v, "license")),
       licenseFilter
