@@ -3,10 +3,11 @@ import { useState, CSSProperties } from "react";
 import Link from "next/link";
 import Warning from "../warning";
 import { useItemSelections, useFilter, TypedSearchableItem } from "../../hooks";
-import { useDataSource } from "../contexts";
-import { getOrDefault, License, toLocalTime } from "../common";
+import { useDataAPI } from "../contexts";
+import { DataAPI, License, toLocalTime } from "../common";
 import { Pagination, usePagination } from "@/components/Pagination";
 import { ColumnSpec, Table } from "@/components/Table";
+import useSWR from "swr";
 
 const dropdownOpenStyle: CSSProperties = {
   position: "absolute",
@@ -22,13 +23,23 @@ type SummaryProps = {
 }
 
 export default function ListView() {
+  const api = useDataAPI();
   const [actionIsOpen, setActionIsOpen] = useState(false); 
-  const dataSource = useDataSource();
 
-  const {data: licenses} = dataSource.getLicenses();
+  const {data: licenses} = useSWR(
+    [api, "licenses", {}],
+    async ([api, type]: [DataAPI, "licenses"]) => await api[type].list(),
+    {fallbackData: []}
+  );
+  const { data: actors } = useSWR(
+    [api, "actors"],
+    ([api, type]: [DataAPI, "actors"]) => api[type].list(),
+    {fallbackData: []}
+  )
+
   const items = (licenses || []).map<TypedSearchableItem<License & SummaryProps>>(item => {
     const licenseHolderInfo = item.actors.find(r => !r.mednr);
-    const licenseHolder = licenseHolderInfo ? dataSource.getActor(licenseHolderInfo.actor) : undefined;
+    const licenseHolder = licenseHolderInfo ? actors.filter(a => a.id === licenseHolderInfo.actor.id)[0] : undefined;
     return {
       id: item.id,
       properties: {
@@ -37,12 +48,12 @@ export default function ListView() {
           component: <Link href={`/bird-ringing/license-view/?entryId=${item.id}`}>{item.mnr}</Link>
         },
         type: {
-          term: getOrDefault(licenseHolder, (lh) => lh.type, "-"),
-          component: getOrDefault(licenseHolder, (lh) => lh.type, "-")
+          term: licenseHolder?.actorType ?? "-",
+          component: licenseHolder?.actorType ?? "-"
         },
         licenseHolder: {
-          term: getOrDefault(licenseHolder, (lh) => lh.name, "-"),
-          component: getOrDefault(licenseHolder,  (lh) => <Link href={`/bird-ringing/actor-view/?entryId=${lh.id}`}>{lh.name}</Link>, "-"),
+          term: licenseHolder?.name ?? "-",
+          component: licenseHolder ? <Link href={`/bird-ringing/actor-view/?entryId=${licenseHolder.id}`}>{licenseHolder.name}</Link> : "-",
         },
         numberOfHelpers: {
           term: String(item.actors.length),
