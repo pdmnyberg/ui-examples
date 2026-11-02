@@ -1,10 +1,11 @@
 "use client"
-import { Actor, toLocalTime, toLocalDate } from "../common";
+import { Actor, toLocalTime, toLocalDate, DataAPI, getActorLicenses, getLicenseInfo } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { useDataSource } from "../contexts";
+import { useDataAPI } from "../contexts";
+import useSWR from "swr";
 
 function entryToTable(entry: Actor): Record<string, React.ReactNode> {
   return {
@@ -17,14 +18,41 @@ function entryToTable(entry: Actor): Record<string, React.ReactNode> {
   }
 }
 
+const getActor = ([api, type, actorId]: [DataAPI, "actors", string]) => api[type].get({id: actorId, type: "actor"})
+
+const getLicenses = async ([api, type, actorId]: [DataAPI, "licenses", string]) => {
+  const licenses = api[type].list({properties: {actorRef: {id: actorId, type: "actor"}}});
+  return licenses;
+}
+
+const getDocuments = async ([api, type, actorId, licenseIds]: [DataAPI, "documents", string, string[]]) => {
+  return await api[type].list({properties: {
+    actorRef: {id: actorId, type: "actor"},
+    licenseRef: licenseIds.map(lid => ({id: lid, type: "license"}))
+  }})
+}
+
 function EntryViewBase() {
   const searchParams = useSearchParams();
-  const dataSource = useDataSource();
+  const api = useDataAPI();
   const actorId = searchParams.get("entryId")
   if (!actorId) {
     notFound();
   }
-  const {data: actor, isLoading} = dataSource.getActor({id: actorId})
+  const {data: actor, isLoading} = useSWR(
+    [api, "actors", actorId],
+    getActor
+  )
+  const {data: allLicenses} = useSWR(
+    [api, "licenses", actorId],
+    getLicenses,
+    {fallbackData: []}
+  );
+  const {data: documents} = useSWR(
+    [api, "documents", actorId, allLicenses.map(l => l.id)],
+    getDocuments,
+    {fallbackData: []}
+  );
   if (isLoading) return (
     <div className="container">
       <h2>License view</h2>
@@ -35,7 +63,7 @@ function EntryViewBase() {
     notFound();
   }
 
-  const licenses = dataSource.getActorLicenses(actor);
+  const licenses = getActorLicenses(allLicenses, actor);
   const entryTable = entryToTable(actor)
   return (
     <div className="container">
@@ -77,8 +105,8 @@ function EntryViewBase() {
         </thead>
         <tbody>
           {licenses.map((l) => {
-            const licenseInfo = dataSource.getLicenseInfo(l, actor);
-            const primaryDocument = dataSource.getDocuments(l, actor)[0];
+            const licenseInfo = getLicenseInfo(l, actor);
+            const primaryDocument = documents.filter(d => d.license.id === l.id && d.actor.id === actor.id)[0];
             const mnr = l.mnr;
             return (
               <tr key={l.id}>
