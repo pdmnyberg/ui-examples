@@ -1,5 +1,5 @@
 import { getGenerator as getBirdRinging } from "./bird-ringing";
-import { StaticDataSource, Actor, LicenseStatus, ActorType, License, DataSource } from "../app/bird-ringing/common";
+import { Actor, LicenseStatus, ActorType, License, createSyncStaticDataAPI, SyncDataAPI, getActorLicenses } from "../app/bird-ringing/common";
 import { getFixedRandom } from "./common";
 
 type MNR = string; // Ringer number, identifier for a ringer.
@@ -252,9 +252,9 @@ function summarizeList(items: string[]) {
     )
 }
 
-function createSummary(license: License, dataSource: DataSource) {
-    const species = Array.from(new Set(license.permissions.flatMap(p => p.speciesList.map(s => dataSource.getSpecies(s).name))))
-    const permissionTypes = Array.from(new Set(license.permissions.map(p => dataSource.getPermissionType(p.permissionType).name)))
+function createSummary(license: License, dataSource: SyncDataAPI) {
+    const species = Array.from(new Set(license.permissions.flatMap(p => p.speciesList.map(s => dataSource.species.get(s).name))))
+    const permissionTypes = Array.from(new Set(license.permissions.map(p => dataSource.permissionTypes.get(p.permissionType).name)))
     const permissionSummary = summarizeList(permissionTypes);
     const speciesSummary = summarizeList(species);
     return `Activities of ${license.mnr} may be performed in the region ${license.region}, and it includes permits to perform ${permissionSummary}, for the species ${speciesSummary}.`;
@@ -263,15 +263,24 @@ function createSummary(license: License, dataSource: DataSource) {
 function getDataSource(numberOfLicenses: number = 100) {
     const generator = getBirdRinging(numberOfLicenses)
     const content = generator.createData();
-    return new StaticDataSource(content.actors, content.licenses, {}, {}, [], content.documents, content.permissionTypes, content.permissionProperties, content.species, false);
+    return createSyncStaticDataAPI(
+        content.actors,
+        content.licenses,
+        {},
+        {},
+        content.documents,
+        content.permissionTypes,
+        content.permissionProperties,
+        content.species,
+    );
 }
 
-export function contentToLegacyData(dataSource: StaticDataSource) {
+export function contentToLegacyData(dataSource: SyncDataAPI) {
     const fixedRandom = getFixedRandom();
 
-    const licenseList = Object.values(dataSource.licenses);
+    const licenseList = dataSource.licenses.list();
     const licenses: Maerkare[] = licenseList.map<Maerkare>((license, index) => {
-        const licenseActor = dataSource.getLicenseActors(license, "Ringer")[0];
+        const licenseActor = license.actors.filter(r => r.role === "Ringer").map(r => dataSource.actors.get(r.actor))[0];
         const [fnamn, enamn] = parseNames(licenseActor);
         const assistantList = licenseList.filter(l => l.mnr !== license.mnr);
         const adrMnr = fixedRandom.randbool() ? fixedRandom.choice(assistantList).mnr : "NULL";
@@ -320,9 +329,9 @@ export function contentToLegacyData(dataSource: StaticDataSource) {
         }
     });
 
-    const actorList = Object.values(dataSource.actors);
+    const actorList = dataSource.actors.list();
     const helpers = fixedRandom.choices(actorList, Math.floor(actorList.length * 0.7)).flatMap<Medhj>((actor, index) => {
-        const helperLicenses = dataSource.getActorLicenses(actor, undefined, undefined, (r) => r.role === "Associate" || r.role === "Communication" || r.role == "Helper")
+        const helperLicenses = licenseList.filter(l => l.actors.some(r => r.actor.id === actor.id && (r.role === "Associate" || r.role === "Communication" || r.role == "Helper")))
         const [fnamn, enamn] = parseNames(actor)
         return helperLicenses.map<Medhj>((license) => {
             const relation = license.actors.filter(r => r.actor.id === actor.id)[0]
@@ -355,7 +364,7 @@ export function contentToLegacyData(dataSource: StaticDataSource) {
         }))
     })
 
-    const species = Object.values(dataSource.species).map<Artilista>(s => {
+    const species = dataSource.species.list().map<Artilista>(s => {
         return {
             "VetKod": s.scientificCode,
             "VetNamn": s.scientificName,
@@ -363,20 +372,20 @@ export function contentToLegacyData(dataSource: StaticDataSource) {
         }
     })
 
-    const permissionTypes = Object.keys(dataSource.permissionTypes).map(key => dataSource.permissionTypes[key]).map<TillstTyp>(pt => ({
+    const permissionTypes = dataSource.permissionTypes.list().map<TillstTyp>(pt => ({
         type_code: pt.id,
         name: pt.name,
         description: pt.description,
     }))
 
-    const properties = Object.keys(dataSource.permissionProperties).map(key => dataSource.permissionProperties[key]).map<TillstProp>(pp => ({
+    const properties = dataSource.permissionProperties.list().map<TillstProp>(pp => ({
         property_code: pp.id,
         name: pp.name,
         description: pp.description,
         related_type_code: pp.permissionType?.id ?? "",
     }))
 
-    const permissions = Object.keys(dataSource.licenses).map(key => dataSource.licenses[key]).flatMap(license => license.permissions.map<Tillstand>(lp => {
+    const permissions = dataSource.licenses.list().flatMap(license => license.permissions.map<Tillstand>(lp => {
         return {
             license_mnr: license.mnr,
             type_code: lp.permissionType.id,
@@ -384,7 +393,7 @@ export function contentToLegacyData(dataSource: StaticDataSource) {
             ends_at: parseDate(new Date(lp.period[1])),
             location: lp.location,
             description: lp.description,
-            species_codes: lp.speciesList.map(s => dataSource.getSpecies(s).scientificCode).join(";"),
+            species_codes: lp.speciesList.map(s => dataSource.species.get(s).scientificCode).join(";"),
             property_codes: lp.properties.map(p => p.id).join(";"),
         }
     }))
@@ -402,7 +411,7 @@ export function contentToLegacyData(dataSource: StaticDataSource) {
 }
 
 
-function contentToNextData(dataSource: StaticDataSource) {
+function contentToNextData(dataSource: SyncDataAPI) {
     const data = contentToLegacyData(dataSource)
 
     const permissions = data["br-ex-Tillstand"].map(p => ({

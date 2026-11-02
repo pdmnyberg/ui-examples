@@ -19,6 +19,8 @@ import {
 import { RandomContext, DataGenerator, getFixedRandom } from "./common";
 import { CommonDataSource, getCommonData } from "./common-data";
 
+type Entry<T> = Omit<T, "type">;
+
 export function getMoonData(): BirdRingingDataSource {
     const licenseStatuses: LicenseStatus[] = [
         "Active",
@@ -72,7 +74,7 @@ export function getMoonData(): BirdRingingDataSource {
         "collaboration with inter-city ecological projects"
     ]
 
-    const permissionTypes: PermissionType[] = [
+    const permissionTypes: Entry<PermissionType>[] = [
         { "id": "capture-and-physical-restraint", "name": "Capture and Physical Restraint", "description": "Authorizes the intentional interruption of a bird’s freedom of movement through capture, holding, or physical restraint. Covers direct handling that may stress, injure, or alter natural behavior." },
         { "id": "temporary-displacement-or-relocation", "name": "Temporary Displacement or Relocation", "description": "Permits moving birds from their usual territory or dome habitat, temporarily or permanently, with or without human assistance." },
         { "id": "nest-access-and-modification", "name": "Nest Access and Modification", "description": "Covers direct interaction with nests, including entry, alteration, or temporary removal, potentially affecting parental care or nest integrity." },
@@ -95,7 +97,7 @@ export function getMoonData(): BirdRingingDataSource {
         { "id": "extended-or-repeated-contact-authorization", "name": "Extended or Repeated Contact Authorization", "description": "Permits sustained or repeated interaction with the same individuals beyond standard contact thresholds." }
     ]
 
-    const permissionProperties: PermissionProperty[] = [
+    const permissionProperties: Entry<PermissionProperty>[] = [
         {
             "id": "manual-handling-required",
             "name": "manual handling required",
@@ -1015,8 +1017,8 @@ export type BirdRingingDataSource = CommonDataSource & {
     reportStatuses: ReportStatus[];
     emailStatus: string[];
     descriptions: string[];
-    permissionTypes: PermissionType[];
-    permissionProperties: PermissionProperty[];
+    permissionTypes: Entry<PermissionType>[];
+    permissionProperties: Entry<PermissionProperty>[];
     speciesSignifiers: {signifier: string, code: string, epithet: string}[];
     species: {name: string, code: string, scientific: string}[];
 }
@@ -1104,7 +1106,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 emailSentAt: updatedAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),
                 city: regionName,
-                birthDate: fixedRandom.randdate(...period)
+                birthDate: fixedRandom.randdate(...period),
+                type: "actor",
             }
         }).reduce<Record<string, Actor>>((acc, actor) => {
             acc[actor.id] = actor;
@@ -1187,6 +1190,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                     ...helpers
                 ],
                 reportStatus: fixedRandom.choice(reportStatuses),
+                type: "license",
             }
         })).reduce<Record<string, License>>((acc, license) => {
             acc[license.id] = license;
@@ -1227,14 +1231,20 @@ export class BirdRingingDataGenerator implements DataGenerator<{
 
     createPermissionTypes() {
         return this.dataSource.permissionTypes.reduce<Record<string, PermissionType>>((acc, pt) => {
-            acc[pt.id] = pt;
+            acc[pt.id] = {
+                ...pt,
+                type: "permission-type",
+            };
             return acc;
         }, {});
     }
 
     createPermissionProperties() {
         return this.dataSource.permissionProperties.reduce<Record<string, PermissionProperty>>((acc, pp) => {
-            acc[pp.id] = pp;
+            acc[pp.id] = {
+                ...pp,
+                type: "permission-property",
+            };
             return acc;
         }, {});
     }
@@ -1249,6 +1259,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 documentType: "license",
                 href: "/mock-license.pdf",
                 createdAt: license.createdAt,
+                type: "document",
             }
         }).reduce<Record<string, LicenseDocument>>((acc, doc) => {
             acc[doc.id] = doc;
@@ -1268,6 +1279,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 name: `${signifier.signifier} ${speciesBase.name}`,
                 scientificCode: `${signifier.code}-${speciesBase.code}`,
                 scientificName: `${speciesBase.scientific} ${signifier.epithet}`,
+                type: "species",
             }
         }).reduce<Record<string, Species>>((acc, s) => {
             acc[s.id] = s;
@@ -1299,6 +1311,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             id: `ring-series-${index}`,
             manufacturer: fixedRandom.choice(manufacturers),
             identifier: `S${String(index).padStart(10, '0')}`,
+            type: "ring-series",
         })).reduce<Record<string, RingSeries>>((acc, s) => {
             acc[s.id] = s;
             return acc;
@@ -1313,6 +1326,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             identifier: `R${String(rsi * 25 + ri).padStart(10, '0')}`,
             ringSeries: {id: rs.id, type: "ring-series"},
             license: fixedRandom.randbool() ? fixedRandom.choice(owners) : undefined,
+            type: "ring",
         })))).reduce<Record<string, Ring>>((acc, s) => {
             acc[s.id] = s;
             return acc;

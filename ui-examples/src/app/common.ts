@@ -111,3 +111,11 @@ export function toLocalTime(date: Date): string {
 export function toLocalDate(date: Date) {
     return date.toLocaleDateString("sv-SE", { timeZone: "UTC" })
 }
+
+export function refsToSet(refs?: (EntityRef<string>[] | EntityRef<string>)): Set<string> {
+  return new Set<string>(toCertainList(refs).map(a => a.id))
+}
+
+export function toCertainList<T>(item?: T[] | T): T[] {
+  return Array.isArray(item) ? item : (item ? [item] : [])
+}

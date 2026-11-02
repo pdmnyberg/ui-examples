@@ -1,11 +1,5 @@
 import { createContext, useContext } from "react";
-import { DataSource, StaticDataSource, DataAPI } from "./common";
-
-export const DataSourceContext = createContext<DataSource>(new StaticDataSource({}, {}, {}, {}, [], {}, {}, {}, {}, true));
-
-export function useDataSource() {
-    return useContext(DataSourceContext);
-}
+import { DataAPI } from "./common";
 
 export const DataContext = createContext<DataAPI | null>(null);
 
