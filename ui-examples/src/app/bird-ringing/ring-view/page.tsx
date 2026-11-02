@@ -1,28 +1,38 @@
 "use client"
-import { toLocalTime, Ring, RingEvent } from "../common";
+import { Ring, DataAPI } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { useDataSource } from "../contexts";
+import { useDataAPI } from "../contexts";
 import { ColumnSpec, DataSpec, VerticalTable } from "@/components/Table";
-import { FilterableTable } from "@/components/FilterableTable";
-import { TypedSearchableItem } from "@/app/hooks";
+import useSWR from "swr";
 
 type SummaryData = {
   manufacturer: string;
   series: string;
 }
 
+const getRing = async ([api, type, entryId]: [DataAPI, "rings", string]) => await api[type].get({id: entryId, type: "ring"})
+
+const getRingSeries = async ([api, type, seriesId]: [DataAPI, "ringSeries", string]) => await api[type].get({id: seriesId, type: "ring-series"})
+
 function EntryViewBase() {
   const searchParams = useSearchParams();
-  const dataSource = useDataSource();
+  const api = useDataAPI();
   const entryId = searchParams.get("entryId")
   if (!entryId) {
     notFound();
   }
-  const {data: entry, isLoading} = dataSource.getRing({id: entryId})
-  if (isLoading) return (
+  const {data: entry, isLoading} = useSWR(
+    [api, "rings", entryId],
+    getRing,
+  );
+  const {data: ringSeries, isLoading: isLoadingRingSeries} = useSWR(
+    [api, "ringSeries", entry?.ringSeries.id],
+    getRingSeries,
+  );
+  if (isLoading || isLoadingRingSeries) return (
     <div className="container">
       <h2>License view</h2>
       <p>Loading...</p>
@@ -32,12 +42,11 @@ function EntryViewBase() {
     notFound();
   }
 
-  const ringSeries = dataSource.getRingSeries(entry.ringSeries);
   const entryData: DataSpec<Ring & SummaryData> = {
     id: entry.id,
     identifier: entry.identifier,
-    manufacturer: ringSeries.manufacturer,
-    series: <Link href={`/bird-ringing/ring-series-view/?entryId=${ringSeries.id}`}>{ringSeries.identifier}</Link>,
+    manufacturer: ringSeries?.manufacturer ?? "-",
+    series: ringSeries ? <Link href={`/bird-ringing/ring-series-view/?entryId=${ringSeries.id}`}>{ringSeries.identifier}</Link> : "-",
   }
   const entryColumns: ColumnSpec<Ring & SummaryData> = {
     identifier: "Identifier",
@@ -45,31 +54,11 @@ function EntryViewBase() {
     series: "Series",
   };
 
-  const ringEvents = dataSource.getRingEvents(entry);
-  const eventColumns: ColumnSpec<RingEvent> = {
-    status: "Status",
-    timestamp: "Time"
-  };
-  const eventData = ringEvents.map<TypedSearchableItem<RingEvent>>((event, index) => ({
-    id: String(index),
-    properties: {
-      status: {
-        term: event.status,
-        component: event.status,
-      },
-      timestamp: {
-        term: toLocalTime(event.timestamp),
-        component: toLocalTime(event.timestamp),
-      },
-    }
-  }))
   return (
     <div className="container">
       <Warning><span/></Warning>
       <h2>Ring view</h2>
       <VerticalTable items={[entryData]} columns={entryColumns} param="Param"/>
-      <h2>Events</h2>
-      <FilterableTable items={eventData} columns={eventColumns} filterLabel="Filter events"/>
     </div>
   )
 }
