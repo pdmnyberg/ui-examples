@@ -40,7 +40,7 @@ function EntryViewBase() {
   );
   if (isLoading || isLoadingRingSeries || isLoadingType) return (
     <div className="container">
-      <h2>License view</h2>
+      <h2>Ring view</h2>
       <p>Loading...</p>
     </div>
   );
@@ -53,7 +53,7 @@ function EntryViewBase() {
     identifier: entry.identifier,
     status: entry.status,
     manufacturer: ringOrder?.manufacturer ?? "-",
-    order: ringOrder ? <Link href={`/bird-ringing/ring-series-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link> : "-",
+    order: ringOrder ? <Link href={`/bird-ringing/ring-order-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link> : "-",
     ringType: ringType ? <Link href={`/bird-ringing/ring-type-view/?entryId=${ringType.id}`}>{ringType.code}</Link> : "-",
     changedAt: entry.changedAt,
   }

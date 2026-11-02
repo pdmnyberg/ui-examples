@@ -1343,11 +1343,17 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const fixedRandom = this.randomContext;
         const numberOfRingSeries = Math.max(1, Math.floor(this.numberOfLicenses * 2));
         const manufacturers = this.createManufacturers(10);
+        const statuses: RingOrder["status"][] = [
+            "Ordered",
+            "Delivered"
+        ];
         return Array.from({length: numberOfRingSeries}).map<RingOrder>((_, index) => ({
             id: `ring-series-${index}`,
             manufacturer: fixedRandom.choice(manufacturers),
             identifier: `O${String(index).padStart(10, '0')}`,
             ringType: {id: fixedRandom.choice(ringTypes).id, type: "ring-type"},
+            status: fixedRandom.choice(statuses),
+            changedAt: fixedRandom.randdate(...this.period).toISOString(),
             type: "ring-order",
         })).reduce<Record<string, RingOrder>>((acc, s) => {
             acc[s.id] = s;
@@ -1358,7 +1364,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     createRings(ringOrders: RingOrder[], licenses: License[]): Record<string, Ring> {
         const fixedRandom = this.randomContext;
         const statuses: RingStatus[] = [
-            "Ordered", "In stock", "Assigned", "In use", "Observed", "Decommissioned"
+            "In stock", "Assigned", "In use", "Observed", "Decommissioned"
         ];
         const owners = licenses.map<LicenseRef>(l => ({id: l.id, type: "license"}));
         return ringOrders.flatMap<Ring>((rs, rsi) => (Array.from({length: 25}).map<Ring>((_, ri) => ({

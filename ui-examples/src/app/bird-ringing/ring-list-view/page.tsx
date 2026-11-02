@@ -41,7 +41,7 @@ export default function ListView() {
         },
         order: {
             term: ringOrder.identifier,
-            component: <Link href={`/bird-ringing/ring-series-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link>
+            component: <Link href={`/bird-ringing/ring-order-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link>
         }
       }
     }

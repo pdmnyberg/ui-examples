@@ -20,7 +20,7 @@ export type LicenseStatus = "Active" | "Not active" | "Discontinued";
 
 export type LicenseRole = "Ringer" | "Helper" | "Associate" | "Communication";
 
-export type RingStatus = "Ordered" | "In stock" | "Assigned" | "In use" | "Observed" | "Decommissioned"
+export type RingStatus = "In stock" | "Assigned" | "In use" | "Observed" | "Decommissioned"
 
 export type ActorRef = EntityRef<"actor">;
 export type LicenseRef = EntityRef<"license">;
@@ -100,9 +100,11 @@ export type Ring = RingRef & {
 }
 
 export type RingOrder = RingOrderRef & {
+    status: "Ordered" | "Delivered";
     identifier: string;
     manufacturer: string;
     ringType: RingTypeRef;
+    changedAt: string;
 }
 
 export type RingType = RingTypeRef & {
