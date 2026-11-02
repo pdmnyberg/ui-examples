@@ -50,7 +50,7 @@ export default function ListView() {
           term: item.name,
           component: <Link href={`/bird-ringing/actor-view/?entryId=${item.id}`}>{item.name}</Link>
         },
-        type: {
+        actorType: {
           term: item.actorType,
           component: item.actorType,
         },
