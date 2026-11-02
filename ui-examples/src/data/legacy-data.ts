@@ -1,5 +1,5 @@
 import { getGenerator as getBirdRinging } from "./bird-ringing";
-import { StaticDataSource, Actor, LicenseStatus, ActorType, License, DataSourceLegacy } from "../app/bird-ringing/common";
+import { StaticDataSource, Actor, LicenseStatus, ActorType, License, DataSource } from "../app/bird-ringing/common";
 import { getFixedRandom } from "./common";
 
 type MNR = string; // Ringer number, identifier for a ringer.
@@ -213,7 +213,7 @@ function parsePriSta(type: ActorType): Maerkare["PriSta"] {
 
 function parseNames(actor: Actor): [string, string] {
     const nameList = actor.name.split(" ")
-    return actor.type === "Organization" ? [actor.name, ""] : [nameList[0], nameList.slice(1).join(" ")]
+    return actor.actorType === "Organization" ? [actor.name, ""] : [nameList[0], nameList.slice(1).join(" ")]
 }
 
 function padZero(value: number, length: number = 2) {
@@ -252,9 +252,9 @@ function summarizeList(items: string[]) {
     )
 }
 
-function createSummary(license: License, dataSource: DataSourceLegacy) {
+function createSummary(license: License, dataSource: DataSource) {
     const species = Array.from(new Set(license.permissions.flatMap(p => p.speciesList.map(s => dataSource.getSpecies(s).name))))
-    const permissionTypes = Array.from(new Set(license.permissions.map(p => dataSource.getPermissionType(p.type).name)))
+    const permissionTypes = Array.from(new Set(license.permissions.map(p => dataSource.getPermissionType(p.permissionType).name)))
     const permissionSummary = summarizeList(permissionTypes);
     const speciesSummary = summarizeList(species);
     return `Activities of ${license.mnr} may be performed in the region ${license.region}, and it includes permits to perform ${permissionSummary}, for the species ${speciesSummary}.`;
@@ -281,7 +281,7 @@ export function contentToLegacyData(dataSource: StaticDataSource) {
         return {
             Mnr: license.mnr,
             Status: parseStatus(license.status),
-            PriSta: parsePriSta(licenseActor.type),
+            PriSta: parsePriSta(licenseActor.actorType),
             Enamn: enamn,
             Fnamn: fnamn,
             Adress1: "",
@@ -379,7 +379,7 @@ export function contentToLegacyData(dataSource: StaticDataSource) {
     const permissions = Object.keys(dataSource.licenses).map(key => dataSource.licenses[key]).flatMap(license => license.permissions.map<Tillstand>(lp => {
         return {
             license_mnr: license.mnr,
-            type_code: lp.type.id,
+            type_code: lp.permissionType.id,
             starts_at: parseDate(new Date(lp.period[0])),
             ends_at: parseDate(new Date(lp.period[1])),
             location: lp.location,

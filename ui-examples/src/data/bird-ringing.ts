@@ -1064,29 +1064,29 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const emailStatus = this.dataSource.emailStatus;
         const regionName = fixedRandom.choice(regionNames)
         const allPeople = [
-            ...familyNames.flatMap(fn => femaleNames.map(gn => `${gn} ${fn}`)).map<Pick<Actor, "sex" | "name" | "type">>(fn => ({
+            ...familyNames.flatMap(fn => femaleNames.map(gn => `${gn} ${fn}`)).map<Pick<Actor, "sex" | "name" | "actorType">>(fn => ({
                 sex: "Female",
                 name: fn,
-                type: "Person"
+                actorType: "Person"
             })),
-            ...familyNames.flatMap(fn => maleNames.map(gn => `${gn} ${fn}`).map<Pick<Actor, "sex" | "name" | "type">>(fn => ({
+            ...familyNames.flatMap(fn => maleNames.map(gn => `${gn} ${fn}`).map<Pick<Actor, "sex" | "name" | "actorType">>(fn => ({
                 sex: "Male",
                 name: fn,
-                type: "Person"
+                actorType: "Person"
             })))
         ];
-        const allOrganizations = groupNames.flatMap(gn => regionNames.map(rn => `${gn} ${rn}`)).map<Pick<Actor, "sex" | "name" | "type">>(on => ({
+        const allOrganizations = groupNames.flatMap(gn => regionNames.map(rn => `${gn} ${rn}`)).map<Pick<Actor, "sex" | "name" | "actorType">>(on => ({
             sex: "N/A",
             name: on,
-            type: "Organization"
+            actorType: "Organization"
         }))
         fixedRandom.seed(0)
         const usedActors = [
             ...fixedRandom.choices(allPeople, numberOfActors - numberOfOrganizations),
             ...fixedRandom.choices(allOrganizations, numberOfOrganizations)
         ]
-        return usedActors.map<Actor>(({sex: actualSex, name, type}, index) => {
-            const isOrganization = type === "Organization";
+        return usedActors.map<Actor>(({sex: actualSex, name, actorType}, index) => {
+            const isOrganization = actorType === "Organization";
             const declareSex = fixedRandom.randbool();
             const updatedAt = fixedRandom.randdate(...period);
             const email = isOrganization ? `contact@${name.toLowerCase().replaceAll(" ", "-")}.example.edu` : `${name.toLowerCase().replaceAll(/(\s+|')/g, ".")}@example.edu`;
@@ -1099,7 +1099,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 name,
                 email,
                 sex,
-                type: isOrganization ? "Organization" : "Person",
+                actorType: isOrganization ? "Organization" : "Person",
                 emailStatus: fixedRandom.choice(emailStatus),
                 emailSentAt: updatedAt.toISOString(),
                 updatedAt: updatedAt.toISOString(),
@@ -1125,11 +1125,11 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             reportStatuses,
         } = this.dataSource;
         const organizationActors = Object.entries(actors).reduce<Record<string, Actor>>((acc, [key, value]) => {
-            if (value.type === "Organization") acc[key] = value;
+            if (value.actorType === "Organization") acc[key] = value;
             return acc;
         }, {});
         const personActors = Object.entries(actors).reduce<Record<string, Actor>>((acc, [key, value]) => {
-            if (value.type === "Person") acc[key] = value;
+            if (value.actorType === "Person") acc[key] = value;
             return acc;
         }, {});
         const ringerIds = [
@@ -1209,7 +1209,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             ];
             const permission: License["permissions"][number] = {
                 description: "",
-                type: {
+                permissionType: {
                     type: "permission-type",
                     id: permissionType.id,
                 },
@@ -1246,7 +1246,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                 id,
                 actor: relation.actor,
                 license: {id: license.id, type: "license"},
-                type: "license",
+                documentType: "license",
                 href: "/mock-license.pdf",
                 createdAt: license.createdAt,
             }
