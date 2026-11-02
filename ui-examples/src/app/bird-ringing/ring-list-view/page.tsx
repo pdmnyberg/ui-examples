@@ -10,7 +10,7 @@ import useSWR from "swr";
 
 type SummaryProps = {
   manufacturer: string;
-  series: string;
+  order: string;
 }
 
 export default function ListView() {
@@ -20,14 +20,14 @@ export default function ListView() {
     async ([api, type]: [DataAPI, "rings"]) => await api[type].list(),
     {fallbackData: []}
   );
-  const {data: ringSeriesMap, isLoading: isLoadingRingSeriesMap} = useSWR(
-    [api, "ringSeries"],
-    async ([api, type]: [DataAPI, "ringSeries"]) => toRecord(await api[type].list()),
+  const {data: ringOrderMap, isLoading: isLoadingRingSeriesMap} = useSWR(
+    [api, "ringOrders"],
+    async ([api, type]: [DataAPI, "ringOrders"]) => toRecord(await api[type].list()),
     {fallbackData: {}}
   )
 
   const items = isLoadingRingSeriesMap ? [] : rings.map<TypedSearchableItem<Ring & SummaryProps>>(item => {
-    const ringSeries = ringSeriesMap[item.ringSeries.id];
+    const ringOrder = ringOrderMap[item.order.id];
     return {
       id: item.id,
       properties: {
@@ -36,12 +36,12 @@ export default function ListView() {
           component: <Link href={`/bird-ringing/ring-view/?entryId=${item.id}`}>{item.identifier}</Link>
         },
         manufacturer: {
-          term: ringSeries.manufacturer,
-          component: ringSeries.manufacturer,
+          term: ringOrder.manufacturer,
+          component: ringOrder.manufacturer,
         },
-        series: {
-            term: ringSeries.identifier,
-            component: <Link href={`/bird-ringing/ring-series-view/?entryId=${ringSeries.id}`}>{ringSeries.identifier}</Link>
+        order: {
+            term: ringOrder.identifier,
+            component: <Link href={`/bird-ringing/ring-series-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link>
         }
       }
     }
@@ -51,7 +51,7 @@ export default function ListView() {
     id: "",
     identifier: "Identifier",
     manufacturer: "Manufacturer",
-    series: "Series",
+    order: "Order",
   }
   
   return (

@@ -15,7 +15,9 @@ type SummaryData = {
 
 const getRing = async ([api, type, entryId]: [DataAPI, "rings", string]) => await api[type].get({id: entryId, type: "ring"})
 
-const getRingSeries = async ([api, type, seriesId]: [DataAPI, "ringSeries", string]) => await api[type].get({id: seriesId, type: "ring-series"})
+const getRingType = async ([api, type, typeId]: [DataAPI, "ringTypes", string]) => await api[type].get({id: typeId, type: "ring-type"})
+
+const getRingOrder = async ([api, type, seriesId]: [DataAPI, "ringOrders", string]) => await api[type].get({id: seriesId, type: "ring-order"})
 
 function EntryViewBase() {
   const searchParams = useSearchParams();
@@ -28,11 +30,15 @@ function EntryViewBase() {
     [api, "rings", entryId],
     getRing,
   );
-  const {data: ringSeries, isLoading: isLoadingRingSeries} = useSWR(
-    [api, "ringSeries", entry?.ringSeries.id],
-    getRingSeries,
+  const {data: ringType, isLoading: isLoadingType} = useSWR(
+    [api, "ringTypes", entry?.ringType.id],
+    getRingType,
   );
-  if (isLoading || isLoadingRingSeries) return (
+  const {data: ringOrder, isLoading: isLoadingRingSeries} = useSWR(
+    [api, "ringOrders", entry?.order.id],
+    getRingOrder,
+  );
+  if (isLoading || isLoadingRingSeries || isLoadingType) return (
     <div className="container">
       <h2>License view</h2>
       <p>Loading...</p>
@@ -45,13 +51,19 @@ function EntryViewBase() {
   const entryData: DataSpec<Ring & SummaryData> = {
     id: entry.id,
     identifier: entry.identifier,
-    manufacturer: ringSeries?.manufacturer ?? "-",
-    series: ringSeries ? <Link href={`/bird-ringing/ring-series-view/?entryId=${ringSeries.id}`}>{ringSeries.identifier}</Link> : "-",
+    status: entry.status,
+    manufacturer: ringOrder?.manufacturer ?? "-",
+    order: ringOrder ? <Link href={`/bird-ringing/ring-series-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link> : "-",
+    ringType: ringType ? <Link href={`/bird-ringing/ring-type-view/?entryId=${ringType.id}`}>{ringType.code}</Link> : "-",
+    changedAt: entry.changedAt,
   }
   const entryColumns: ColumnSpec<Ring & SummaryData> = {
     identifier: "Identifier",
+    status: "Status",
     manufacturer: "Manufacturer",
-    series: "Series",
+    order: "Order",
+    ringType: "Ring type",
+    changedAt: "Changed at",
   };
 
   return (

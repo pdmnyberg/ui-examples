@@ -1,5 +1,5 @@
 import { getGenerator as getBirdRinging } from "./bird-ringing";
-import { Actor, LicenseStatus, ActorType, License, createSyncStaticDataAPI, SyncDataAPI, getActorLicenses } from "../app/bird-ringing/common";
+import { Actor, LicenseStatus, ActorType, License, createSyncStaticDataAPI, SyncDataAPI } from "../app/bird-ringing/common";
 import { getFixedRandom } from "./common";
 
 type MNR = string; // Ringer number, identifier for a ringer.
@@ -263,16 +263,17 @@ function createSummary(license: License, dataSource: SyncDataAPI) {
 function getDataSource(numberOfLicenses: number = 100) {
     const generator = getBirdRinging(numberOfLicenses)
     const content = generator.createData();
-    return createSyncStaticDataAPI(
-        content.actors,
-        content.licenses,
-        {},
-        {},
-        content.documents,
-        content.permissionTypes,
-        content.permissionProperties,
-        content.species,
-    );
+    return createSyncStaticDataAPI({
+        actors: content.actors,
+        licenses: content.licenses,
+        rings: {},
+        ringTypes: {},
+        ringOrders: {},
+        documents: content.documents,
+        permissionTypes: content.permissionTypes,
+        permissionProperties: content.permissionProperties,
+        species: content.species,
+    });
 }
 
 export function contentToLegacyData(dataSource: SyncDataAPI) {

@@ -46,7 +46,8 @@ export default function PageLayout({
               permissionPropertyUrl={birdRingingUrl(basePath, "permissionProperties")}
               speciesUrl={birdRingingUrl(basePath, "species")}
               ringUrl={birdRingingUrl(basePath, "rings")}
-              ringSeriesUrl={birdRingingUrl(basePath, "ringSeries")}
+              ringOrdersUrl={birdRingingUrl(basePath, "ringOrders")}
+              ringTypesUrl={birdRingingUrl(basePath, "ringTypes")}
             >
               {children}
             </DataProvider>

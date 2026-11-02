@@ -11,8 +11,8 @@ import {
     PermissionType,
     PermissionProperty,
     Ring,
-    RingSeries,
-    RingEvent,
+    RingOrder,
+    RingType,
     RingStatus,
     LicenseRef,
 } from "../app/bird-ringing/common";
@@ -1030,8 +1030,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
     permissionTypes: Record<string, PermissionType>,
     permissionProperties: Record<string, PermissionProperty>,
     rings: Record<string, Ring>,
-    ringSeries: Record<string, RingSeries>;
-    ringEvents: RingEvent[],
+    ringOrders: Record<string, RingOrder>;
+    ringTypes: Record<string, RingType>,
 }> {
     randomContext: RandomContext;
     period: [Date, Date];
@@ -1303,81 +1303,77 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         })
     }
 
-    createRingSeries(): Record<string, RingSeries> {
+    createRingTypes(numberOfTypes: number): Record<string, RingType> {
+        const fixedRandom = this.randomContext;
+        const variants: RingType["variant"][] = ["Round", "Oval", "Triangle"];
+        const materials: RingType["material"][] = ["Aluminium", "Steel"];
+        const prefixes: string[] = ["A", "B", "C", "D", "AB", "AC"];
+        const numberOfDigitsOptions: number[] = [5, 6, 7, 8, 9, 10];
+        const diameters: number[] = Array.from({length: 20}).map((_, index) => (index * 0.3) + 1.5);
+        const allRingTypes = variants.flatMap<RingType>((variant) => {
+            const variantTypes: RingType[] = [];
+            for (const material of materials) {
+                for (const prefix of prefixes) {
+                    for (const numberOfDigits of numberOfDigitsOptions) {
+                        for (const diameter of diameters) {
+                            const code = `${variant[0]}${material[0]}-${prefix}-${numberOfDigits}-${diameter}`;
+                            variantTypes.push({
+                                id: `ring-type-${code}`,
+                                code: code,
+                                material,
+                                prefix,
+                                numberOfDigits,
+                                diameter,
+                                variant,
+                                type: "ring-type",
+                            })
+                        }
+                    }
+                }
+            }
+            return variantTypes;
+        });
+        return fixedRandom.choices(allRingTypes, numberOfTypes).reduce<Record<string, RingType>>((acc, t) => {
+            acc[t.id] = t;
+            return acc;
+        }, {});
+    }
+
+    createRingOrders(ringTypes: RingType[]): Record<string, RingOrder> {
         const fixedRandom = this.randomContext;
         const numberOfRingSeries = Math.max(1, Math.floor(this.numberOfLicenses * 2));
         const manufacturers = this.createManufacturers(10);
-        return Array.from({length: numberOfRingSeries}).map<RingSeries>((_, index) => ({
+        return Array.from({length: numberOfRingSeries}).map<RingOrder>((_, index) => ({
             id: `ring-series-${index}`,
             manufacturer: fixedRandom.choice(manufacturers),
-            identifier: `S${String(index).padStart(10, '0')}`,
-            type: "ring-series",
-        })).reduce<Record<string, RingSeries>>((acc, s) => {
+            identifier: `O${String(index).padStart(10, '0')}`,
+            ringType: {id: fixedRandom.choice(ringTypes).id, type: "ring-type"},
+            type: "ring-order",
+        })).reduce<Record<string, RingOrder>>((acc, s) => {
             acc[s.id] = s;
             return acc;
         }, {});
     }
 
-    createRings(ringSeries: RingSeries[], licenses: License[]): Record<string, Ring> {
+    createRings(ringOrders: RingOrder[], licenses: License[]): Record<string, Ring> {
         const fixedRandom = this.randomContext;
+        const statuses: RingStatus[] = [
+            "Ordered", "In stock", "Assigned", "In use", "Observed", "Decommissioned"
+        ];
         const owners = licenses.map<LicenseRef>(l => ({id: l.id, type: "license"}));
-        return ringSeries.flatMap<Ring>((rs, rsi) => (Array.from({length: 25}).map<Ring>((_, ri) => ({
+        return ringOrders.flatMap<Ring>((rs, rsi) => (Array.from({length: 25}).map<Ring>((_, ri) => ({
             id: `ring-${rsi * 25 + ri}`,
             identifier: `R${String(rsi * 25 + ri).padStart(10, '0')}`,
-            ringSeries: {id: rs.id, type: "ring-series"},
+            order: {id: rs.id, type: "ring-order"},
             license: fixedRandom.randbool() ? fixedRandom.choice(owners) : undefined,
+            status: fixedRandom.choice(statuses),
+            changedAt: fixedRandom.randdate(...this.period).toISOString(),
+            ringType: rs.ringType,
             type: "ring",
         })))).reduce<Record<string, Ring>>((acc, s) => {
             acc[s.id] = s;
             return acc;
         }, {});
-    }
-
-    createRingEvents(rings: Ring[]): RingEvent[] {
-        const fixedRandom = this.randomContext;
-        const eventOrderAndCount: [RingStatus, number][] = [
-            ["Ordered", 1],
-            ["In stock", 1],
-            ["Assigned", 1],
-            ["In use", 1],
-            ["Observed", 10],
-            ["Decommissioned", 1]
-        ];
-        const distributionMap = rings.reduce<Record<string, boolean>>((acc, ring) => {
-            if (ring.license) acc[String(ring.ringSeries.id)] = true;
-            return acc;
-        }, {})
-        const initialDates = rings.reduce<Partial<Record<string, Date[]>>>((acc, ring) => {
-            const id = String(ring.ringSeries.id);
-            if (id in acc || !distributionMap[id]) return acc;
-
-            acc[id] = fixedRandom.randdaterange(...this.period, this.maxRingOrderTime);
-            return acc;
-        }, {});
-        return rings.flatMap<RingEvent>(ring => {
-            const distributionDates = initialDates[String(ring.ringSeries.id)];
-            const selectedEvents = eventOrderAndCount.slice(
-                0,
-                distributionDates ? fixedRandom.randint(3, eventOrderAndCount.length) : fixedRandom.randint(1, 2)
-            );
-            const neededDateCount = selectedEvents.reduce((acc, v) => acc + v[1], 0);
-            const eventDates = distributionDates ? [
-                ...distributionDates,
-                ...fixedRandom.randdatesequence(distributionDates[1], this.period[1], Math.max(0, neededDateCount - distributionDates.length))
-            ] : fixedRandom.randdatesequence(...this.period, neededDateCount);
-            let eventIndex = 0;
-            return selectedEvents.flatMap<RingEvent>(([status, count]) => {
-                const selectedCount = fixedRandom.randint(1, count);
-                return Array.from({length: selectedCount}).map<RingEvent>(() => {
-                    const eventDate = eventDates[eventIndex++];
-                    return {
-                        ring: {id: ring.id, type: "ring"},
-                        status: status,
-                        timestamp: eventDate.toISOString(),
-                    }
-                })
-            })
-        });
     }
 
     createData() {
@@ -1387,9 +1383,9 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const documents = this.createDocuments(licenses);
         const permissionTypes = this.createPermissionTypes();
         const permissionProperties = this.createPermissionProperties();
-        const ringSeries = this.createRingSeries();
-        const rings = this.createRings(Object.values(ringSeries), Object.values(licenses));
-        const ringEvents = this.createRingEvents(Object.values(rings));
+        const ringTypes = this.createRingTypes(20);
+        const ringOrders = this.createRingOrders(Object.values(ringTypes));
+        const rings = this.createRings(Object.values(ringOrders), Object.values(licenses));
         return {
             actors,
             licenses,
@@ -1398,8 +1394,8 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             permissionTypes,
             permissionProperties,
             rings,
-            ringSeries,
-            ringEvents,
+            ringTypes,
+            ringOrders,
         }
     }
 }

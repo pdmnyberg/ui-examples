@@ -1,6 +1,18 @@
 "use client"
 import { PropsWithChildren, useMemo } from "react";
-import { Actor, createStaticDataAPI, DataAPI, License, LicenseDocument, PermissionProperty, PermissionType, Ring, RingSeries, Species } from "./common";
+import {
+  Actor,
+  createStaticDataAPI,
+  DataAPI,
+  License,
+  LicenseDocument,
+  PermissionProperty,
+  PermissionType,
+  Ring,
+  RingOrder,
+  RingType,
+  Species
+} from "./common";
 import { fetchData } from "../utils";
 import useSWR from "swr";
 import { DataContext } from "./contexts";
@@ -15,8 +27,9 @@ function fetchAppData(
     permissionPropertyUrl,
     speciesUrl,
     ringUrl,
-    ringSeriesUrl
-  ]: [string, string, string, string, string, string, string, string]
+    ringOrdersUrl,
+    ringTypesUrl,
+  ]: [string, string, string, string, string, string, string, string, string]
 ) {
   return Promise.all([
     fetchData<Record<string, Actor>>(actorUrl),
@@ -26,7 +39,8 @@ function fetchAppData(
     fetchData<Record<string, PermissionProperty>>(permissionPropertyUrl),
     fetchData<Record<string, Species>>(speciesUrl),
     fetchData<Record<string, Ring>>(ringUrl),
-    fetchData<Record<string, RingSeries>>(ringSeriesUrl),
+    fetchData<Record<string, RingOrder>>(ringOrdersUrl),
+    fetchData<Record<string, RingType>>(ringTypesUrl),
   ]);
 }
 
@@ -38,7 +52,8 @@ export function DataProvider({
   permissionPropertyUrl,
   speciesUrl,
   ringUrl,
-  ringSeriesUrl,
+  ringOrdersUrl,
+  ringTypesUrl,
   children,
 }: PropsWithChildren<{
   actorUrl: string;
@@ -48,7 +63,8 @@ export function DataProvider({
   permissionPropertyUrl: string;
   speciesUrl: string;
   ringUrl: string;
-  ringSeriesUrl: string;
+  ringOrdersUrl: string;
+  ringTypesUrl: string;
 }>) {
   const {data, error, isLoading} = useSWR([
     actorUrl,
@@ -58,7 +74,8 @@ export function DataProvider({
     permissionPropertyUrl,
     speciesUrl,
     ringUrl,
-    ringSeriesUrl
+    ringOrdersUrl,
+    ringTypesUrl,
   ], fetchAppData);
   if (error) {
     console.log(error);
@@ -73,7 +90,9 @@ export function DataProvider({
       species,
       rings,
       ringSeries,
+      ringTypes,
     ] = (data || [
+      {},
       {},
       {},
       {},
@@ -92,6 +111,7 @@ export function DataProvider({
       permissionTypes,
       permissionProperties,
       species,
+      ringTypes,
     )
   }, [data])
   return (

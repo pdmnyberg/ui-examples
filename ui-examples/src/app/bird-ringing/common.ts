@@ -1,4 +1,4 @@
-import { AsyncDataSource, DataSource, EntityRef, refsToSet, SearchFunction, StaticDataSource, toCertainList, toList } from "../common";
+import { AsyncDataSource, EntityRef, refsToSet, SearchFunction, StaticDataSource, toCertainList, toList } from "../common";
 
 export type Actor = ActorRef & {
     name: string;
@@ -28,8 +28,9 @@ export type LicenseDocumentRef = EntityRef<"document">;
 export type SpeciesRef = EntityRef<"species">;
 export type PermissionTypeRef = EntityRef<"permission-type">;
 export type PermissionPropertyRef = EntityRef<"permission-property">;
-export type RingSeriesRef = EntityRef<"ring-series">;
+export type RingOrderRef = EntityRef<"ring-order">;
 export type RingRef = EntityRef<"ring">;
+export type RingTypeRef = EntityRef<"ring-type">;
 
 export type License = LicenseRef & {
     mnr: string;
@@ -91,19 +92,26 @@ export type Permission = {
 
 export type Ring = RingRef & {
     identifier: string;
-    ringSeries: RingSeriesRef;
+    order: RingOrderRef;
     license?: LicenseRef;
+    status: RingStatus;
+    changedAt: string;
+    ringType: RingTypeRef;
 }
 
-export type RingSeries = RingSeriesRef & {
+export type RingOrder = RingOrderRef & {
     identifier: string;
     manufacturer: string;
+    ringType: RingTypeRef;
 }
 
-export type RingEvent = {
-    ring: RingRef;
-    status: RingStatus;
-    timestamp: string;
+export type RingType = RingTypeRef & {
+    code: string;
+    variant: "Round" | "Oval" | "Triangle";
+    material: "Aluminium" | "Steel";
+    prefix: string;
+    numberOfDigits: number;
+    diameter: number;
 }
 
 export type RelationStatus = "Active" | "Inactive";
@@ -123,7 +131,8 @@ export interface DataAPI {
     permissionProperties: AsyncDataSource<PermissionProperty>;
     species: AsyncDataSource<Species>;
     rings: AsyncDataSource<Ring>;
-    ringSeries: AsyncDataSource<RingSeries>;
+    ringOrders: AsyncDataSource<RingOrder>;
+    ringTypes: AsyncDataSource<RingType>;
 }
 
 export interface SyncDataAPI {
@@ -134,7 +143,8 @@ export interface SyncDataAPI {
     permissionProperties: StaticDataSource<PermissionProperty>;
     species: StaticDataSource<Species>;
     rings: StaticDataSource<Ring>;
-    ringSeries: StaticDataSource<RingSeries>;
+    ringOrders: StaticDataSource<RingOrder>;
+    ringTypes: StaticDataSource<RingType>;
 }
 
 export function fetchItemList<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, params: Parameters<DataAPI[T]["list"]>): ReturnType<DataAPI[T]["list"]> {
@@ -147,16 +157,27 @@ export function fetchItem<T extends keyof Omit<DataAPI, "ringEvents">>(api: Data
     return getter(ref);
 }
 
-export function createSyncStaticDataAPI(
+export function createSyncStaticDataAPI({
+    actors,
+    licenses,
+    rings,
+    ringOrders,
+    documents,
+    permissionTypes,
+    permissionProperties,
+    species,
+    ringTypes,
+}: {
     actors: Record<string, Actor>,
     licenses: Record<string, License>,
     rings: Record<string, Ring>,
-    ringSeries: Record<string, RingSeries>,
+    ringOrders: Record<string, RingOrder>,
     documents: Record<string, LicenseDocument>,
     permissionTypes: Record<string, PermissionType>,
     permissionProperties: Record<string, PermissionProperty>,
     species: Record<string, Species>,
-): SyncDataAPI {
+    ringTypes: Record<string, RingType>,
+}): SyncDataAPI {
     return {
         actors: new StaticDataSource<Actor>(
             toList(actors || {}).map(v => toEntity(v, "actor")),
@@ -174,7 +195,8 @@ export function createSyncStaticDataAPI(
         permissionProperties: new StaticDataSource<PermissionProperty>(toList(permissionProperties || {}).map(v => toEntity(v, "permission-property"))),
         species: new StaticDataSource<Species>(toList(species || {}).map(v => toEntity(v, "species"))),
         rings: new StaticDataSource<Ring>(toList(rings || {}).map(v => toEntity(v, "ring"))),
-        ringSeries: new StaticDataSource<RingSeries>(toList(ringSeries || {}).map(v => toEntity(v, "ring-series"))),
+        ringOrders: new StaticDataSource<RingOrder>(toList(ringOrders || {}).map(v => toEntity(v, "ring-series"))),
+        ringTypes: new StaticDataSource<RingType>(toList(ringTypes || {}).map(v => toEntity(v, "ring-series"))),
     }
 }
 
@@ -182,22 +204,24 @@ export function createStaticDataAPI(
     actors: Record<string, Actor>,
     licenses: Record<string, License>,
     rings: Record<string, Ring>,
-    ringSeries: Record<string, RingSeries>,
+    ringOrders: Record<string, RingOrder>,
     documents: Record<string, LicenseDocument>,
     permissionTypes: Record<string, PermissionType>,
     permissionProperties: Record<string, PermissionProperty>,
     species: Record<string, Species>,
+    ringTypes: Record<string, RingType>,
 ): DataAPI {
-    const syncAPI = createSyncStaticDataAPI(
+    const syncAPI = createSyncStaticDataAPI({
         actors,
         licenses,
         rings,
-        ringSeries,
+        ringOrders,
         documents,
         permissionTypes,
         permissionProperties,
         species,
-    );
+        ringTypes,
+    });
     return {
         actors: syncAPI.actors.toAsyncSource(),
         licenses: syncAPI.licenses.toAsyncSource(),
@@ -206,7 +230,8 @@ export function createStaticDataAPI(
         permissionProperties: syncAPI.permissionProperties.toAsyncSource(),
         species: syncAPI.species.toAsyncSource(),
         rings: syncAPI.rings.toAsyncSource(),
-        ringSeries: syncAPI.ringSeries.toAsyncSource(),
+        ringOrders: syncAPI.ringOrders.toAsyncSource(),
+        ringTypes: syncAPI.ringTypes.toAsyncSource(),
     }
 }
 
