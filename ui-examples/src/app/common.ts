@@ -6,9 +6,9 @@ export type SearchParams<T> = {
     limit?: number;
 }
 
-export type SearchFunction<T, SP> = (value: T, props: SearchParams<T & SP>["properties"]) => boolean;
+export type SearchFunction<T, SP extends object = object> = (value: T, props: SearchParams<T & SP>["properties"]) => boolean;
 
-export interface ListSource<T, SP extends object = {}> {
+export interface ListSource<T, SP extends object = object> {
     list(params?: SearchParams<T & SP>): T[];
 }
 
@@ -16,10 +16,10 @@ export interface EntrySource<T extends EntityRef<V>, V extends string = T["type"
     get(ref: EntityRef<V>): T;
 }
 
-export interface DataSource<T extends EntityRef<V>, LT extends EntityRef<V> = T, V extends string = T["type"], SP extends object = {}> extends EntrySource<T>, ListSource<LT, SP> {};
+export interface DataSource<T extends EntityRef<V>, LT extends EntityRef<V> = T, V extends string = T["type"], SP extends object = object> extends EntrySource<T>, ListSource<LT, SP> {};
 
 
-export interface AsyncListSource<T, SP extends object = {}> {
+export interface AsyncListSource<T, SP extends object = object> {
     list(params?: SearchParams<T & SP>): Promise<T[]>;
 }
 
@@ -31,7 +31,7 @@ export interface AsyncDataSource<
     T extends EntityRef<V>,
     LT extends EntityRef<V> = T,
     V extends string = T["type"],
-    SP extends object = {}
+    SP extends object = object
 > extends AsyncEntrySource<T>, AsyncListSource<LT, SP> {};
 
 

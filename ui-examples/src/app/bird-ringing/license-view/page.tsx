@@ -22,7 +22,7 @@ function entryToTable(entry: License): Record<string, React.ReactNode> {
 
 const getLicense = ([api, type, licenseId]: [DataAPI, "licenses", string]) => api[type].get({id: licenseId, type: "license"})
 
-const getActors = async ([api, type, _licenseId, actorIds]: [DataAPI, "actors", string, string[]]) => {
+const getActors = async ([api, type, actorIds]: [DataAPI, "actors", string[]]) => {
   const actors = Promise.all(
     actorIds.map(aid => api[type].get({id: aid, type: "actor"}))
   );
@@ -41,22 +41,22 @@ function EntryViewBase() {
     getLicense
   )
   const {data: actors} = useSWR(
-    [api, "actors", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    [api, "actors", (entry?.actors ?? []).map(a => a.actor.id)],
     getActors,
     {fallbackData: []}
   )
   const {data: permissionTypeMap, isLoading: isLoadingPermissionTypeMap} = useSWR(
-    [api, "permissionTypes", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    [api, "permissionTypes"],
     async ([api, type]: [DataAPI, "permissionTypes"]) => toRecord(await api[type].list()),
     {fallbackData: {}}
   )
   const {data: permissionPropertyMap, isLoading: isLoadingPermissionPropertyMap} = useSWR(
-    [api, "permissionProperties", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    [api, "permissionProperties"],
     async ([api, type]: [DataAPI, "permissionProperties"]) => toRecord(await api[type].list()),
     {fallbackData: {}}
   )
   const {data: speciesMap, isLoading: isLoadingSpecies} = useSWR(
-    [api, "species", entryId, (entry?.actors ?? []).map(a => a.actor.id)],
+    [api, "species"],
     async ([api, type]: [DataAPI, "species"]) => toRecord(await api[type].list()),
     {fallbackData: {}}
   )

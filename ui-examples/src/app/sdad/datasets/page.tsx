@@ -29,7 +29,7 @@ export default function Datasets() {
       icon: "list-ul"
     }
   ]
-  const datasetItems = datasets.all().map<TypedSearchableItem<Dataset & {datasetId: string}> & {href: string}>(dataset => ({
+  const datasetItems = datasets.list().map<TypedSearchableItem<Dataset & {datasetId: string}> & {href: string}>(dataset => ({
     id: dataset.id,
     href: getDatasetHref(dataset.id),
     properties: {

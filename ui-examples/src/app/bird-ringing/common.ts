@@ -146,9 +146,9 @@ export interface DataAPI {
     ringSeries: AsyncDataSource<EntityRef<"ring-series"> & RingSeries>;
 }
 
-export function fetchItemList<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, params: Parameters<DataAPI[T]["list"]>[0]): ReturnType<DataAPI[T]["list"]> {
-    const source = api[type];
-    return source.list(params as any) as ReturnType<DataAPI[T]["list"]>;
+export function fetchItemList<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, params: Parameters<DataAPI[T]["list"]>): ReturnType<DataAPI[T]["list"]> {
+    const lister = api[type].list as (...args: Parameters<DataAPI[T]["list"]>) => ReturnType<DataAPI[T]["list"]>;
+    return lister(...params);
 }
 
 export function fetchItem<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, ref: EntityRef<NoInfer<T>>): ReturnType<DataAPI[T]["get"]> {

@@ -44,7 +44,7 @@ const licenseFilter: SearchFunction<EntityRef<"license"> & License, {actorRef: E
   return license.actors.some(a => (roles.size === 0 || roles.has(a.role)) && (actors.size === 0 || actors.has(a.actor.id)))
 }
 
-const actorFilter: SearchFunction<EntityRef<"actor"> & Actor, {}> = (actor, props) => {
+const actorFilter: SearchFunction<EntityRef<"actor"> & Actor> = (actor, props) => {
   const ids = new Set(toArray(props?.id));
   return ids.size === 0 || ids.has(actor.id);
 }
@@ -96,35 +96,37 @@ export function DataProvider({
   if (error) {
     console.log(error);
   }
-  const [
-    actors,
-    licenses,
-    documents,
-    permissionTypes,
-    permissionProperties,
-    species,
-    rings,
-    ringSeries,
-  ] = (data || []);
-  const dataSource = useMemo<DataAPI>(() => ({
-    actors: new StaticDataSource<EntityRef<"actor"> & Actor>(
-      toList(actors || {}).map(v => toEntity(v, "actor")),
-      actorFilter
-    ).toAsyncSource(),
-    licenses: new StaticDataSource<EntityRef<"license"> & License>(
-      toList(licenses || {}).map(v => toEntity(v, "license")),
-      licenseFilter
-    ).toAsyncSource(),
-    documents: new StaticDataSource<EntityRef<"document"> & LicenseDocument>(
-      toList(documents || {}).map(v => toEntity(v, "document")),
-      documentFilter
-    ).toAsyncSource(),
-    permissionTypes: new StaticDataSource<EntityRef<"permission-type"> & PermissionType>(toList(permissionTypes || {}).map(v => toEntity(v, "permission-type"))).toAsyncSource(),
-    permissionProperties: new StaticDataSource<EntityRef<"permission-property"> & PermissionProperty>(toList(permissionProperties || {}).map(v => toEntity(v, "permission-property"))).toAsyncSource(),
-    species: new StaticDataSource<EntityRef<"species"> & Species>(toList(species || {}).map(v => toEntity(v, "species"))).toAsyncSource(),
-    rings: new StaticDataSource<EntityRef<"ring"> & Ring>(toList(rings || {}).map(v => toEntity(v, "ring"))).toAsyncSource(),
-    ringSeries: new StaticDataSource<EntityRef<"ring-series"> & RingSeries>(toList(ringSeries || {}).map(v => toEntity(v, "ring-series"))).toAsyncSource(),
-  }), [data])
+  const dataSource = useMemo<DataAPI>(() => {
+    const [
+      actors,
+      licenses,
+      documents,
+      permissionTypes,
+      permissionProperties,
+      species,
+      rings,
+      ringSeries,
+    ] = (data || []);
+    return {
+      actors: new StaticDataSource<EntityRef<"actor"> & Actor>(
+        toList(actors || {}).map(v => toEntity(v, "actor")),
+        actorFilter
+      ).toAsyncSource(),
+      licenses: new StaticDataSource<EntityRef<"license"> & License>(
+        toList(licenses || {}).map(v => toEntity(v, "license")),
+        licenseFilter
+      ).toAsyncSource(),
+      documents: new StaticDataSource<EntityRef<"document"> & LicenseDocument>(
+        toList(documents || {}).map(v => toEntity(v, "document")),
+        documentFilter
+      ).toAsyncSource(),
+      permissionTypes: new StaticDataSource<EntityRef<"permission-type"> & PermissionType>(toList(permissionTypes || {}).map(v => toEntity(v, "permission-type"))).toAsyncSource(),
+      permissionProperties: new StaticDataSource<EntityRef<"permission-property"> & PermissionProperty>(toList(permissionProperties || {}).map(v => toEntity(v, "permission-property"))).toAsyncSource(),
+      species: new StaticDataSource<EntityRef<"species"> & Species>(toList(species || {}).map(v => toEntity(v, "species"))).toAsyncSource(),
+      rings: new StaticDataSource<EntityRef<"ring"> & Ring>(toList(rings || {}).map(v => toEntity(v, "ring"))).toAsyncSource(),
+      ringSeries: new StaticDataSource<EntityRef<"ring-series"> & RingSeries>(toList(ringSeries || {}).map(v => toEntity(v, "ring-series"))).toAsyncSource(),
+    }
+  }, [data])
   return (
     isLoading ? <></> : <DataContext.Provider value={dataSource}>{children}</DataContext.Provider>
   )
