@@ -2,10 +2,11 @@
 import Link from "next/link";
 import Warning from "../warning";
 import { TypedSearchableItem } from "../../hooks";
-import { useDataSource } from "../contexts";
-import { getOrDefault, Ring } from "../common";
+import { useDataAPI, useDataSource } from "../contexts";
+import { DataAPI, Ring, toRecord } from "../common";
 import { ColumnSpec } from "@/components/Table";
 import { FilterableTable } from "@/components/FilterableTable";
+import useSWR from "swr";
 
 type SummaryProps = {
   manufacturer: string;
@@ -13,11 +14,20 @@ type SummaryProps = {
 }
 
 export default function ListView() {
-  const dataSource = useDataSource();
+  const api = useDataAPI();
+  const {data: rings} = useSWR(
+    [api, "rings", {}],
+    async ([api, type]: [DataAPI, "rings"]) => await api[type].list(),
+    {fallbackData: []}
+  );
+  const {data: ringSeriesMap, isLoading: isLoadingRingSeriesMap} = useSWR(
+    [api, "ringSeries"],
+    async ([api, type]: [DataAPI, "ringSeries"]) => toRecord(await api[type].list()),
+    {fallbackData: {}}
+  )
 
-  const rings = getOrDefault(dataSource.getRings(), (a) => a, []);
-  const items = rings.map<TypedSearchableItem<Ring & SummaryProps>>(item => {
-    const ringSeries = dataSource.getRingSeries(item.ringSeries);
+  const items = isLoadingRingSeriesMap ? [] : rings.map<TypedSearchableItem<Ring & SummaryProps>>(item => {
+    const ringSeries = ringSeriesMap[item.ringSeries.id];
     return {
       id: item.id,
       properties: {
