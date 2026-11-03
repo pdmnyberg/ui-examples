@@ -51,7 +51,7 @@ function EntryViewBase() {
 
   const entryData: DataSpec<Ring & SummaryData> = {
     id: entry.id,
-    identifier: ringType ? ringIdentifier(entry, ringType) : "-",
+    identifier: ringType ? <span className="all-spaces">{ringIdentifier(entry, ringType)}</span> : "-",
     status: entry.status,
     manufacturer: ringOrder?.manufacturer ?? "-",
     order: ringOrder ? <Link href={`/bird-ringing/ring-order-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link> : "-",

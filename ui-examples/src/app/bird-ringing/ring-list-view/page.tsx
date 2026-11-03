@@ -39,7 +39,11 @@ export default function ListView() {
       properties: {
         identifier: {
           term: isLoadingRingTypeMap ? "" : ringIdentifier(item, ringTypeMap[item.ringType.id]),
-          component: isLoadingRingTypeMap ? "-" : <Link href={`/bird-ringing/ring-view/?entryId=${item.id}`} style={{whiteSpace: "pre"}}>{ringIdentifier(item, ringTypeMap[item.ringType.id])}</Link>
+          component: isLoadingRingTypeMap ? "-" : <Link href={`/bird-ringing/ring-view/?entryId=${item.id}`} className="all-spaces">{ringIdentifier(item, ringTypeMap[item.ringType.id])}</Link>
+        },
+        status: {
+          term: item.status,
+          component: item.status
         },
         manufacturer: {
           term: ringOrder.manufacturer,
@@ -60,6 +64,7 @@ export default function ListView() {
   const columns: ColumnSpec<Ring & SummaryProps> = {
     id: "",
     identifier: "Identifier",
+    status: "Status",
     ringType: "Type",
     manufacturer: "Manufacturer",
     order: "Order",

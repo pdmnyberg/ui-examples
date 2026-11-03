@@ -1378,7 +1378,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         ];
         const owners = licenses.map<LicenseRef>(l => ({id: l.id, type: "license"}));
 
-        return ringOrders.flatMap<Ring>((rs, rsi) => (Array.from({length: rs.count}).map<Ring>((_, ri) => ({
+        return ringOrders.flatMap<Ring>((rs) => (Array.from({length: rs.count}).map<Ring>((_, ri) => ({
             id: `ring-${rs.ringType.id}-${rs.startNumber + ri}`,
             number: rs.startNumber + ri,
             order: {id: rs.id, type: "ring-order"},
