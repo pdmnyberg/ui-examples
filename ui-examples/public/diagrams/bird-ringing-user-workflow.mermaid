@@ -14,14 +14,25 @@ descriptions:
    When operations are performed on licenses it is generally assumed that they are performed on all actors assigned to the selected licenses, that are relevant for the selected operation
 ---
 
-flowchart TD
+flowchart LR
     admin@{ shape: circle, label: "Admin" }
     intent@{ shape: diamond, label: "Intent" }
 
-    subgraph license_list_view["License list view"]
-        llist[License list]
-        lselection[License selection]
+    subgraph license_group[" "]
+      subgraph license_list_view["License list view"]
+          llist[License list]
+          lselection[License selection]
+      end
+
+      subgraph license_view["License view"]
+          license[License]
+          lalist[License actor list]
+          lplist[License permission list]
+          ldetails[License details]
+          lhistory[License history]
+      end
     end
+    style license_group fill:transparent,stroke:transparent,color:transparent
 
     subgraph system_operations["System operations"]
         lgenerate@{ shape: lin-rect , label: "Generate license(s)"}
@@ -31,31 +42,43 @@ flowchart TD
         permissionupdate@{ shape: lin-rect , label: "Update permissions"}
     end
 
-    subgraph actor_list_view["Actor list view"]
-        alist[Actor list]
-        aselection[Actor selection]
-    end
+    subgraph actor_group[" "]
+      subgraph actor_list_view["Actor list view"]
+          alist[Actor list]
+          aselection[Actor selection]
+      end
 
-    subgraph actor_view["Actor view"]
-        actor[Actor]
-        allist[Actor license list]
-        adetails[Actor details]
-        acomstatus[Actor communication status]
-        adlist[Actor document list]
+      subgraph actor_view["Actor view"]
+          actor[Actor]
+          allist[Actor license list]
+          adetails[Actor details]
+          acomstatus[Actor communication status]
+          adlist[Actor document list]
+      end
     end
-
-    subgraph license_view["License view"]
-        license[License]
-        lalist[License actor list]
-        lplist[License permission list]
-        ldetails[License details]
-        lhistory[License history]
-    end
+    style actor_group fill:transparent,stroke:transparent,color:transparent
 
     subgraph permission_edit["Permission edit"]
       permissionlist[Permission list]
       permissionpropertylist[Permission property list]
     end
+
+    subgraph ring_group[" "]
+      subgraph ring_view["Ring view"]
+          ring[Ring]
+          ringdetails[Ring details]
+          ringstatus[Ring status]
+      end
+
+      subgraph ring_list_view["Ring list view"]
+          ringlist[Ring list]
+          ringfilteropts[Ring filter options]
+          ringselection[Ring selection]
+          ringstocksummary[Ring stock summary]
+      end
+    end
+    style ring_group fill:transparent,stroke:transparent,color:transparent
+    
 
     admin --> intent
     intent -- "License has changed" --> llist
@@ -99,3 +122,13 @@ flowchart TD
     aselection -. "Send licenses" .-> lsend
     aselection -. "Download licenses" .-> ldownload
     aselection -. "Get list of emails addresses" .-> listemails
+
+    intent -- "Evaluate current ring stock" --> ringlist
+    intent -- "Determine where rings are located" --> ringlist
+    ringlist -- "Find rings with characteristics" --> ringfilteropts
+    ringfilteropts -- "Filter ring list" --> ringlist
+    ringlist -- "View ring" --> ring
+    ringlist -- "Select rings" --> ringselection
+    ringlist -- "View stock summary" --> ringstocksummary
+    ring -- "View details" --> ringdetails
+    ring -- "Update ring status" --> ringstatus
