@@ -1325,6 +1325,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
                                 numberOfDigits,
                                 diameter,
                                 variant,
+                                fillerStyle: fixedRandom.choice(["sering", "euring"]),
                                 type: "ring-type",
                             })
                         }
@@ -1347,15 +1348,24 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             "Ordered",
             "Delivered"
         ];
-        return Array.from({length: numberOfRingSeries}).map<RingOrder>((_, index) => ({
-            id: `ring-series-${index}`,
-            manufacturer: fixedRandom.choice(manufacturers),
-            identifier: `O${String(index).padStart(10, '0')}`,
-            ringType: {id: fixedRandom.choice(ringTypes).id, type: "ring-type"},
-            status: fixedRandom.choice(statuses),
-            changedAt: fixedRandom.randdate(...this.period).toISOString(),
-            type: "ring-order",
-        })).reduce<Record<string, RingOrder>>((acc, s) => {
+        const ringTypeCount: Record<string, number> = {};
+        return Array.from({length: numberOfRingSeries}).map<RingOrder>((_, index) => {
+            const ringTypeId = fixedRandom.choice(ringTypes).id;
+            const startNumber = ringTypeCount[ringTypeId] ?? 0;
+            const count = fixedRandom.choice([20, 40, 60, 80]);
+            ringTypeCount[ringTypeId] = startNumber + count;
+            return {
+                id: `ring-series-${index}`,
+                manufacturer: fixedRandom.choice(manufacturers),
+                identifier: `O${String(index).padStart(10, '0')}`,
+                ringType: {id: ringTypeId, type: "ring-type"},
+                status: fixedRandom.choice(statuses),
+                changedAt: fixedRandom.randdate(...this.period).toISOString(),
+                startNumber: startNumber,
+                count: count,
+                type: "ring-order",
+            }
+        }).reduce<Record<string, RingOrder>>((acc, s) => {
             acc[s.id] = s;
             return acc;
         }, {});
@@ -1367,9 +1377,10 @@ export class BirdRingingDataGenerator implements DataGenerator<{
             "In stock", "Assigned", "In use", "Observed", "Decommissioned"
         ];
         const owners = licenses.map<LicenseRef>(l => ({id: l.id, type: "license"}));
-        return ringOrders.flatMap<Ring>((rs, rsi) => (Array.from({length: 25}).map<Ring>((_, ri) => ({
-            id: `ring-${rsi * 25 + ri}`,
-            identifier: `R${String(rsi * 25 + ri).padStart(10, '0')}`,
+
+        return ringOrders.flatMap<Ring>((rs, rsi) => (Array.from({length: rs.count}).map<Ring>((_, ri) => ({
+            id: `ring-${rs.ringType.id}-${rs.startNumber + ri}`,
+            number: rs.startNumber + ri,
             order: {id: rs.id, type: "ring-order"},
             license: fixedRandom.randbool() ? fixedRandom.choice(owners) : undefined,
             status: fixedRandom.choice(statuses),

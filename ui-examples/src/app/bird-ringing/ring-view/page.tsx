@@ -1,5 +1,5 @@
 "use client"
-import { Ring, DataAPI } from "../common";
+import { Ring, DataAPI, ringIdentifier } from "../common";
 import Warning from "../warning";
 import { useSearchParams, notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -11,6 +11,7 @@ import useSWR from "swr";
 type SummaryData = {
   manufacturer: string;
   series: string;
+  identifier: string;
 }
 
 const getRing = async ([api, type, entryId]: [DataAPI, "rings", string]) => await api[type].get({id: entryId, type: "ring"})
@@ -50,7 +51,7 @@ function EntryViewBase() {
 
   const entryData: DataSpec<Ring & SummaryData> = {
     id: entry.id,
-    identifier: entry.identifier,
+    identifier: ringType ? ringIdentifier(entry, ringType) : "-",
     status: entry.status,
     manufacturer: ringOrder?.manufacturer ?? "-",
     order: ringOrder ? <Link href={`/bird-ringing/ring-order-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link> : "-",

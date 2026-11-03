@@ -3,12 +3,13 @@ import Link from "next/link";
 import Warning from "../warning";
 import { TypedSearchableItem } from "../../hooks";
 import { useDataAPI } from "../contexts";
-import { DataAPI, Ring, toRecord } from "../common";
+import { DataAPI, Ring, ringIdentifier, toRecord } from "../common";
 import { ColumnSpec } from "@/components/Table";
 import { FilterableTable } from "@/components/FilterableTable";
 import useSWR from "swr";
 
 type SummaryProps = {
+  identifier: string;
   manufacturer: string;
   order: string;
 }
@@ -37,8 +38,8 @@ export default function ListView() {
       id: item.id,
       properties: {
         identifier: {
-          term: item.identifier,
-          component: <Link href={`/bird-ringing/ring-view/?entryId=${item.id}`}>{item.identifier}</Link>
+          term: isLoadingRingTypeMap ? "" : ringIdentifier(item, ringTypeMap[item.ringType.id]),
+          component: isLoadingRingTypeMap ? "-" : <Link href={`/bird-ringing/ring-view/?entryId=${item.id}`} style={{whiteSpace: "pre"}}>{ringIdentifier(item, ringTypeMap[item.ringType.id])}</Link>
         },
         manufacturer: {
           term: ringOrder.manufacturer,

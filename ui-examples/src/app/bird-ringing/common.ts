@@ -91,7 +91,7 @@ export type Permission = {
 }
 
 export type Ring = RingRef & {
-    identifier: string;
+    number: number;
     order: RingOrderRef;
     license?: LicenseRef;
     status: RingStatus;
@@ -104,6 +104,8 @@ export type RingOrder = RingOrderRef & {
     identifier: string;
     manufacturer: string;
     ringType: RingTypeRef;
+    startNumber: number;
+    count: number;
     changedAt: string;
 }
 
@@ -114,6 +116,7 @@ export type RingType = RingTypeRef & {
     prefix: string;
     numberOfDigits: number;
     diameter: number;
+    fillerStyle: "sering" | "euring";
 }
 
 export type RelationStatus = "Active" | "Inactive";
@@ -295,4 +298,12 @@ export function toRecord<T extends {id: string}>(items: T[]): Record<string, T> 
         acc[item.id] = item;
         return acc;
     }, {})
+}
+
+export function ringIdentifier(ring: Ring, type: RingType): string {
+    const fillCharacter = type.fillerStyle === "sering" ? " " : ".";
+    const identifierSize = type.fillerStyle === "sering" ? 8 : 10;
+    const minimumNumberSize = Math.max(type.numberOfDigits, identifierSize - type.prefix.length);
+    const numberPart = String(ring.number).padStart(minimumNumberSize, fillCharacter);
+    return `${type.prefix}${numberPart}`;
 }
