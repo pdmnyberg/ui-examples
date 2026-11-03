@@ -25,6 +25,11 @@ export default function ListView() {
     async ([api, type]: [DataAPI, "ringOrders"]) => toRecord(await api[type].list()),
     {fallbackData: {}}
   )
+  const {data: ringTypeMap, isLoading: isLoadingRingTypeMap} = useSWR(
+    [api, "ringTypes"],
+    async ([api, type]: [DataAPI, "ringTypes"]) => toRecord(await api[type].list()),
+    {fallbackData: {}}
+  )
 
   const items = isLoadingRingSeriesMap ? [] : rings.map<TypedSearchableItem<Ring & SummaryProps>>(item => {
     const ringOrder = ringOrderMap[item.order.id];
@@ -39,6 +44,10 @@ export default function ListView() {
           term: ringOrder.manufacturer,
           component: ringOrder.manufacturer,
         },
+        ringType: {
+          term: isLoadingRingTypeMap ? "" : ringTypeMap[item.ringType.id].code,
+          component: isLoadingRingTypeMap ? "-" : <Link href={`/bird-ringing/ring-type-view/?entryId=${item.ringType.id}`}>{ringTypeMap[item.ringType.id].code}</Link>,
+        },
         order: {
             term: ringOrder.identifier,
             component: <Link href={`/bird-ringing/ring-order-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link>
@@ -50,6 +59,7 @@ export default function ListView() {
   const columns: ColumnSpec<Ring & SummaryProps> = {
     id: "",
     identifier: "Identifier",
+    ringType: "Type",
     manufacturer: "Manufacturer",
     order: "Order",
   }
