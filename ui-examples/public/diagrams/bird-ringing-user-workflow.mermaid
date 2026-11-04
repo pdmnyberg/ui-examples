@@ -142,7 +142,7 @@ flowchart LR
     ringlist -- "Select rings" --> ringselection
     ringlist -- "View stock summary" --> ringstocksummary
     ring -- "View details" --> ringdetails
-    ring -- "Update ring status" --> ringstatus
+    ring -- "View / update ring status" --> ringstatus
 
 
     intent -- "New rings are needed" --> orderlist
@@ -151,5 +151,5 @@ flowchart LR
     orderfilter -- "Filter order list" --> orderlist
     orderlist -- "View order" --> order
     orderlist -- "Create order" --> order
-    order -- "Update order status" --> orderstatus
-    order -- "Changer order details" --> orderdetails
+    order -- "View or update order status" --> orderstatus
+    order -- "View or change order details" --> orderdetails
