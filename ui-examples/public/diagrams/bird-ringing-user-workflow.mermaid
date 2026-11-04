@@ -64,6 +64,17 @@ flowchart LR
     end
 
     subgraph ring_group[" "]
+      subgraph ring_order_list["Ring order list view"]
+        orderlist[Order list]
+        orderfilter[Order filter options]
+      end
+
+      subgraph ring_order["Ring order view"]
+        order[Order]
+        orderdetails[Order details]
+        orderstatus[Order status]
+      end
+
       subgraph ring_view["Ring view"]
           ring[Ring]
           ringdetails[Ring details]
@@ -72,7 +83,7 @@ flowchart LR
 
       subgraph ring_list_view["Ring list view"]
           ringlist[Ring list]
-          ringfilteropts[Ring filter options]
+          ringfilter[Ring filter options]
           ringselection[Ring selection]
           ringstocksummary[Ring stock summary]
       end
@@ -125,10 +136,20 @@ flowchart LR
 
     intent -- "Evaluate current ring stock" --> ringlist
     intent -- "Determine where rings are located" --> ringlist
-    ringlist -- "Find rings with characteristics" --> ringfilteropts
-    ringfilteropts -- "Filter ring list" --> ringlist
+    ringlist -- "Find rings with characteristics" --> ringfilter
+    ringfilter -- "Filter ring list" --> ringlist
     ringlist -- "View ring" --> ring
     ringlist -- "Select rings" --> ringselection
     ringlist -- "View stock summary" --> ringstocksummary
     ring -- "View details" --> ringdetails
     ring -- "Update ring status" --> ringstatus
+
+
+    intent -- "New rings are needed" --> orderlist
+    intent -- "Order status changed" --> orderlist
+    orderlist -- "Find an order or group of orders" --> orderfilter
+    orderfilter -- "Filter order list" --> orderlist
+    orderlist -- "View order" --> order
+    orderlist -- "Create order" --> order
+    order -- "Update order status" --> orderstatus
+    order -- "Changer order details" --> orderdetails
