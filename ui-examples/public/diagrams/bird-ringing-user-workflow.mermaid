@@ -40,6 +40,8 @@ flowchart LR
         ldownload@{ shape: lin-rect , label: "Downoad license(s)"}
         listemails@{ shape: lin-rect , label: "Get list of email addresses"}
         permissionupdate@{ shape: lin-rect , label: "Update permissions"}
+        orderupdate@{ shape: lin-rect , label: "Update orders"}
+        ringupdate@{ shape: lin-rect , label: "Update ring"}
     end
 
     subgraph actor_group[" "]
@@ -142,7 +144,8 @@ flowchart LR
     ringlist -- "Select rings" --> ringselection
     ringlist -- "View stock summary" --> ringstocksummary
     ring -- "View details" --> ringdetails
-    ring -- "View / update ring status" --> ringstatus
+    ring -- "View or update ring status" --> ringstatus
+    ringstatus -. "Update ring status" .-> ringupdate
 
 
     intent -- "New rings are needed" --> orderlist
@@ -153,3 +156,5 @@ flowchart LR
     orderlist -- "Create order" --> order
     order -- "View or update order status" --> orderstatus
     order -- "View or change order details" --> orderdetails
+    orderstatus -. "Update order status" .-> orderupdate
+    orderdetails -. "Update order details" .-> orderupdate
