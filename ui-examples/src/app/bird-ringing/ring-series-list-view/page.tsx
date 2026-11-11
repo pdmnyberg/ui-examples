@@ -2,7 +2,7 @@
 import Warning from "../warning";
 import { TypedSearchableItem } from "../../hooks";
 import { useDataAPI } from "../contexts";
-import { DataAPI, RingSeries, ringIdentifier, toRecord } from "../common";
+import { DataAPI, RingSeries, ringIdentifier } from "../common";
 import { ColumnSpec } from "@/components/Table";
 import { FilterableTable } from "@/components/FilterableTable";
 import useSWR from "swr";
@@ -19,13 +19,8 @@ export default function ListView() {
     async ([api, type]: [DataAPI, "ringSeries"]) => await api[type].list(),
     {fallbackData: []}
   );
-  const {data: ringOrderMap, isLoading: isLoadingRingOrderMap} = useSWR(
-    [api, "ringOrders"],
-    async ([api, type]: [DataAPI, "ringOrders"]) => toRecord(await api[type].list()),
-    {fallbackData: {}}
-  )
 
-  const items = isLoadingRingOrderMap ? [] : ringSeries.map<TypedSearchableItem<RingSeries & SummaryProps>>(item => {
+  const items = ringSeries.map<TypedSearchableItem<RingSeries & SummaryProps>>(item => {
     return {
       id: item.id,
       properties: {
@@ -46,8 +41,8 @@ export default function ListView() {
           component: item.fillerStyle
         },
         color: {
-          term: item.color,
-          component: item.color
+          term: item.color ?? "",
+          component: item.color ?? "-"
         },
         hasWebAddress: {
           term: String(item.hasWebAddress),

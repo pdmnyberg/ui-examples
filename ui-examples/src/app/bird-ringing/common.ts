@@ -126,7 +126,7 @@ export type RingSeries = RingSeriesRef & {
     prefix: string;
     numberOfDigits: number;
     fillerStyle: "sering" | "euring";
-    color: string;
+    color?: string;
     hasWebAddress: boolean;
 }
 

@@ -1349,7 +1349,7 @@ export class BirdRingingDataGenerator implements DataGenerator<{
         const fillerStyles: RingSeries["fillerStyle"][] = ["sering", "euring"];
         const prefixes: string[] = ["A", "B", "C", "D", "AB", "AC"];
         const numberOfDigitsOptions: number[] = [5, 6, 7, 8, 9, 10];
-        const colors = ["Red", "Blue", "Green"]
+        const colors = [undefined, undefined, undefined, undefined, undefined, undefined, "Red", "Blue", "Green"]
         const series = Array.from({length: numberOfSeries}).map<RingSeries>((_, index) => ({
             id: `ring-series-${index}`,
             fillerStyle: fixedRandom.choice(fillerStyles),

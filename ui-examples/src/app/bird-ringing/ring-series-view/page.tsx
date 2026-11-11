@@ -41,7 +41,7 @@ function EntryViewBase() {
     prefix: entry.prefix,
     numberOfDigits: entry.numberOfDigits,
     fillerStyle: entry.fillerStyle,
-    color: entry.color,
+    color: entry.color ?? "-",
     hasWebAddress: entry.hasWebAddress,
   }
   const entryColumns: ColumnSpec<RingSeries & SummaryProps> = {
