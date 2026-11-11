@@ -78,7 +78,7 @@ export default function ListView() {
   return (
     <div className="container">
       <Warning><span/></Warning>
-      <h2>Ring List View</h2>
+      <h2>Ring list view</h2>
       <FilterableTable
         items={items}
         columns={columns}

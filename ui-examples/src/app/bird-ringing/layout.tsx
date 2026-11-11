@@ -20,6 +20,7 @@ export default function PageLayout({
     {type: "heading", label: "Manage details"},
     {type: "item", label: "Ring list", href: "/bird-ringing/ring-list-view", id: "ring-list-view"},
     {type: "item", label: "Order list", href: "/bird-ringing/ring-order-list-view", id: "ring-order-list-view"},
+    {type: "item", label: "Ring series list", href: "/bird-ringing/ring-series-list-view", id: "ring-series-list-view"},
     {type: "item", label: "Species list", href: "/bird-ringing/species-list-view", id: "species-list-view"},
     {type: "item", label: "Permissions list", href: "/bird-ringing/permissions-list-view", id: "permissions-list-view"},
     {type: "separator"},

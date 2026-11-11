@@ -3,7 +3,7 @@ import Link from "next/link";
 import Warning from "../warning";
 import { TypedSearchableItem } from "../../hooks";
 import { useDataAPI } from "../contexts";
-import { DataAPI, RingOrder, toRecord } from "../common";
+import { DataAPI, ringIdentifier, RingOrder, toRecord } from "../common";
 import { ColumnSpec } from "@/components/Table";
 import { FilterableTable } from "@/components/FilterableTable";
 import useSWR from "swr";
@@ -28,13 +28,19 @@ export default function ListView() {
     {fallbackData: {}}
   )
 
-  const items = isLoadingRingTypeMap ? [] : orders.map<TypedSearchableItem<RingOrder & SummaryProps>>(item => {
+  const {data: ringSeriesMap, isLoading: isLoadingRingSeriesMap} = useSWR(
+    [api, "ringSeries"],
+    async ([api, type]: [DataAPI, "ringSeries"]) => toRecord(await api[type].list()),
+    {fallbackData: {}}
+  )
+
+  const items = orders.map<TypedSearchableItem<RingOrder & SummaryProps>>(item => {
     return {
       id: item.id,
       properties: {
         identifier: {
           term: item.identifier,
-          component: isLoadingRingTypeMap ? "-" : <Link href={`/bird-ringing/ring-order-view/?entryId=${item.id}`} className="all-spaces">{item.identifier}</Link>
+          component: <Link href={`/bird-ringing/ring-order-view/?entryId=${item.id}`} className="all-spaces">{item.identifier}</Link>
         },
         status: {
           term: item.status,
@@ -48,6 +54,10 @@ export default function ListView() {
           term: isLoadingRingTypeMap ? "" : ringTypeMap[item.ringType.id].code,
           component: isLoadingRingTypeMap ? "-" : <Link href={`/bird-ringing/ring-type-view/?entryId=${item.ringType.id}`}>{ringTypeMap[item.ringType.id].code}</Link>,
         },
+        ringSeries: {
+          term: isLoadingRingSeriesMap ? "" : ringIdentifier(0, ringSeriesMap[item.ringSeries.id]),
+          component: isLoadingRingSeriesMap ? "-" : <Link href={`/bird-ringing/ring-series-view/?entryId=${item.ringSeries.id}`}>{ringIdentifier(0, ringSeriesMap[item.ringSeries.id])}</Link>,
+        },
       }
     }
   });
@@ -57,13 +67,14 @@ export default function ListView() {
     identifier: "Identifier",
     status: "Status",
     ringType: "Type",
+    ringSeries: "Ring Series",
     manufacturer: "Manufacturer",
   }
   
   return (
     <div className="container">
       <Warning><span/></Warning>
-      <h2>Ring order List View</h2>
+      <h2>Ring order list view</h2>
       <FilterableTable
         items={items}
         columns={columns}
