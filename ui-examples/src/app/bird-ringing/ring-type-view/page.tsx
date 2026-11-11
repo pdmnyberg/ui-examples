@@ -36,16 +36,18 @@ function EntryViewBase() {
     variant: entry.variant,
     material: entry.material,
     diameter: entry.diameter,
-    prefix: entry.prefix,
-    numberOfDigits: entry.numberOfDigits
+    height: entry.height,
+    thickness: entry.thickness,
+    weight: entry.weight,
   }
   const entryColumns: ColumnSpec<RingType> = {
     code: "Code",
     variant: "Variant",
     material: "Material",
     diameter: "Diameter",
-    prefix: "Prefix",
-    numberOfDigits: "Number of digits"
+    height: "Height",
+    thickness: "Thickness",
+    weight: "Weight",
   };
 
   return (

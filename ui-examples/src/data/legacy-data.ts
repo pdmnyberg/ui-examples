@@ -273,6 +273,7 @@ function getDataSource(numberOfLicenses: number = 100) {
         permissionTypes: content.permissionTypes,
         permissionProperties: content.permissionProperties,
         species: content.species,
+        ringSeries: {},
     });
 }
 

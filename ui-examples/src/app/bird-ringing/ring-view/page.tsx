@@ -10,7 +10,6 @@ import useSWR from "swr";
 
 type SummaryData = {
   manufacturer: string;
-  series: string;
   identifier: string;
 }
 
@@ -18,7 +17,9 @@ const getRing = async ([api, type, entryId]: [DataAPI, "rings", string]) => awai
 
 const getRingType = async ([api, type, typeId]: [DataAPI, "ringTypes", string]) => await api[type].get({id: typeId, type: "ring-type"})
 
-const getRingOrder = async ([api, type, seriesId]: [DataAPI, "ringOrders", string]) => await api[type].get({id: seriesId, type: "ring-order"})
+const getRingOrder = async ([api, type, orderId]: [DataAPI, "ringOrders", string]) => await api[type].get({id: orderId, type: "ring-order"})
+
+const getRingSeries = async ([api, type, seriesId]: [DataAPI, "ringSeries", string]) => await api[type].get({id: seriesId, type: "ring-series"})
 
 function EntryViewBase() {
   const searchParams = useSearchParams();
@@ -35,11 +36,15 @@ function EntryViewBase() {
     [api, "ringTypes", entry?.ringType.id],
     getRingType,
   );
+  const {data: ringSeries, isLoading: isLoadingSeries} = useSWR(
+    [api, "ringSeries", entry?.ringSeries.id],
+    getRingSeries,
+  );
   const {data: ringOrder, isLoading: isLoadingRingSeries} = useSWR(
     [api, "ringOrders", entry?.order.id],
     getRingOrder,
   );
-  if (isLoading || isLoadingRingSeries || isLoadingType) return (
+  if (isLoading || isLoadingRingSeries || isLoadingType || isLoadingSeries) return (
     <div className="container">
       <h2>Ring view</h2>
       <p>Loading...</p>
@@ -51,11 +56,12 @@ function EntryViewBase() {
 
   const entryData: DataSpec<Ring & SummaryData> = {
     id: entry.id,
-    identifier: ringType ? <span className="all-spaces">{ringIdentifier(entry, ringType)}</span> : "-",
+    identifier: ringSeries ? <span className="all-spaces">{ringIdentifier(entry.number, ringSeries)}</span> : "-",
     status: entry.status,
     manufacturer: ringOrder?.manufacturer ?? "-",
     order: ringOrder ? <Link href={`/bird-ringing/ring-order-view/?entryId=${ringOrder.id}`}>{ringOrder.identifier}</Link> : "-",
     ringType: ringType ? <Link href={`/bird-ringing/ring-type-view/?entryId=${ringType.id}`}>{ringType.code}</Link> : "-",
+    ringSeries: ringSeries ? <Link className="all-spaces" href={`/bird-ringing/ring-series-view/?entryId=${ringSeries.id}`}>{ringIdentifier(0, ringSeries)}</Link> : "-",
     changedAt: entry.changedAt,
   }
   const entryColumns: ColumnSpec<Ring & SummaryData> = {
@@ -64,6 +70,7 @@ function EntryViewBase() {
     manufacturer: "Manufacturer",
     order: "Order",
     ringType: "Ring type",
+    ringSeries: "Ring series",
     changedAt: "Changed at",
   };
 

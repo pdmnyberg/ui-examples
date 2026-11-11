@@ -49,6 +49,7 @@ export default function PageLayout({
               ringUrl={birdRingingUrl(basePath, "rings")}
               ringOrdersUrl={birdRingingUrl(basePath, "ringOrders")}
               ringTypesUrl={birdRingingUrl(basePath, "ringTypes")}
+              ringSeriesUrl={birdRingingUrl(basePath, "ringSeries")}
             >
               {children}
             </DataProvider>

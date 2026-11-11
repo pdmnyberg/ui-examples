@@ -11,6 +11,7 @@ import {
   Ring,
   RingOrder,
   RingType,
+  RingSeries,
   Species
 } from "./common";
 import { fetchData } from "../utils";
@@ -29,7 +30,8 @@ function fetchAppData(
     ringUrl,
     ringOrdersUrl,
     ringTypesUrl,
-  ]: [string, string, string, string, string, string, string, string, string]
+    ringSeriesUrl,
+  ]: [string, string, string, string, string, string, string, string, string, string]
 ) {
   return Promise.all([
     fetchData<Record<string, Actor>>(actorUrl),
@@ -41,6 +43,7 @@ function fetchAppData(
     fetchData<Record<string, Ring>>(ringUrl),
     fetchData<Record<string, RingOrder>>(ringOrdersUrl),
     fetchData<Record<string, RingType>>(ringTypesUrl),
+    fetchData<Record<string, RingSeries>>(ringSeriesUrl),
   ]);
 }
 
@@ -54,6 +57,7 @@ export function DataProvider({
   ringUrl,
   ringOrdersUrl,
   ringTypesUrl,
+  ringSeriesUrl,
   children,
 }: PropsWithChildren<{
   actorUrl: string;
@@ -65,6 +69,7 @@ export function DataProvider({
   ringUrl: string;
   ringOrdersUrl: string;
   ringTypesUrl: string;
+  ringSeriesUrl: string;
 }>) {
   const {data, error, isLoading} = useSWR([
     actorUrl,
@@ -76,6 +81,7 @@ export function DataProvider({
     ringUrl,
     ringOrdersUrl,
     ringTypesUrl,
+    ringSeriesUrl,
   ], fetchAppData);
   if (error) {
     console.log(error);
@@ -89,9 +95,11 @@ export function DataProvider({
       permissionProperties,
       species,
       rings,
-      ringSeries,
+      ringOrders,
       ringTypes,
+      ringSeries,
     ] = (data || [
+      {},
       {},
       {},
       {},
@@ -106,12 +114,13 @@ export function DataProvider({
       actors,
       licenses,
       rings,
-      ringSeries,
+      ringOrders,
       documents,
       permissionTypes,
       permissionProperties,
       species,
       ringTypes,
+      ringSeries,
     )
   }, [data])
   return (

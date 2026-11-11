@@ -31,6 +31,7 @@ export type PermissionPropertyRef = EntityRef<"permission-property">;
 export type RingOrderRef = EntityRef<"ring-order">;
 export type RingRef = EntityRef<"ring">;
 export type RingTypeRef = EntityRef<"ring-type">;
+export type RingSeriesRef = EntityRef<"ring-series">;
 
 export type License = LicenseRef & {
     mnr: string;
@@ -97,6 +98,7 @@ export type Ring = RingRef & {
     status: RingStatus;
     changedAt: string;
     ringType: RingTypeRef;
+    ringSeries: RingSeriesRef;
 }
 
 export type RingOrder = RingOrderRef & {
@@ -104,6 +106,7 @@ export type RingOrder = RingOrderRef & {
     identifier: string;
     manufacturer: string;
     ringType: RingTypeRef;
+    ringSeries: RingSeriesRef,
     startNumber: number;
     count: number;
     changedAt: string;
@@ -113,10 +116,18 @@ export type RingType = RingTypeRef & {
     code: string;
     variant: "Round" | "Oval" | "Triangle";
     material: "Aluminium" | "Steel";
+    diameter: number;
+    height: number;
+    weight: number;
+    thickness: number;
+}
+
+export type RingSeries = RingSeriesRef & {
     prefix: string;
     numberOfDigits: number;
-    diameter: number;
     fillerStyle: "sering" | "euring";
+    color: string;
+    hasWebAddress: boolean;
 }
 
 export type RelationStatus = "Active" | "Inactive";
@@ -138,6 +149,7 @@ export interface DataAPI {
     rings: AsyncDataSource<Ring>;
     ringOrders: AsyncDataSource<RingOrder>;
     ringTypes: AsyncDataSource<RingType>;
+    ringSeries: AsyncDataSource<RingSeries>;
 }
 
 export interface SyncDataAPI {
@@ -150,6 +162,7 @@ export interface SyncDataAPI {
     rings: StaticDataSource<Ring>;
     ringOrders: StaticDataSource<RingOrder>;
     ringTypes: StaticDataSource<RingType>;
+    ringSeries: StaticDataSource<RingSeries>;
 }
 
 export function fetchItemList<T extends keyof Omit<DataAPI, "ringEvents">>(api: DataAPI, type: T, params: Parameters<DataAPI[T]["list"]>): ReturnType<DataAPI[T]["list"]> {
@@ -172,6 +185,7 @@ export function createSyncStaticDataAPI({
     permissionProperties,
     species,
     ringTypes,
+    ringSeries,
 }: {
     actors: Record<string, Actor>,
     licenses: Record<string, License>,
@@ -182,6 +196,7 @@ export function createSyncStaticDataAPI({
     permissionProperties: Record<string, PermissionProperty>,
     species: Record<string, Species>,
     ringTypes: Record<string, RingType>,
+    ringSeries: Record<string, RingSeries>,
 }): SyncDataAPI {
     return {
         actors: new StaticDataSource<Actor>(
@@ -196,12 +211,13 @@ export function createSyncStaticDataAPI({
             toList(documents || {}).map(v => toEntity(v, "document")),
             documentFilter
         ),
-        permissionTypes: new StaticDataSource<PermissionType>(toList(permissionTypes || {}).map(v => toEntity(v, "permission-type"))),
-        permissionProperties: new StaticDataSource<PermissionProperty>(toList(permissionProperties || {}).map(v => toEntity(v, "permission-property"))),
-        species: new StaticDataSource<Species>(toList(species || {}).map(v => toEntity(v, "species"))),
-        rings: new StaticDataSource<Ring>(toList(rings || {}).map(v => toEntity(v, "ring"))),
-        ringOrders: new StaticDataSource<RingOrder>(toList(ringOrders || {}).map(v => toEntity(v, "ring-series"))),
-        ringTypes: new StaticDataSource<RingType>(toList(ringTypes || {}).map(v => toEntity(v, "ring-series"))),
+        permissionTypes: new StaticDataSource<PermissionType>(toList(permissionTypes || {})),
+        permissionProperties: new StaticDataSource<PermissionProperty>(toList(permissionProperties || {})),
+        species: new StaticDataSource<Species>(toList(species || {})),
+        rings: new StaticDataSource<Ring>(toList(rings || {})),
+        ringOrders: new StaticDataSource<RingOrder>(toList(ringOrders || {})),
+        ringTypes: new StaticDataSource<RingType>(toList(ringTypes || {})),
+        ringSeries: new StaticDataSource<RingSeries>(toList(ringSeries || {})),
     }
 }
 
@@ -215,6 +231,7 @@ export function createStaticDataAPI(
     permissionProperties: Record<string, PermissionProperty>,
     species: Record<string, Species>,
     ringTypes: Record<string, RingType>,
+    ringSeries: Record<string, RingSeries>,
 ): DataAPI {
     const syncAPI = createSyncStaticDataAPI({
         actors,
@@ -226,6 +243,7 @@ export function createStaticDataAPI(
         permissionProperties,
         species,
         ringTypes,
+        ringSeries,
     });
     return {
         actors: syncAPI.actors.toAsyncSource(),
@@ -237,6 +255,7 @@ export function createStaticDataAPI(
         rings: syncAPI.rings.toAsyncSource(),
         ringOrders: syncAPI.ringOrders.toAsyncSource(),
         ringTypes: syncAPI.ringTypes.toAsyncSource(),
+        ringSeries: syncAPI.ringSeries.toAsyncSource(),
     }
 }
 
@@ -300,10 +319,10 @@ export function toRecord<T extends {id: string}>(items: T[]): Record<string, T> 
     }, {})
 }
 
-export function ringIdentifier(ring: Ring, type: RingType): string {
-    const fillCharacter = type.fillerStyle === "sering" ? " " : ".";
-    const identifierSize = type.fillerStyle === "sering" ? 8 : 10;
-    const minimumNumberSize = Math.max(type.numberOfDigits, identifierSize - type.prefix.length);
-    const numberPart = String(ring.number).padStart(minimumNumberSize, fillCharacter);
-    return `${type.prefix}${numberPart}`;
+export function ringIdentifier(number: number, series: RingSeries): string {
+    const fillCharacter = series.fillerStyle === "sering" ? " " : ".";
+    const identifierSize = series.fillerStyle === "sering" ? 8 : 10;
+    const minimumNumberSize = Math.max(series.numberOfDigits, identifierSize - series.prefix.length);
+    const numberPart = String(number).padStart(minimumNumberSize, fillCharacter);
+    return `${series.prefix}${numberPart}`;
 }
