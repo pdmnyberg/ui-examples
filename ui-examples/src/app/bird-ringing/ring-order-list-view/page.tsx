@@ -40,7 +40,7 @@ export default function ListView() {
       properties: {
         identifier: {
           term: item.identifier,
-          component: <Link href={`/bird-ringing/ring-order-view/?entryId=${item.id}`} className="all-spaces">{item.identifier}</Link>
+          component: <Link href={`/bird-ringing/ring-order-view/?entryId=${item.id}`}>{item.identifier}</Link>
         },
         status: {
           term: item.status,
@@ -56,7 +56,7 @@ export default function ListView() {
         },
         ringSeries: {
           term: isLoadingRingSeriesMap ? "" : ringIdentifier(0, ringSeriesMap[item.ringSeries.id]),
-          component: isLoadingRingSeriesMap ? "-" : <Link href={`/bird-ringing/ring-series-view/?entryId=${item.ringSeries.id}`}>{ringIdentifier(0, ringSeriesMap[item.ringSeries.id])}</Link>,
+          component: isLoadingRingSeriesMap ? "-" : <Link className="all-spaces" href={`/bird-ringing/ring-series-view/?entryId=${item.ringSeries.id}`}>{ringIdentifier(0, ringSeriesMap[item.ringSeries.id])}</Link>,
         },
       }
     }
