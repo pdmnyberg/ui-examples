@@ -323,6 +323,6 @@ export function ringIdentifier(number: number, series: RingSeries): string {
     const fillCharacter = series.fillerStyle === "sering" ? " " : ".";
     const identifierSize = series.fillerStyle === "sering" ? 8 : 10;
     const minimumNumberSize = Math.max(series.numberOfDigits, identifierSize - series.prefix.length);
-    const numberPart = String(number).padStart(minimumNumberSize, fillCharacter);
+    const numberPart = String(number).padStart(series.numberOfDigits, "0").padStart(minimumNumberSize, fillCharacter);
     return `${series.prefix}${numberPart}`;
 }
